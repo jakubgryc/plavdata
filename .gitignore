@@ -1,0 +1,47 @@
+# ─── Python / Backend ────────────────────────────────
+backend/__pycache__/
+backend/**/*.py[cod]
+backend/.venv/
+backend/.mypy_cache/
+backend/.pytest_cache/
+backend/.pdm-python
+backend/__pypackages__/
+
+# If using .env files for secrets
+backend/.env
+
+# PDM specific
+backend/pdm.lock
+
+# ─── Node / Frontend ────────────────────────────────
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.env
+frontend/.env.*
+
+# ─── Editor / OS Crap ───────────────────────────────
+*.DS_Store
+*.swp
+*.swo
+*.bak
+*.tmp
+*.log
+.vscode/
+.idea/
+
+# ─── Docker ─────────────────────────────────────────
+**/.env                # top-level or any .env file with secrets
+docker-compose.override.yml
+pgdata/                # named volume might not be a folder, but just in case
+
+# ─── Misc ───────────────────────────────────────────
+.env
+.env.local
+__pycache__/
+*.sqlite3              # if testing with SQLite
+coverage/
+htmlcov/
+*.log
+*.db
+
