@@ -11,7 +11,7 @@ backend/__pypackages__/
 backend/.env
 
 # PDM specific
-backend/pdm.lock
+# backend/pdm.lock
 
 # ─── Node / Frontend ────────────────────────────────
 frontend/node_modules/
