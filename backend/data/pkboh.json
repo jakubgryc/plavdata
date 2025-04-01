@@ -5,7 +5,8 @@
         "lastName": "REPPEROVÁ",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "K6"
+        "group": "K6",
+        "gender": "Z"
     },
     {
         "userId": 63437461,
@@ -13,7 +14,8 @@
         "lastName": "PIERANOVÁ",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "Z2"
+        "group": "Z2",
+        "gender": "Z"
     },
     {
         "userId": 63437466,
@@ -21,7 +23,8 @@
         "lastName": "ORŠULÍK",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "Z2"
+        "group": "Z2",
+        "gender": "M"
     },
     {
         "userId": 57191000,
@@ -29,7 +32,8 @@
         "lastName": "WILLERT",
         "birthYear": 2009,
         "clubAbbrev": "PKBoh",
-        "group": "K2"
+        "group": "K2",
+        "gender": "M"
     },
     {
         "userId": 63437467,
@@ -37,7 +41,8 @@
         "lastName": "OLSZOWSKI",
         "birthYear": 2009,
         "clubAbbrev": "PKBoh",
-        "group": "K2"
+        "group": "K2",
+        "gender": "M"
     },
     {
         "userId": 63437468,
@@ -45,7 +50,8 @@
         "lastName": "OLSZOWSKI",
         "birthYear": 2009,
         "clubAbbrev": "PKBoh",
-        "group": "K2"
+        "group": "K2",
+        "gender": "M"
     },
     {
         "userId": 63437472,
@@ -53,7 +59,8 @@
         "lastName": "CZERNÝ",
         "birthYear": 1980,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63437474,
@@ -61,7 +68,8 @@
         "lastName": "KVIATKOVSKÝ",
         "birthYear": 2012,
         "clubAbbrev": "PKBoh",
-        "group": "former"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63437221,
@@ -69,7 +77,8 @@
         "lastName": "VÁLEK",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "Z1"
+        "group": "Z1",
+        "gender": "M"
     },
     {
         "userId": 57176000,
@@ -77,7 +86,8 @@
         "lastName": "TRACHOVÁ",
         "birthYear": 2010,
         "clubAbbrev": "PKBoh",
-        "group": "Z1"
+        "group": "Z1",
+        "gender": "Z"
     },
     {
         "userId": 63439784,
@@ -85,7 +95,8 @@
         "lastName": "CHALUPOVÁ",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "former"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 60683000,
@@ -93,7 +104,8 @@
         "lastName": "TARTAINI",
         "birthYear": 2012,
         "clubAbbrev": "PKBoh",
-        "group": "former"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 60660000,
@@ -101,7 +113,8 @@
         "lastName": "STERNADLOVÁ",
         "birthYear": 2007,
         "clubAbbrev": "PKBoh",
-        "group": "K1"
+        "group": "K1",
+        "gender": "Z"
     },
     {
         "userId": 48795000,
@@ -109,7 +122,8 @@
         "lastName": "SOVA",
         "birthYear": 2010,
         "clubAbbrev": "PKBoh",
-        "group": "former"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 48775000,
@@ -117,7 +131,8 @@
         "lastName": "KOŽUSZNIK",
         "birthYear": 2007,
         "clubAbbrev": "PKBoh",
-        "group": "K1"
+        "group": "K1",
+        "gender": "M"
     },
     {
         "userId": 24447000,
@@ -125,7 +140,8 @@
         "lastName": "KLICH",
         "birthYear": 1999,
         "clubAbbrev": "PKBoh",
-        "group": "veteran"
+        "group": "veteran",
+        "gender": "M"
     },
     {
         "userId": 57139000,
@@ -133,7 +149,8 @@
         "lastName": "KALETOVÁ",
         "birthYear": 2010,
         "clubAbbrev": "PKBoh",
-        "group": "Z1"
+        "group": "Z1",
+        "gender": "Z"
     },
     {
         "userId": 39382000,
@@ -141,7 +158,8 @@
         "lastName": "BASISTA",
         "birthYear": 2007,
         "clubAbbrev": "PKBoh",
-        "group": "former"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 60524000,
@@ -149,7 +167,8 @@
         "lastName": "HALODA",
         "birthYear": 2008,
         "clubAbbrev": "PKBoh",
-        "group": "K2"
+        "group": "K2",
+        "gender": "M"
     },
     {
         "userId": 60651000,
@@ -157,7 +176,8 @@
         "lastName": "ŠLACHTOVÁ",
         "birthYear": 1980,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 60591000,
@@ -165,7 +185,8 @@
         "lastName": "LAUBR",
         "birthYear": 2011,
         "clubAbbrev": "PKBoh",
-        "group": "K5"
+        "group": "K5",
+        "gender": "M"
     },
     {
         "userId": 60564000,
@@ -173,7 +194,8 @@
         "lastName": "KLJUČIKOVÁ",
         "birthYear": 2011,
         "clubAbbrev": "PKBoh",
-        "group": "former"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 60563000,
@@ -181,7 +203,8 @@
         "lastName": "KLJUČIK",
         "birthYear": 2009,
         "clubAbbrev": "PKBoh",
-        "group": "former"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 60561000,
@@ -189,7 +212,8 @@
         "lastName": "KLÍMA",
         "birthYear": 2010,
         "clubAbbrev": "PKBoh",
-        "group": "K3"
+        "group": "K3",
+        "gender": "M"
     },
     {
         "userId": 60503000,
@@ -197,7 +221,8 @@
         "lastName": "DUDKOVÁ",
         "birthYear": 2012,
         "clubAbbrev": "PKBoh",
-        "group": "Z1"
+        "group": "Z1",
+        "gender": "Z"
     },
     {
         "userId": 19852000,
@@ -205,7 +230,8 @@
         "lastName": "KYJONKA",
         "birthYear": 1999,
         "clubAbbrev": "PKBoh",
-        "group": "veteran"
+        "group": "veteran",
+        "gender": "M"
     },
     {
         "userId": 57167000,
@@ -213,7 +239,8 @@
         "lastName": "RUSKOVÁ",
         "birthYear": 2008,
         "clubAbbrev": "PKBoh",
-        "group": "K1"
+        "group": "K1",
+        "gender": "Z"
     },
     {
         "userId": 57156000,
@@ -221,7 +248,8 @@
         "lastName": "NOVÁK",
         "birthYear": 2011,
         "clubAbbrev": "PKBoh",
-        "group": "K4"
+        "group": "K4",
+        "gender": "M"
     },
     {
         "userId": 57124000,
@@ -229,7 +257,8 @@
         "lastName": "FIGUROVÁ",
         "birthYear": 2009,
         "clubAbbrev": "PKBoh",
-        "group": "Z1"
+        "group": "Z1",
+        "gender": "Z"
     },
     {
         "userId": 57127000,
@@ -237,7 +266,8 @@
         "lastName": "GVUZD",
         "birthYear": 2010,
         "clubAbbrev": "PKBoh",
-        "group": "K3"
+        "group": "K3",
+        "gender": "M"
     },
     {
         "userId": 19815000,
@@ -245,7 +275,8 @@
         "lastName": "KLEINOVÁ",
         "birthYear": 1979,
         "clubAbbrev": "PKBoh",
-        "group": ""
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63465521,
@@ -253,7 +284,8 @@
         "lastName": "GOŇCOVÁ",
         "birthYear": 2012,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63465523,
@@ -261,7 +293,8 @@
         "lastName": "HERMAN",
         "birthYear": 2008,
         "clubAbbrev": "PKBoh",
-        "group": "K2"
+        "group": "K2",
+        "gender": "M"
     },
     {
         "userId": 63465524,
@@ -269,7 +302,8 @@
         "lastName": "KUČA",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63465525,
@@ -277,7 +311,8 @@
         "lastName": "BABIŠ",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB3"
+        "group": "ZPB3",
+        "gender": "Z"
     },
     {
         "userId": 50209000,
@@ -285,7 +320,8 @@
         "lastName": "PECL",
         "birthYear": 2007,
         "clubAbbrev": "PKBoh",
-        "group": "K1"
+        "group": "K1",
+        "gender": "M"
     },
     {
         "userId": 50201000,
@@ -293,7 +329,8 @@
         "lastName": "MATOUŠEK",
         "birthYear": 2007,
         "clubAbbrev": "PKBoh",
-        "group": "veteran"
+        "group": "veteran",
+        "gender": "M"
     },
     {
         "userId": 50173000,
@@ -301,7 +338,8 @@
         "lastName": "DANKO",
         "birthYear": 2008,
         "clubAbbrev": "PKBoh",
-        "group": "K1"
+        "group": "K1",
+        "gender": "M"
     },
     {
         "userId": 25786000,
@@ -309,7 +347,8 @@
         "lastName": "PLUTOVÁ",
         "birthYear": 2001,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": "veteran",
+        "gender": "Z"
     },
     {
         "userId": 63465526,
@@ -317,7 +356,8 @@
         "lastName": "HALLA",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB1"
+        "group": "ZPB1",
+        "gender": "Z"
     },
     {
         "userId": 57154000,
@@ -325,7 +365,8 @@
         "lastName": "MENŠÍK",
         "birthYear": 2010,
         "clubAbbrev": "PKBoh",
-        "group": "Z1"
+        "group": "Z1",
+        "gender": "M"
     },
     {
         "userId": 60588000,
@@ -333,7 +374,8 @@
         "lastName": "KUPKA",
         "birthYear": 2012,
         "clubAbbrev": "PKBoh",
-        "group": "K6"
+        "group": "K6",
+        "gender": "M"
     },
     {
         "userId": 63465527,
@@ -341,7 +383,8 @@
         "lastName": "KEMPNÝ",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB4"
+        "group": "ZPB4",
+        "gender": "M"
     },
     {
         "userId": 63465530,
@@ -349,7 +392,8 @@
         "lastName": "MANETA",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC1"
+        "group": "ZPC1",
+        "gender": "M"
     },
     {
         "userId": 63465533,
@@ -357,7 +401,8 @@
         "lastName": "PROUZOVÁ",
         "birthYear": 2019,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB4"
+        "group": "ZPB4",
+        "gender": "Z"
     },
     {
         "userId": 63465534,
@@ -365,7 +410,8 @@
         "lastName": "PROUZOVÁ",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC2"
+        "group": "ZPC2",
+        "gender": "Z"
     },
     {
         "userId": 63465531,
@@ -373,7 +419,8 @@
         "lastName": "ŠTUBŇA",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63465535,
@@ -381,7 +428,8 @@
         "lastName": "SNOPEK",
         "birthYear": 2015,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC2"
+        "group": "ZPC2",
+        "gender": "M"
     },
     {
         "userId": 63465532,
@@ -389,7 +437,8 @@
         "lastName": "MALAČKOVÁ",
         "birthYear": 2019,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63465536,
@@ -397,7 +446,8 @@
         "lastName": "MEZEROVÁ",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC3"
+        "group": "ZPC3",
+        "gender": "Z"
     },
     {
         "userId": 63465541,
@@ -405,7 +455,8 @@
         "lastName": "KUČERŇÁK",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC4"
+        "group": "ZPC4",
+        "gender": "M"
     },
     {
         "userId": 63465542,
@@ -413,7 +464,8 @@
         "lastName": "KUNERT",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC1"
+        "group": "ZPC1",
+        "gender": "M"
     },
     {
         "userId": 63465537,
@@ -421,7 +473,8 @@
         "lastName": "KNEBLÍK",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB3"
+        "group": "ZPB3",
+        "gender": "M"
     },
     {
         "userId": 63465543,
@@ -429,7 +482,8 @@
         "lastName": "FRIEDL",
         "birthYear": 2019,
         "clubAbbrev": "PKBoh",
-        "group": "ZPA1"
+        "group": "ZPA1",
+        "gender": "M"
     },
     {
         "userId": 63465538,
@@ -437,7 +491,8 @@
         "lastName": "STOKLASA",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB1"
+        "group": "ZPB1",
+        "gender": "M"
     },
     {
         "userId": 63465539,
@@ -445,7 +500,8 @@
         "lastName": "TOMAN",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63465544,
@@ -453,7 +509,8 @@
         "lastName": "ŠOSTOKOVÁ",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB5"
+        "group": "ZPB5",
+        "gender": "Z"
     },
     {
         "userId": 63465540,
@@ -461,7 +518,8 @@
         "lastName": "KUČERŇÁKOVÁ",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB6"
+        "group": "ZPB6",
+        "gender": "Z"
     },
     {
         "userId": 63465545,
@@ -469,7 +527,8 @@
         "lastName": "HAVLÍČKOVÁ",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB5"
+        "group": "ZPB5",
+        "gender": "Z"
     },
     {
         "userId": 63465548,
@@ -477,7 +536,8 @@
         "lastName": "ŠIMÁK",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63465549,
@@ -485,7 +545,8 @@
         "lastName": "KONVIČNÝ",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63465550,
@@ -493,7 +554,8 @@
         "lastName": "KONVIČNÁ",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63465551,
@@ -501,7 +563,8 @@
         "lastName": "MALECOVÁ",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB1"
+        "group": "ZPB1",
+        "gender": "Z"
     },
     {
         "userId": 63465552,
@@ -509,7 +572,8 @@
         "lastName": "URBÁNEK",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB1"
+        "group": "ZPB1",
+        "gender": "M"
     },
     {
         "userId": 63465553,
@@ -517,7 +581,8 @@
         "lastName": "TVARDÍK",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC3"
+        "group": "ZPC3",
+        "gender": "M"
     },
     {
         "userId": 25782000,
@@ -525,7 +590,8 @@
         "lastName": "GRYC",
         "birthYear": 2002,
         "clubAbbrev": "PKBoh",
-        "group": "veteran"
+        "group": "veteran",
+        "gender": "M"
     },
     {
         "userId": 63438231,
@@ -533,7 +599,8 @@
         "lastName": "KOVÁŘOVÁ",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "Z2"
+        "group": "Z2",
+        "gender": "Z"
     },
     {
         "userId": 63437452,
@@ -541,7 +608,8 @@
         "lastName": "ŠTĚPÁNOVÁ",
         "birthYear": 2010,
         "clubAbbrev": "PKBoh",
-        "group": "K3"
+        "group": "K3",
+        "gender": "Z"
     },
     {
         "userId": 63437473,
@@ -549,7 +617,8 @@
         "lastName": "CZERNÁ",
         "birthYear": 1981,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63437476,
@@ -557,7 +626,8 @@
         "lastName": "LAUBROVÁ",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "K5"
+        "group": "K5",
+        "gender": "Z"
     },
     {
         "userId": 63439690,
@@ -565,7 +635,8 @@
         "lastName": "ADÁMEK",
         "birthYear": 2012,
         "clubAbbrev": "PKBoh",
-        "group": "Z1"
+        "group": "Z1",
+        "gender": "M"
     },
     {
         "userId": 63439762,
@@ -573,7 +644,8 @@
         "lastName": "SKULINOVÁ",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "K5"
+        "group": "K5",
+        "gender": "Z"
     },
     {
         "userId": 63439771,
@@ -581,7 +653,8 @@
         "lastName": "KOSCIELNIK",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "K5"
+        "group": "K5",
+        "gender": "M"
     },
     {
         "userId": 63439772,
@@ -589,7 +662,8 @@
         "lastName": "KORAUŠ",
         "birthYear": 2011,
         "clubAbbrev": "PKBoh",
-        "group": "K4"
+        "group": "K4",
+        "gender": "M"
     },
     {
         "userId": 63439773,
@@ -597,7 +671,8 @@
         "lastName": "KORAUŠ",
         "birthYear": 2011,
         "clubAbbrev": "PKBoh",
-        "group": "K4"
+        "group": "K4",
+        "gender": "Z"
     },
     {
         "userId": 63439778,
@@ -605,7 +680,8 @@
         "lastName": "KAŠTÁNEK",
         "birthYear": 2011,
         "clubAbbrev": "PKBoh",
-        "group": "K4"
+        "group": "K4",
+        "gender": "M"
     },
     {
         "userId": 63461362,
@@ -613,7 +689,8 @@
         "lastName": "KUPKOVÁ",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63461363,
@@ -621,7 +698,8 @@
         "lastName": "BABINSKI",
         "birthYear": 2010,
         "clubAbbrev": "PKBoh",
-        "group": "K4"
+        "group": "K4",
+        "gender": "M"
     },
     {
         "userId": 63461365,
@@ -629,7 +707,8 @@
         "lastName": "RATAJSKÝ",
         "birthYear": 2014,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC1"
+        "group": "ZPC1",
+        "gender": "M"
     },
     {
         "userId": 39474000,
@@ -637,7 +716,8 @@
         "lastName": "SLANINOVÁ",
         "birthYear": 2008,
         "clubAbbrev": "PKBoh",
-        "group": "veteran"
+        "group": "veteran",
+        "gender": "Z"
     },
     {
         "userId": 63461366,
@@ -645,7 +725,8 @@
         "lastName": "ADÁMEK",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "P1"
+        "group": "P1",
+        "gender": "M"
     },
     {
         "userId": 39427000,
@@ -653,7 +734,8 @@
         "lastName": "KOHANOVÁ",
         "birthYear": 2007,
         "clubAbbrev": "PKBoh",
-        "group": "veteran"
+        "group": "veteran",
+        "gender": "Z"
     },
     {
         "userId": 60562000,
@@ -661,7 +743,8 @@
         "lastName": "KLÍMA",
         "birthYear": 2010,
         "clubAbbrev": "PKBoh",
-        "group": "K3"
+        "group": "K3",
+        "gender": "M"
     },
     {
         "userId": 63461369,
@@ -669,7 +752,8 @@
         "lastName": "NOGOVÁ",
         "birthYear": 2012,
         "clubAbbrev": "PKBoh",
-        "group": "K6"
+        "group": "K6",
+        "gender": "Z"
     },
     {
         "userId": 63461372,
@@ -677,7 +761,8 @@
         "lastName": "HAVRANOVÁ",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "K5"
+        "group": "K5",
+        "gender": "Z"
     },
     {
         "userId": 63461373,
@@ -685,7 +770,8 @@
         "lastName": "PLAČKOVÁ",
         "birthYear": 2015,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63461375,
@@ -693,7 +779,8 @@
         "lastName": "WIJA",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC4"
+        "group": "ZPC4",
+        "gender": "M"
     },
     {
         "userId": 63461376,
@@ -701,7 +788,8 @@
         "lastName": "POSPĚCHOVÁ",
         "birthYear": 2015,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 6217000,
@@ -709,7 +797,8 @@
         "lastName": "KUDER",
         "birthYear": 1981,
         "clubAbbrev": "PKBoh",
-        "group": "veteran"
+        "group": "veteran",
+        "gender": "M"
     },
     {
         "userId": 63461378,
@@ -717,7 +806,8 @@
         "lastName": "KOTAS",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63461379,
@@ -725,7 +815,8 @@
         "lastName": "ORŠULÍKOVÁ",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC2"
+        "group": "ZPC2",
+        "gender": "Z"
     },
     {
         "userId": 63461380,
@@ -733,7 +824,8 @@
         "lastName": "PROSTĚJOVSKÝ",
         "birthYear": 2015,
         "clubAbbrev": "PKBoh",
-        "group": "P1"
+        "group": "P1",
+        "gender": "M"
     },
     {
         "userId": 63461381,
@@ -741,7 +833,8 @@
         "lastName": "KUTNOHORSKÝ",
         "birthYear": 2015,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC5"
+        "group": "ZPC5",
+        "gender": "M"
     },
     {
         "userId": 63461384,
@@ -749,7 +842,8 @@
         "lastName": "SYDOR",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63461436,
@@ -757,7 +851,8 @@
         "lastName": "TOŠENOVSKÁ",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 21816000,
@@ -765,7 +860,8 @@
         "lastName": "KOČAŘOVÁ",
         "birthYear": 1993,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 48799000,
@@ -773,7 +869,8 @@
         "lastName": "ŠMÍDL",
         "birthYear": 2008,
         "clubAbbrev": "PKBoh",
-        "group": "K1"
+        "group": "K1",
+        "gender": "M"
     },
     {
         "userId": 48810000,
@@ -781,7 +878,8 @@
         "lastName": "VYCHODILOVÁ",
         "birthYear": 2009,
         "clubAbbrev": "PKBoh",
-        "group": "K1"
+        "group": "K1",
+        "gender": "Z"
     },
     {
         "userId": 48805000,
@@ -789,7 +887,8 @@
         "lastName": "TKADLEC",
         "birthYear": 2009,
         "clubAbbrev": "PKBoh",
-        "group": "K3"
+        "group": "K3",
+        "gender": "M"
     },
     {
         "userId": 48803000,
@@ -797,7 +896,8 @@
         "lastName": "TARTAINI",
         "birthYear": 2010,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 48796000,
@@ -805,7 +905,8 @@
         "lastName": "SOVA",
         "birthYear": 2010,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 48778000,
@@ -813,7 +914,8 @@
         "lastName": "LUŠŇÁK",
         "birthYear": 2009,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 48769000,
@@ -821,7 +923,8 @@
         "lastName": "JANOŠOVÁ",
         "birthYear": 2009,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 48759000,
@@ -829,7 +932,8 @@
         "lastName": "CZERNÁ",
         "birthYear": 2010,
         "clubAbbrev": "PKBoh",
-        "group": "K1"
+        "group": "K1",
+        "gender": "Z"
     },
     {
         "userId": 48752000,
@@ -837,7 +941,8 @@
         "lastName": "ARADSKÝ",
         "birthYear": 2009,
         "clubAbbrev": "PKBoh",
-        "group": "Z1"
+        "group": "Z1",
+        "gender": "M"
     },
     {
         "userId": 48762000,
@@ -845,7 +950,8 @@
         "lastName": "DOBROCKÝ",
         "birthYear": 2002,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 46264000,
@@ -853,7 +959,8 @@
         "lastName": "ŠELONGOVÁ",
         "birthYear": 2006,
         "clubAbbrev": "PKBoh",
-        "group": "veteran"
+        "group": "veteran",
+        "gender": "Z"
     },
     {
         "userId": 46237000,
@@ -861,7 +968,8 @@
         "lastName": "NOVÁKOVÁ",
         "birthYear": 2005,
         "clubAbbrev": "PKBoh",
-        "group": "veteran"
+        "group": "veteran",
+        "gender": "Z"
     },
     {
         "userId": 63450928,
@@ -869,7 +977,8 @@
         "lastName": "KOČAŘ",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63450929,
@@ -877,7 +986,8 @@
         "lastName": "KOVÁŘ",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC1"
+        "group": "ZPC1",
+        "gender": "M"
     },
     {
         "userId": 63450933,
@@ -885,7 +995,8 @@
         "lastName": "KUPKOVÁ",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC1"
+        "group": "ZPC1",
+        "gender": "Z"
     },
     {
         "userId": 60590000,
@@ -893,7 +1004,8 @@
         "lastName": "KVÍČALOVÁ",
         "birthYear": 2011,
         "clubAbbrev": "PKBoh",
-        "group": "K3"
+        "group": "K3",
+        "gender": "Z"
     },
     {
         "userId": 63444029,
@@ -901,7 +1013,8 @@
         "lastName": "LINZER",
         "birthYear": 2014,
         "clubAbbrev": "PKBoh",
-        "group": "Z2"
+        "group": "Z2",
+        "gender": "M"
     },
     {
         "userId": 63450934,
@@ -909,7 +1022,8 @@
         "lastName": "MACHÁLKOVÁ",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC1"
+        "group": "ZPC1",
+        "gender": "Z"
     },
     {
         "userId": 63450935,
@@ -917,7 +1031,8 @@
         "lastName": "MANETA",
         "birthYear": 2014,
         "clubAbbrev": "PKBoh",
-        "group": "P1"
+        "group": "P1",
+        "gender": "M"
     },
     {
         "userId": 63450937,
@@ -925,7 +1040,8 @@
         "lastName": "MAŠÁNOVÁ",
         "birthYear": 2010,
         "clubAbbrev": "PKBoh",
-        "group": "K3"
+        "group": "K3",
+        "gender": "Z"
     },
     {
         "userId": 63450938,
@@ -933,7 +1049,8 @@
         "lastName": "MATULA",
         "birthYear": 2014,
         "clubAbbrev": "PKBoh",
-        "group": "Z2"
+        "group": "Z2",
+        "gender": "M"
     },
     {
         "userId": 63450939,
@@ -941,7 +1058,8 @@
         "lastName": "MIKLOŠOVÁ",
         "birthYear": 2011,
         "clubAbbrev": "PKBoh",
-        "group": "K4"
+        "group": "K4",
+        "gender": "Z"
     },
     {
         "userId": 63450940,
@@ -949,7 +1067,8 @@
         "lastName": "MIKLOŠOVÁ",
         "birthYear": 2011,
         "clubAbbrev": "PKBoh",
-        "group": "K4"
+        "group": "K4",
+        "gender": "Z"
     },
     {
         "userId": 63450947,
@@ -957,7 +1076,8 @@
         "lastName": "POLÁŠEK",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "K6"
+        "group": "K6",
+        "gender": "M"
     },
     {
         "userId": 63450948,
@@ -965,7 +1085,8 @@
         "lastName": "POMKLOVÁ",
         "birthYear": 2015,
         "clubAbbrev": "PKBoh",
-        "group": "P1"
+        "group": "P1",
+        "gender": "Z"
     },
     {
         "userId": 63450951,
@@ -973,7 +1094,8 @@
         "lastName": "SEDLÁČEK",
         "birthYear": 2014,
         "clubAbbrev": "PKBoh",
-        "group": "P1"
+        "group": "P1",
+        "gender": "M"
     },
     {
         "userId": 63450952,
@@ -981,7 +1103,8 @@
         "lastName": "SOBOL",
         "birthYear": 2014,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63450953,
@@ -989,7 +1112,8 @@
         "lastName": "SOLICH",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63444039,
@@ -997,7 +1121,8 @@
         "lastName": "ŠKUTA",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63450954,
@@ -1005,7 +1130,8 @@
         "lastName": "ŠKUTA",
         "birthYear": 2015,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63450955,
@@ -1013,7 +1139,8 @@
         "lastName": "ŠLAUEROVÁ",
         "birthYear": 2012,
         "clubAbbrev": "PKBoh",
-        "group": "K6"
+        "group": "K6",
+        "gender": "Z"
     },
     {
         "userId": 63450956,
@@ -1021,7 +1148,8 @@
         "lastName": "ŠOSTOKOVÁ",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 39470000,
@@ -1029,7 +1157,8 @@
         "lastName": "RUTAR",
         "birthYear": 2008,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 39469000,
@@ -1037,7 +1166,8 @@
         "lastName": "RUTAR",
         "birthYear": 2005,
         "clubAbbrev": "PKBoh",
-        "group": "veteran"
+        "group": "veteran",
+        "gender": "M"
     },
     {
         "userId": 39451000,
@@ -1045,7 +1175,8 @@
         "lastName": "MOLNÁR",
         "birthYear": 2006,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 39420000,
@@ -1053,7 +1184,8 @@
         "lastName": "KASANOVÁ",
         "birthYear": 2006,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 39418000,
@@ -1061,7 +1193,8 @@
         "lastName": "KANTOR",
         "birthYear": 2005,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63450959,
@@ -1069,7 +1202,8 @@
         "lastName": "VOZŇÁKOVÁ",
         "birthYear": 2010,
         "clubAbbrev": "PKBoh",
-        "group": "K3"
+        "group": "K3",
+        "gender": "Z"
     },
     {
         "userId": 63450960,
@@ -1077,7 +1211,8 @@
         "lastName": "VRLA",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "Z2"
+        "group": "Z2",
+        "gender": "Z"
     },
     {
         "userId": 38013000,
@@ -1085,7 +1220,8 @@
         "lastName": "ORLÍK",
         "birthYear": 2004,
         "clubAbbrev": "PKBoh",
-        "group": "veteran"
+        "group": "veteran",
+        "gender": "M"
     },
     {
         "userId": 33911000,
@@ -1093,7 +1229,8 @@
         "lastName": "MORSKÁ",
         "birthYear": 2003,
         "clubAbbrev": "PKBoh",
-        "group": "veteran"
+        "group": "veteran",
+        "gender": "Z"
     },
     {
         "userId": 31090000,
@@ -1101,7 +1238,8 @@
         "lastName": "ŠLACHTA",
         "birthYear": 1980,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 26291000,
@@ -1109,7 +1247,8 @@
         "lastName": "KOLARCZYK",
         "birthYear": 2001,
         "clubAbbrev": "PKBoh",
-        "group": "veteran"
+        "group": "veteran",
+        "gender": "M"
     },
     {
         "userId": 25783000,
@@ -1117,7 +1256,8 @@
         "lastName": "GRYC",
         "birthYear": 2000,
         "clubAbbrev": "PKBoh",
-        "group": "veteran"
+        "group": "veteran",
+        "gender": "M"
     },
     {
         "userId": 24448000,
@@ -1125,7 +1265,8 @@
         "lastName": "FOLTÝNOVÁ",
         "birthYear": 1999,
         "clubAbbrev": "PKBoh",
-        "group": "veteran"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 18564000,
@@ -1133,7 +1274,8 @@
         "lastName": "VÍCHA",
         "birthYear": 1997,
         "clubAbbrev": "PKBoh",
-        "group": "veteran"
+        "group": "veteran",
+        "gender": "M"
     },
     {
         "userId": 18562000,
@@ -1141,7 +1283,8 @@
         "lastName": "SKUDŘÍKOVÁ",
         "birthYear": 1997,
         "clubAbbrev": "PKBoh",
-        "group": "veteran"
+        "group": "veteran",
+        "gender": "Z"
     },
     {
         "userId": 18552000,
@@ -1149,7 +1292,8 @@
         "lastName": "KAŇOKOVÁ",
         "birthYear": 1998,
         "clubAbbrev": "PKBoh",
-        "group": "veteran"
+        "group": "veteran",
+        "gender": "Z"
     },
     {
         "userId": 18551000,
@@ -1157,7 +1301,8 @@
         "lastName": "MIRANDA",
         "birthYear": 1996,
         "clubAbbrev": "PKBoh",
-        "group": "veteran"
+        "group": "veteran",
+        "gender": "Z"
     },
     {
         "userId": 57181000,
@@ -1165,7 +1310,8 @@
         "lastName": "VIDENKA",
         "birthYear": 2009,
         "clubAbbrev": "PKBoh",
-        "group": "K2"
+        "group": "K2",
+        "gender": "M"
     },
     {
         "userId": 55797000,
@@ -1173,7 +1319,8 @@
         "lastName": "JORDAN",
         "birthYear": 2007,
         "clubAbbrev": "PKBoh",
-        "group": "K1"
+        "group": "K1",
+        "gender": "Z"
     },
     {
         "userId": 48774000,
@@ -1181,7 +1328,8 @@
         "lastName": "KOVÁŘOVÁ",
         "birthYear": 2011,
         "clubAbbrev": "PKBoh",
-        "group": "Z1"
+        "group": "Z1",
+        "gender": "Z"
     },
     {
         "userId": 63443336,
@@ -1189,7 +1337,8 @@
         "lastName": "MENŠÍKOVÁ",
         "birthYear": 2011,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 39380000,
@@ -1197,7 +1346,8 @@
         "lastName": "BÁRTL",
         "birthYear": 2008,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63443996,
@@ -1205,7 +1355,8 @@
         "lastName": "BLAŽKOVÁ",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63444002,
@@ -1213,7 +1364,8 @@
         "lastName": "DAMKOVÁ",
         "birthYear": 2014,
         "clubAbbrev": "PKBoh",
-        "group": "Z2"
+        "group": "Z2",
+        "gender": "Z"
     },
     {
         "userId": 63444004,
@@ -1221,7 +1373,8 @@
         "lastName": "DRÁPELOVÁ",
         "birthYear": 2014,
         "clubAbbrev": "PKBoh",
-        "group": "Z2"
+        "group": "Z2",
+        "gender": "Z"
     },
     {
         "userId": 63444009,
@@ -1229,7 +1382,8 @@
         "lastName": "HERMAN",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "Z2"
+        "group": "Z2",
+        "gender": "M"
     },
     {
         "userId": 63444010,
@@ -1237,7 +1391,8 @@
         "lastName": "HUMLÍČKOVÁ",
         "birthYear": 2009,
         "clubAbbrev": "PKBoh",
-        "group": "K1"
+        "group": "K1",
+        "gender": "Z"
     },
     {
         "userId": 63444016,
@@ -1245,7 +1400,8 @@
         "lastName": "JANUSOVÁ",
         "birthYear": 2012,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63444018,
@@ -1253,7 +1409,8 @@
         "lastName": "JUREČEK",
         "birthYear": 2011,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63444021,
@@ -1261,7 +1418,8 @@
         "lastName": "KOČÍ",
         "birthYear": 2011,
         "clubAbbrev": "PKBoh",
-        "group": "K4"
+        "group": "K4",
+        "gender": "Z"
     },
     {
         "userId": 63444026,
@@ -1269,7 +1427,8 @@
         "lastName": "KŘENEK",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "Z2"
+        "group": "Z2",
+        "gender": "M"
     },
     {
         "userId": 63444031,
@@ -1277,7 +1436,8 @@
         "lastName": "MATYSIOKOVÁ",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63444033,
@@ -1285,7 +1445,8 @@
         "lastName": "NOGA",
         "birthYear": 2009,
         "clubAbbrev": "PKBoh",
-        "group": "K3"
+        "group": "K3",
+        "gender": "M"
     },
     {
         "userId": 63444045,
@@ -1293,7 +1454,8 @@
         "lastName": "TVARDÍK",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC5"
+        "group": "ZPC5",
+        "gender": "M"
     },
     {
         "userId": 63448686,
@@ -1301,7 +1463,8 @@
         "lastName": "ARADSKÝ",
         "birthYear": 2015,
         "clubAbbrev": "PKBoh",
-        "group": "Z2"
+        "group": "Z2",
+        "gender": "M"
     },
     {
         "userId": 63448688,
@@ -1309,7 +1472,8 @@
         "lastName": "DENDIS",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "K5"
+        "group": "K5",
+        "gender": "M"
     },
     {
         "userId": 63448689,
@@ -1317,7 +1481,8 @@
         "lastName": "FIŠEROVÁ",
         "birthYear": 2015,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC1"
+        "group": "ZPC1",
+        "gender": "Z"
     },
     {
         "userId": 63448692,
@@ -1325,7 +1490,8 @@
         "lastName": "HUMLÍČEK",
         "birthYear": 2015,
         "clubAbbrev": "PKBoh",
-        "group": "P1"
+        "group": "P1",
+        "gender": "M"
     },
     {
         "userId": 63448695,
@@ -1333,7 +1499,8 @@
         "lastName": "KOŽUSZNIKOVÁ",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "K6"
+        "group": "K6",
+        "gender": "Z"
     },
     {
         "userId": 63448698,
@@ -1341,7 +1508,8 @@
         "lastName": "KYSELA",
         "birthYear": 2012,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63448714,
@@ -1349,7 +1517,8 @@
         "lastName": "MUCHOWITZ",
         "birthYear": 2015,
         "clubAbbrev": "PKBoh",
-        "group": "P1"
+        "group": "P1",
+        "gender": "M"
     },
     {
         "userId": 63448723,
@@ -1357,7 +1526,8 @@
         "lastName": "PONIŠTOVÁ",
         "birthYear": 2011,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63448729,
@@ -1365,7 +1535,8 @@
         "lastName": "RADOVESNICKÝ",
         "birthYear": 2007,
         "clubAbbrev": "PKBoh",
-        "group": "K2"
+        "group": "K2",
+        "gender": "M"
     },
     {
         "userId": 63448770,
@@ -1373,7 +1544,8 @@
         "lastName": "ŠMUKOVÁ",
         "birthYear": 2012,
         "clubAbbrev": "PKBoh",
-        "group": "Z1"
+        "group": "Z1",
+        "gender": "Z"
     },
     {
         "userId": 63448782,
@@ -1381,7 +1553,8 @@
         "lastName": "TAUŠ",
         "birthYear": 2014,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC2"
+        "group": "ZPC2",
+        "gender": "M"
     },
     {
         "userId": 63448792,
@@ -1389,7 +1562,8 @@
         "lastName": "TVARDÍK",
         "birthYear": 2014,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC5"
+        "group": "ZPC5",
+        "gender": "M"
     },
     {
         "userId": 63448799,
@@ -1397,7 +1571,8 @@
         "lastName": "VALENTA",
         "birthYear": 2010,
         "clubAbbrev": "PKBoh",
-        "group": "K2"
+        "group": "K2",
+        "gender": "M"
     },
     {
         "userId": 63448800,
@@ -1405,7 +1580,8 @@
         "lastName": "VAVREČKA",
         "birthYear": 2012,
         "clubAbbrev": "PKBoh",
-        "group": "K3"
+        "group": "K3",
+        "gender": "M"
     },
     {
         "userId": 63448801,
@@ -1413,7 +1589,8 @@
         "lastName": "VERONESI",
         "birthYear": 2015,
         "clubAbbrev": "PKBoh",
-        "group": "P1"
+        "group": "P1",
+        "gender": "Z"
     },
     {
         "userId": 57110000,
@@ -1421,7 +1598,8 @@
         "lastName": "ARADSKÁ",
         "birthYear": 2011,
         "clubAbbrev": "PKBoh",
-        "group": "Z1"
+        "group": "Z1",
+        "gender": "Z"
     },
     {
         "userId": 63450911,
@@ -1429,7 +1607,8 @@
         "lastName": "BABIŠOVÁ",
         "birthYear": 2015,
         "clubAbbrev": "PKBoh",
-        "group": "P1"
+        "group": "P1",
+        "gender": "Z"
     },
     {
         "userId": 63450913,
@@ -1437,7 +1616,8 @@
         "lastName": "BLOKŠOVÁ",
         "birthYear": 2012,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63450915,
@@ -1445,7 +1625,8 @@
         "lastName": "BRISUDOVÁ",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC2"
+        "group": "ZPC2",
+        "gender": "Z"
     },
     {
         "userId": 63443998,
@@ -1453,7 +1634,8 @@
         "lastName": "BULAVOVÁ",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "K6"
+        "group": "K6",
+        "gender": "Z"
     },
     {
         "userId": 63450916,
@@ -1461,7 +1643,8 @@
         "lastName": "DANČÁKOVÁ",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63444414,
@@ -1469,7 +1652,8 @@
         "lastName": "DANČÁKOVÁ",
         "birthYear": 2015,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63450917,
@@ -1477,7 +1661,8 @@
         "lastName": "DÍTĚTOVÁ",
         "birthYear": 2008,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63450918,
@@ -1485,7 +1670,8 @@
         "lastName": "DUDOVÁ",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 39400000,
@@ -1493,7 +1679,8 @@
         "lastName": "FRYCZ",
         "birthYear": 2007,
         "clubAbbrev": "PKBoh",
-        "group": "K1"
+        "group": "K1",
+        "gender": "M"
     },
     {
         "userId": 63439795,
@@ -1501,7 +1688,8 @@
         "lastName": "GURA",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "K5"
+        "group": "K5",
+        "gender": "M"
     },
     {
         "userId": 63450923,
@@ -1509,7 +1697,8 @@
         "lastName": "HOLUB",
         "birthYear": 2011,
         "clubAbbrev": "PKBoh",
-        "group": "K3"
+        "group": "K3",
+        "gender": "M"
     },
     {
         "userId": 63444447,
@@ -1517,7 +1706,8 @@
         "lastName": "CHOLEVA",
         "birthYear": 2015,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 60541000,
@@ -1525,7 +1715,8 @@
         "lastName": "JAKUBKOVÁ",
         "birthYear": 2009,
         "clubAbbrev": "PKBoh",
-        "group": "K2"
+        "group": "K2",
+        "gender": "Z"
     },
     {
         "userId": 60542000,
@@ -1533,7 +1724,8 @@
         "lastName": "JAKUBKOVÁ",
         "birthYear": 2010,
         "clubAbbrev": "PKBoh",
-        "group": "K2"
+        "group": "K2",
+        "gender": "Z"
     },
     {
         "userId": 50189000,
@@ -1541,7 +1733,8 @@
         "lastName": "KOHAN",
         "birthYear": 2004,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 46218000,
@@ -1549,7 +1742,8 @@
         "lastName": "KLOSÍNSKÁ",
         "birthYear": 2005,
         "clubAbbrev": "PKBoh",
-        "group": "veteran"
+        "group": "veteran",
+        "gender": "Z"
     },
     {
         "userId": 63456233,
@@ -1557,7 +1751,8 @@
         "lastName": "MUDROVÁ",
         "birthYear": 1997,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63458988,
@@ -1565,7 +1760,8 @@
         "lastName": "LE",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "Z1"
+        "group": "Z1",
+        "gender": "Z"
     },
     {
         "userId": 63461351,
@@ -1573,7 +1769,8 @@
         "lastName": "BUJKA",
         "birthYear": 2011,
         "clubAbbrev": "PKBoh",
-        "group": "K4"
+        "group": "K4",
+        "gender": "M"
     },
     {
         "userId": 63461353,
@@ -1581,7 +1778,8 @@
         "lastName": "LUKÁČ",
         "birthYear": 2015,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC5"
+        "group": "ZPC5",
+        "gender": "M"
     },
     {
         "userId": 63461354,
@@ -1589,7 +1787,8 @@
         "lastName": "GUEDES",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC3"
+        "group": "ZPC3",
+        "gender": "Z"
     },
     {
         "userId": 63461359,
@@ -1597,7 +1796,8 @@
         "lastName": "SKALÍK",
         "birthYear": 2012,
         "clubAbbrev": "PKBoh",
-        "group": "K4"
+        "group": "K4",
+        "gender": "M"
     },
     {
         "userId": 63465488,
@@ -1605,7 +1805,8 @@
         "lastName": "NOGA",
         "birthYear": 2015,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC2"
+        "group": "ZPC2",
+        "gender": "M"
     },
     {
         "userId": 63465489,
@@ -1613,7 +1814,8 @@
         "lastName": "BOČEK",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB3"
+        "group": "ZPB3",
+        "gender": "M"
     },
     {
         "userId": 63464860,
@@ -1621,7 +1823,8 @@
         "lastName": "BEZDĚKOVÁ",
         "birthYear": 2014,
         "clubAbbrev": "PKBoh",
-        "group": "P1"
+        "group": "P1",
+        "gender": "Z"
     },
     {
         "userId": 63465490,
@@ -1629,7 +1832,8 @@
         "lastName": "KOČAŘOVÁ",
         "birthYear": 2019,
         "clubAbbrev": "PKBoh",
-        "group": "ZPA1"
+        "group": "ZPA1",
+        "gender": "Z"
     },
     {
         "userId": 63465492,
@@ -1637,7 +1841,8 @@
         "lastName": "MICHÁLKOVÁ",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "K5"
+        "group": "K5",
+        "gender": "Z"
     },
     {
         "userId": 63465494,
@@ -1645,7 +1850,8 @@
         "lastName": "BUDAYOVÁ",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "K6"
+        "group": "K6",
+        "gender": "Z"
     },
     {
         "userId": 63465495,
@@ -1653,7 +1859,8 @@
         "lastName": "LEPÍKOVÁ",
         "birthYear": 2015,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63465496,
@@ -1661,7 +1868,8 @@
         "lastName": "LEPÍKOVÁ",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63465497,
@@ -1669,7 +1877,8 @@
         "lastName": "MENŠÍKOVÁ",
         "birthYear": 2014,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63465498,
@@ -1677,7 +1886,8 @@
         "lastName": "HŘÍBKOVÁ",
         "birthYear": 2014,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63465499,
@@ -1685,7 +1895,8 @@
         "lastName": "PASKUDOVÁ",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC5"
+        "group": "ZPC5",
+        "gender": "Z"
     },
     {
         "userId": 63465500,
@@ -1693,7 +1904,8 @@
         "lastName": "SKUPIEŇ",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB2"
+        "group": "ZPB2",
+        "gender": "M"
     },
     {
         "userId": 63465501,
@@ -1701,7 +1913,8 @@
         "lastName": "SLÍVA",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB4"
+        "group": "ZPB4",
+        "gender": "M"
     },
     {
         "userId": 63465502,
@@ -1709,7 +1922,8 @@
         "lastName": "KAŠTÁNKOVÁ",
         "birthYear": 2014,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC5"
+        "group": "ZPC5",
+        "gender": "Z"
     },
     {
         "userId": 63465507,
@@ -1717,7 +1931,8 @@
         "lastName": "DRUMMEY",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63465509,
@@ -1725,7 +1940,8 @@
         "lastName": "TESARCZYK",
         "birthYear": 2014,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC1"
+        "group": "ZPC1",
+        "gender": "M"
     },
     {
         "userId": 63465510,
@@ -1733,7 +1949,8 @@
         "lastName": "SZTWIERTNIA",
         "birthYear": 2014,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC2"
+        "group": "ZPC2",
+        "gender": "M"
     },
     {
         "userId": 63465512,
@@ -1741,7 +1958,8 @@
         "lastName": "BARTEČKOVÁ",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC3"
+        "group": "ZPC3",
+        "gender": "Z"
     },
     {
         "userId": 63465513,
@@ -1749,7 +1967,8 @@
         "lastName": "WALTER",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC2"
+        "group": "ZPC2",
+        "gender": "M"
     },
     {
         "userId": 63465514,
@@ -1757,7 +1976,8 @@
         "lastName": "SUSZKOVÁ",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63465515,
@@ -1765,7 +1985,8 @@
         "lastName": "HERMANN",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB5"
+        "group": "ZPB5",
+        "gender": "M"
     },
     {
         "userId": 63465516,
@@ -1773,7 +1994,8 @@
         "lastName": "FIŠER",
         "birthYear": 2019,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63465517,
@@ -1781,7 +2003,8 @@
         "lastName": "MOLEK",
         "birthYear": 2012,
         "clubAbbrev": "PKBoh",
-        "group": "K6"
+        "group": "K6",
+        "gender": "Z"
     },
     {
         "userId": 63465518,
@@ -1789,7 +2012,8 @@
         "lastName": "JANOUŠKOVÁ",
         "birthYear": 2012,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63465520,
@@ -1797,7 +2021,8 @@
         "lastName": "SPLESNIOK",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB3"
+        "group": "ZPB3",
+        "gender": "M"
     },
     {
         "userId": 63466087,
@@ -1805,7 +2030,8 @@
         "lastName": "SOBALA",
         "birthYear": 2015,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63467036,
@@ -1813,7 +2039,8 @@
         "lastName": "SZELIGOVÁ",
         "birthYear": 2014,
         "clubAbbrev": "PKBoh",
-        "group": "P1"
+        "group": "P1",
+        "gender": "Z"
     },
     {
         "userId": 63444483,
@@ -1821,7 +2048,8 @@
         "lastName": "KRČMARSKÁ",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "Z2"
+        "group": "Z2",
+        "gender": "Z"
     },
     {
         "userId": 63467037,
@@ -1829,7 +2057,8 @@
         "lastName": "JUREK",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC3"
+        "group": "ZPC3",
+        "gender": "M"
     },
     {
         "userId": 48806000,
@@ -1837,7 +2066,8 @@
         "lastName": "TKADLECOVÁ",
         "birthYear": 2005,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63471038,
@@ -1845,7 +2075,8 @@
         "lastName": "OSLIZLOKOVÁ",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "K5"
+        "group": "K5",
+        "gender": "Z"
     },
     {
         "userId": 63471039,
@@ -1853,7 +2084,8 @@
         "lastName": "MACH",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "K6"
+        "group": "K6",
+        "gender": "M"
     },
     {
         "userId": 63465493,
@@ -1861,7 +2093,8 @@
         "lastName": "ŠIMON",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB5"
+        "group": "ZPB5",
+        "gender": "M"
     },
     {
         "userId": 63471040,
@@ -1869,7 +2102,8 @@
         "lastName": "SEBERA",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB3"
+        "group": "ZPB3",
+        "gender": "M"
     },
     {
         "userId": 63449685,
@@ -1877,7 +2111,8 @@
         "lastName": "OPIC",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB3"
+        "group": "ZPB3",
+        "gender": "M"
     },
     {
         "userId": 63471041,
@@ -1885,7 +2120,8 @@
         "lastName": "SMOLKA",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC1"
+        "group": "ZPC1",
+        "gender": "M"
     },
     {
         "userId": 63471042,
@@ -1893,7 +2129,8 @@
         "lastName": "BAYER",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63471043,
@@ -1901,7 +2138,8 @@
         "lastName": "BRUDOVSKÝ",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB1"
+        "group": "ZPB1",
+        "gender": "M"
     },
     {
         "userId": 63471045,
@@ -1909,7 +2147,8 @@
         "lastName": "PIERAN",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB1"
+        "group": "ZPB1",
+        "gender": "M"
     },
     {
         "userId": 63471046,
@@ -1917,7 +2156,8 @@
         "lastName": "SALA",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB2"
+        "group": "ZPB2",
+        "gender": "M"
     },
     {
         "userId": 63461060,
@@ -1925,7 +2165,8 @@
         "lastName": "VIDENKA",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63471047,
@@ -1933,7 +2174,8 @@
         "lastName": "KABOT",
         "birthYear": 2015,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63471048,
@@ -1941,7 +2183,8 @@
         "lastName": "KRUPKA",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC3"
+        "group": "ZPC3",
+        "gender": "M"
     },
     {
         "userId": 63471049,
@@ -1949,7 +2192,8 @@
         "lastName": "PROCHÁZKA",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB3"
+        "group": "ZPB3",
+        "gender": "M"
     },
     {
         "userId": 63471050,
@@ -1957,7 +2201,8 @@
         "lastName": "ROHEL",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63471051,
@@ -1965,7 +2210,8 @@
         "lastName": "ŠMUKOVÁ",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB1"
+        "group": "ZPB1",
+        "gender": "Z"
     },
     {
         "userId": 63471052,
@@ -1973,7 +2219,8 @@
         "lastName": "ŠRUBAŘOVÁ",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63471053,
@@ -1981,7 +2228,8 @@
         "lastName": "FIŠEROVÁ",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB2"
+        "group": "ZPB2",
+        "gender": "Z"
     },
     {
         "userId": 63471054,
@@ -1989,7 +2237,8 @@
         "lastName": "HAVRAN",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB1"
+        "group": "ZPB1",
+        "gender": "M"
     },
     {
         "userId": 63471055,
@@ -1997,7 +2246,8 @@
         "lastName": "ZEMAN",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB3"
+        "group": "ZPB3",
+        "gender": "M"
     },
     {
         "userId": 63471056,
@@ -2005,7 +2255,8 @@
         "lastName": "DOBRANSKÁ",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB2"
+        "group": "ZPB2",
+        "gender": "Z"
     },
     {
         "userId": 63471057,
@@ -2013,7 +2264,8 @@
         "lastName": "FILUSZ",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC3"
+        "group": "ZPC3",
+        "gender": "M"
     },
     {
         "userId": 63471058,
@@ -2021,7 +2273,8 @@
         "lastName": "JUREK",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB5"
+        "group": "ZPB5",
+        "gender": "M"
     },
     {
         "userId": 63471059,
@@ -2029,7 +2282,8 @@
         "lastName": "KUKULOVÁ",
         "birthYear": 2014,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63471060,
@@ -2037,7 +2291,8 @@
         "lastName": "MRÁZKOVÁ",
         "birthYear": 2013,
         "clubAbbrev": "PKBoh",
-        "group": "K5"
+        "group": "K5",
+        "gender": "Z"
     },
     {
         "userId": 63472076,
@@ -2045,7 +2300,8 @@
         "lastName": "KHOMICH",
         "birthYear": 2015,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "M"
     },
     {
         "userId": 63472082,
@@ -2053,7 +2309,8 @@
         "lastName": "NÁVRAT",
         "birthYear": 2012,
         "clubAbbrev": "PKBoh",
-        "group": "K5"
+        "group": "K5",
+        "gender": "M"
     },
     {
         "userId": 63476139,
@@ -2061,7 +2318,8 @@
         "lastName": "LODGE",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63476140,
@@ -2069,7 +2327,8 @@
         "lastName": "HONYSZOVÁ",
         "birthYear": 2019,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63476143,
@@ -2077,7 +2336,8 @@
         "lastName": "KOHÚTOVÁ",
         "birthYear": 2009,
         "clubAbbrev": "PKBoh",
-        "group": "K2"
+        "group": "K2",
+        "gender": "Z"
     },
     {
         "userId": 63476144,
@@ -2085,7 +2345,8 @@
         "lastName": "LISOVÁ",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB7"
+        "group": "ZPB7",
+        "gender": "Z"
     },
     {
         "userId": 63476146,
@@ -2093,7 +2354,8 @@
         "lastName": "ROKOŠ",
         "birthYear": 2014,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC4"
+        "group": "ZPC4",
+        "gender": "M"
     },
     {
         "userId": 63476148,
@@ -2101,7 +2363,8 @@
         "lastName": "SCHENK",
         "birthYear": 2019,
         "clubAbbrev": "PKBoh",
-        "group": "ZPA1"
+        "group": "ZPA1",
+        "gender": "M"
     },
     {
         "userId": 63476150,
@@ -2109,7 +2372,8 @@
         "lastName": "VIČÍKOVÁ",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB6"
+        "group": "ZPB6",
+        "gender": "Z"
     },
     {
         "userId": 63476152,
@@ -2117,7 +2381,8 @@
         "lastName": "ZAJÍČEK",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB5"
+        "group": "ZPB5",
+        "gender": "M"
     },
     {
         "userId": 63476153,
@@ -2125,7 +2390,8 @@
         "lastName": "NÁVRAT",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB5"
+        "group": "ZPB5",
+        "gender": "M"
     },
     {
         "userId": 63476155,
@@ -2133,7 +2399,8 @@
         "lastName": "WORKOVÁ",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB4"
+        "group": "ZPB4",
+        "gender": "Z"
     },
     {
         "userId": 63476157,
@@ -2141,7 +2408,8 @@
         "lastName": "HANÁKOVÁ",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB5"
+        "group": "ZPB5",
+        "gender": "Z"
     },
     {
         "userId": 63476159,
@@ -2149,7 +2417,8 @@
         "lastName": "KRAUS",
         "birthYear": 2020,
         "clubAbbrev": "PKBoh",
-        "group": "ZPA2"
+        "group": "ZPA2",
+        "gender": "M"
     },
     {
         "userId": 63476161,
@@ -2157,7 +2426,8 @@
         "lastName": "TOMÁŠ",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB5"
+        "group": "ZPB5",
+        "gender": "M"
     },
     {
         "userId": 63476162,
@@ -2165,7 +2435,8 @@
         "lastName": "ŠVEC",
         "birthYear": 2015,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC4"
+        "group": "ZPC4",
+        "gender": "M"
     },
     {
         "userId": 63476165,
@@ -2173,7 +2444,8 @@
         "lastName": "PŘÍVĚTIVÁ",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB6"
+        "group": "ZPB6",
+        "gender": "Z"
     },
     {
         "userId": 63476167,
@@ -2181,7 +2453,8 @@
         "lastName": "TRŽICKÝ",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB7"
+        "group": "ZPB7",
+        "gender": "M"
     },
     {
         "userId": 63476168,
@@ -2189,7 +2462,8 @@
         "lastName": "ZAVADIL",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB7"
+        "group": "ZPB7",
+        "gender": "M"
     },
     {
         "userId": 63476170,
@@ -2197,7 +2471,8 @@
         "lastName": "CHOBOTOVÁ",
         "birthYear": 2019,
         "clubAbbrev": "PKBoh",
-        "group": "-"
+        "group": null,
+        "gender": "Z"
     },
     {
         "userId": 63476172,
@@ -2205,7 +2480,8 @@
         "lastName": "TICHOPÁD",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB4"
+        "group": "ZPB4",
+        "gender": "M"
     },
     {
         "userId": 63476175,
@@ -2213,7 +2489,8 @@
         "lastName": "PŘÍVARA",
         "birthYear": 2014,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC5"
+        "group": "ZPC5",
+        "gender": "M"
     },
     {
         "userId": 63476177,
@@ -2221,7 +2498,8 @@
         "lastName": "RATH",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB6"
+        "group": "ZPB6",
+        "gender": "M"
     },
     {
         "userId": 63476178,
@@ -2229,7 +2507,8 @@
         "lastName": "HLUCHNÍK",
         "birthYear": 2019,
         "clubAbbrev": "PKBoh",
-        "group": "ZPA2"
+        "group": "ZPA2",
+        "gender": "M"
     },
     {
         "userId": 63476180,
@@ -2237,7 +2516,8 @@
         "lastName": "GLEMBKOVÁ",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB6"
+        "group": "ZPB6",
+        "gender": "Z"
     },
     {
         "userId": 63476182,
@@ -2245,7 +2525,8 @@
         "lastName": "GLEMBEK",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB6"
+        "group": "ZPB6",
+        "gender": "M"
     },
     {
         "userId": 63476183,
@@ -2253,7 +2534,8 @@
         "lastName": "KUDRNA",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB7"
+        "group": "ZPB7",
+        "gender": "M"
     },
     {
         "userId": 63476184,
@@ -2261,7 +2543,8 @@
         "lastName": "PIETRASZOVÁ",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB4"
+        "group": "ZPB4",
+        "gender": "Z"
     },
     {
         "userId": 63476185,
@@ -2269,7 +2552,8 @@
         "lastName": "DROBÍKOVÁ",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB5"
+        "group": "ZPB5",
+        "gender": "Z"
     },
     {
         "userId": 63476186,
@@ -2277,7 +2561,8 @@
         "lastName": "ŠABO",
         "birthYear": 2019,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB6"
+        "group": "ZPB6",
+        "gender": "M"
     },
     {
         "userId": 63476187,
@@ -2285,7 +2570,8 @@
         "lastName": "BIELA",
         "birthYear": 2015,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC4"
+        "group": "ZPC4",
+        "gender": "Z"
     },
     {
         "userId": 63476188,
@@ -2293,7 +2579,8 @@
         "lastName": "DWORSKY",
         "birthYear": 2016,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC4"
+        "group": "ZPC4",
+        "gender": "M"
     },
     {
         "userId": 63476191,
@@ -2301,7 +2588,8 @@
         "lastName": "TUREČKOVÁ",
         "birthYear": 2018,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB4"
+        "group": "ZPB4",
+        "gender": "Z"
     },
     {
         "userId": 63476192,
@@ -2309,7 +2597,8 @@
         "lastName": "ACKSTEINER",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB6"
+        "group": "ZPB6",
+        "gender": "M"
     },
     {
         "userId": 63476194,
@@ -2317,7 +2606,8 @@
         "lastName": "FRÖML",
         "birthYear": 2014,
         "clubAbbrev": "PKBoh",
-        "group": "ZPC4"
+        "group": "ZPC4",
+        "gender": "M"
     },
     {
         "userId": 63476195,
@@ -2325,6 +2615,7 @@
         "lastName": "ZICHÁČEK",
         "birthYear": 2017,
         "clubAbbrev": "PKBoh",
-        "group": "ZPB4"
+        "group": "ZPB4",
+        "gender": "M"
     }
 ]
