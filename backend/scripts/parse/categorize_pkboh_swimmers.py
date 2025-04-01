@@ -1,11 +1,11 @@
-import sys
 import json
+import sys
 import requests
 from bs4 import BeautifulSoup
 
 from typing import Any
 
-from .config import DATA_DIR, HEADERS
+from scripts.config import DATA_DIR, HEADERS
 
 URL = "https://www.plavanibohumin.cz/cz/treninky/rozdeleni-plavcu/"
 PKBOH_SWIMMERS = DATA_DIR / "pkboh_swimmers.json"
@@ -13,27 +13,29 @@ RESULT_FILE = DATA_DIR / "pkboh_automatically_categorized.json"
 
 
 class Swimmer:
+    """
+
+
+    Attributes:
+        name: [TODO:description]
+        surname: [TODO:description]
+        id: [TODO:description]
+        group: [TODO:description]
+        birth_year: [TODO:description]
+        gender: [TODO:description]
+    """
+
     name: str
     surname: str
     id: int
     group: str
     birth_year: int
+    gender: str
 
     def __init__(self, name, surname, group):
         self.name = name
         self.surname = surname
         self.group = group
-
-    def __str__(self):
-        return f"{self.name} {self.surname} ({self.group})"
-
-    def __eq__(self, other):
-        return (
-            True
-            if self.name.lower() == other.name.lower()
-            and self.surname.lower() == other.surname.lower()
-            else False
-        )
 
     def add_data(self, id, birth_year):
         self.id = id
@@ -41,30 +43,56 @@ class Swimmer:
 
 
 def fetch_pkboh_table():
+    """[TODO:summary]
+
+    [TODO:description]
+    """
     html = requests.get(URL, headers=HEADERS).content.decode("utf-8")
     soup = BeautifulSoup(html, "lxml")
 
     return soup.find("tbody")
 
 
-def check_swimmer_group(swimmer_data: list[Any], swimmers_current: list[Any]) -> bool:
+def check_swimmer_group(
+    swimmer_data: dict[str, Any], swimmers_current: list[dict[str, Any]]
+) -> str | None:
+    """
+
+    Checks if the swimmer is in the current list of swimmers and returns their group.
+
+    Args:
+        swimmer_data: Dictionary containing swimmer data
+        swimmers_current: List of objects of current swimmers
+
+    Returns:
+        Group of the swimmer if found, otherwise None
+    """
     for s in swimmers_current:
         if (
             s.name.lower() == swimmer_data["firstName"].lower()
             and s.surname.lower() == swimmer_data["lastName"].lower()
         ):
             return s.group
-    # s["group"] = swimmer.group if found else "unassigned"
-    return "unassigned"
+    return None
 
 
 def categorize(swimmers: list[str]):
+    """[TODO:summary]
+
+    [TODO:description]
+
+    Args:
+        swimmers: [TODO:description]
+    """
     with open(PKBOH_SWIMMERS, "r") as file:
         swimmers_open_data = json.load(file)
 
     for current_swimmer in swimmers_open_data:
         group = check_swimmer_group(current_swimmer, swimmers)
         current_swimmer["group"] = group
+
+        gender = "Z" if current_swimmer["lastName"][-1] == "Á" else "M"
+        current_swimmer["gender"] = gender
 
     return swimmers_open_data
 

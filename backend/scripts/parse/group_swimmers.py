@@ -1,7 +1,7 @@
-import sys
 import json
+import sys
 
-from .config import DATA_DIR
+from scripts.config import DATA_DIR
 
 PKBOH_SWIMMERS = DATA_DIR / "pkboh_automatically_categorized.json"
 RESULT_FILE = DATA_DIR / "pkboh_grouped.json"

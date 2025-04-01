@@ -1,6 +1,6 @@
 import json
 
-from .config import DATA_DIR
+from scripts.config import DATA_DIR
 
 ALL_SWIMMERS_FILE = DATA_DIR / "all_swimmers.json"
 RESULT_FILE = DATA_DIR / "pkboh_swimmers.json"

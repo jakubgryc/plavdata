@@ -1,7 +1,7 @@
 import json
 import requests
 
-from .config import DATA_DIR, HEADERS
+from scripts.config import DATA_DIR, HEADERS
 
 URL = (
     "https://vysledky.czechswimming.cz/cz.zma.csps.portal.rest/api/public/search?query="
