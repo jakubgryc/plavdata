@@ -4,6 +4,23 @@ from sqlalchemy.orm import relationship
 from .db import Base
 
 
+class Course(Base):
+    __tablename__ = "courses"
+
+    id = Column(Integer, primary_key=True, index=True)
+    type = Column(String, nullable=False)
+    length = Column(Integer, nullable=False)
+
+
+class Discipline(Base):
+    __tablename__ = "disciplines"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    code = Column(String, nullable=False)
+    gender = Column(String, nullable=False)
+
+
 class Swimmer(Base):
     __tablename__ = "swimmers"
 
@@ -21,14 +38,15 @@ class PersonalBest(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     swimmer_id = Column(Integer, ForeignKey("swimmers.id"))
+    discipline_id = Column(Integer, ForeignKey("disciplines.id"))
+    course_id = Column(Integer, ForeignKey("courses.id"))
     time = Column(Integer, nullable=False)
-    discipline_title = Column(String, nullable=False)
-    discipline_code = Column(String, nullable=False)
-    pool_length = Column(Integer, nullable=False)
     points = Column(Integer, nullable=True)
     competition_location = Column(String, nullable=False)
     date = Column(Date, nullable=False)
 
+    discipline = relationship("Discipline")
+    course = relationship("Course")
     swimmer = relationship("Swimmer", back_populates="personal_bests")
 
 
