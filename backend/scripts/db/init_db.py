@@ -29,7 +29,12 @@ def init_static_tables(db: Session):
     for title, code in zip(STROKE_TITLES, STROKE_CODES):
         for distance in DISTANCES:
             for gender in GENDERS:
-                if code == "O" and distance not in [100, 200, 400] or code in ["Z", "M", "P"] and distance not in [50, 100, 200]:
+                if (
+                    code == "O"
+                    and distance not in [100, 200, 400]
+                    or code in ["Z", "M", "P"]
+                    and distance not in [50, 100, 200]
+                ):
                     continue
                 disciplines.append(
                     {
