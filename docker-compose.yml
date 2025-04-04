@@ -39,7 +39,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: plavdata
-    command: ["python", "-m", "scripts.init_db"]
+    command: ["python", "-m", "scripts.db.init_db"]
     restart: "no"   # run once and stop
 
   sync-pb:
@@ -53,7 +53,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: plavdata
-    command: ["python", "-m", "scripts.sync_personal_bests"]
+    command: ["python", "-m", "scripts.db.sync_personal_bests"]
     restart: "no"   # run once and stop
 
 volumes:
