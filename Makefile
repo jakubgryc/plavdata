@@ -18,6 +18,8 @@ sync-pb:
 	docker compose build sync-pb
 	docker compose run --rm sync-pb
 
+debug:
+	docker compose exec -it backend python -m scripts.debug
 
 db:
 	docker exec -it postgres_db psql -U postgres -d plavdata
