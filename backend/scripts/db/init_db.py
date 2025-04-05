@@ -11,7 +11,6 @@ SWIMMERS_FILE = DATA_DIR / "pkboh.json"
 STROKE_TITLES = ["Volný způsob", "Znak", "Prsa", "Motýlek", "Polohový závod"]
 STROKE_CODES = ["K", "Z", "P", "M", "O"]
 DISTANCES = [50, 100, 200, 400, 800, 1500]
-GENDERS = ["M", "Z"]
 
 
 def init_static_tables(db: Session):
@@ -28,26 +27,24 @@ def init_static_tables(db: Session):
     disciplines: list = []
     for title, code in zip(STROKE_TITLES, STROKE_CODES):
         for distance in DISTANCES:
-            for gender in GENDERS:
-                if (
-                    code == "O"
-                    and distance not in [100, 200, 400]
-                    or code in ["Z", "M", "P"]
-                    and distance not in [50, 100, 200]
-                ):
-                    continue
-                disciplines.append(
-                    {
-                        "title": f"{distance}m {title}",
-                        "code": f"{distance} {code}",
-                        "gender": gender,
-                    }
-                )
+            if (
+                code == "O"
+                and distance not in [100, 200, 400]
+                or code in ["Z", "M", "P"]
+                and distance not in [50, 100, 200]
+            ):
+                continue
+            disciplines.append(
+                {
+                    "title": f"{distance}m {title}",
+                    "code": f"{distance} {code}",
+                }
+            )
 
     for d in disciplines:
         exists = (
             db.query(Discipline)
-            .filter_by(code=d.get("code"), gender=d.get("gender"))
+            .filter_by(code=d.get("code"))
             .first()
         )
         if not exists:

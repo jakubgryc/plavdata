@@ -18,6 +18,9 @@ sync-pb:
 	docker compose build sync-pb
 	docker compose run --rm sync-pb
 
+sync-results:
+	docker compose exec -it backend python -m scripts.db.sync_results
+
 debug:
 	docker compose exec -it backend python -m scripts.debug
 
