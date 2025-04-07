@@ -28,33 +28,33 @@ services:
     ports:
       - "5432:5432"
 
-  init-db:
-    build: ./backend
-    container_name: init_db_runner
-    working_dir: /app
-    depends_on:
-      - db
-    environment:
-      POSTGRES_HOST: db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: plavdata
-    command: ["python", "-m", "scripts.db.init_db"]
-    restart: "no"   # run once and stop
-
-  sync-pb:
-    build: ./backend
-    container_name: sync_pb_runner
-    working_dir: /app
-    depends_on:
-      - db
-    environment:
-      POSTGRES_HOST: db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: plavdata
-    command: ["python", "-m", "scripts.db.sync_personal_bests"]
-    restart: "no"   # run once and stop
+  # init-db:
+  #   build: ./backend
+  #   container_name: init_db_runner
+  #   working_dir: /app
+  #   depends_on:
+  #     - db
+  #   environment:
+  #     POSTGRES_HOST: db
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_DB: plavdata
+  #   command: ["python", "-m", "scripts.db.init_db"]
+  #   restart: "no"   # run once and stop
+  #
+  # sync-pb:
+  #   build: ./backend
+  #   container_name: sync_pb_runner
+  #   working_dir: /app
+  #   depends_on:
+  #     - db
+  #   environment:
+  #     POSTGRES_HOST: db
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_DB: plavdata
+  #   command: ["python", "-m", "scripts.db.sync_personal_bests"]
+  #   restart: "no"   # run once and stop
 
 volumes:
   pgdata:

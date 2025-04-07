@@ -3,6 +3,10 @@
 dev:
 	docker compose up db backend
 
+.PHONY: backend
+backend:
+	docker compose up backend
+
 
 clean:
 	docker compose stop
@@ -10,13 +14,11 @@ clean:
 
 
 init-db:
-	docker compose build init-db
-	docker compose run --rm init-db
+	docker compose exec -it backend python -m scripts.db.init_db
 
 
 sync-pb:
-	docker compose build sync-pb
-	docker compose run --rm sync-pb
+	docker compose exec -it backend python -m scripts.db.sync_personal_bests
 
 sync-results:
 	docker compose exec -it backend python -m scripts.db.sync_results
