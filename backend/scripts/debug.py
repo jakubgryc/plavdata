@@ -101,6 +101,43 @@ def load_personal_bests():
     return pbs
 
 
+def get_all_swimmers():
+    db: Session = SessionLocal()
+
+    groups = ["Z1", "Z2", "P1", "veteran"]
+
+    swimmers = db.query(Swimmer).filter(Swimmer.group.in_(groups)).all()
+
+    db.close()
+
+    return swimmers
+
+
+def get_all_disciplines():
+    db: Session = SessionLocal()
+
+    disciplines = [row[0] for row in db.query(Discipline.code).all()]
+
+    db.close()
+
+    return disciplines
+
+
+def init_data():
+    """Initialize the data structure for storing personal bests."""
+    data = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
+    all_swimmers = get_all_swimmers()
+    all_disciplines = get_all_disciplines()
+
+    for swimmer in all_swimmers:
+        swimmer_key = (swimmer.name, swimmer.surname, swimmer.birth_year)
+        for course in ["SCM", "LCM"]:
+            for discipline in all_disciplines:
+                data[course][swimmer.group][swimmer_key][discipline] = None
+
+    return data
+
+
 header_fill = PatternFill(fill_type="solid", start_color="B00D08")
 white_font = Font(bold=True, color="FFFFFF")
 
@@ -136,8 +173,9 @@ today = date.today().strftime("%d.%m.%Y")
 
 def generate_excel_from_pbs(pbs: list[PBInfo], filename: str = "personal_bests.xlsx"):
     # Organize data by course type -> group -> swimmer_id -> {discipline: PBInfo}
-    structured_data = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
     all_discipline_keys = defaultdict(set)
+
+    structured_data = init_data()
 
     group_order = {
         "Z1": 0,
@@ -156,8 +194,8 @@ def generate_excel_from_pbs(pbs: list[PBInfo], filename: str = "personal_bests.x
 
     for pb in pbs:
         course = pb.course
-        group = pb.group
         swimmer_key = (pb.name, pb.surname, pb.birth_year)
+        group = pb.group
         disc_key = pb.discipline
 
         structured_data[course][group][swimmer_key][disc_key] = pb
@@ -179,7 +217,11 @@ def generate_excel_from_pbs(pbs: list[PBInfo], filename: str = "personal_bests.x
         start_col = get_column_letter(1)
         end_col = get_column_letter(total_columns)
         ws.merge_cells(f"{start_col}{current_row}:{end_col}{current_row}")
-        cell = ws.cell(row=current_row, column=1, value=f"Osobní rekordy {"25" if course == 'SCM' else '50'} m - aktualizováno {today}")
+        cell = ws.cell(
+            row=current_row,
+            column=1,
+            value=f"Osobní rekordy {'25' if course == 'SCM' else '50'} m - aktualizováno {today}",
+        )
         cell.font = title_font
         cell.fill = title_fill
         cell.border = border
