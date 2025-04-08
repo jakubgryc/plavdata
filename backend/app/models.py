@@ -60,6 +60,8 @@ class PersonalBest(Base):
     discipline_id = Column(Integer, ForeignKey("disciplines.id"))
     course_id = Column(Integer, ForeignKey("courses.id"))
     time = Column(Integer, nullable=False)
+    split_time = Column(Boolean)
+    relay_part = Column(Boolean)
     points = Column(Integer, nullable=True)
     competition_location = Column(String, nullable=False)
     date = Column(Date, nullable=False)

@@ -41,6 +41,8 @@ def sync():
             points = entry.get("points")
             competition_location = entry.get("competitionLocation")
             date_str = entry.get("date")
+            split_time = entry.get("splitTime")
+            relay_part = entry.get("relayPart")
 
             discipline = db.query(Discipline).filter_by(code=discipline_code).first()
             if not discipline:
@@ -72,6 +74,8 @@ def sync():
                         points=points,
                         competition_location=competition_location,
                         date=datetime.fromisoformat(date_str),
+                        split_time=split_time,
+                        relay_part=relay_part,
                     )
                 )
 

@@ -12,6 +12,14 @@ from openpyxl.styles import Border, Side, Font, Alignment, PatternFill
 from openpyxl.utils import get_column_letter
 
 
+def format_time(ms: int | None) -> str:
+    if ms is None:
+        return ""
+    minutes, rem_ms = divmod(ms, 60_000)
+    seconds, milliseconds = divmod(rem_ms, 1_000)
+    return f"{minutes:02}:{seconds:02}.{milliseconds // 10:02}"
+
+
 class PBInfo(NamedTuple):
     name: str
     surname: str
@@ -20,16 +28,32 @@ class PBInfo(NamedTuple):
     discipline: str
     course: str
     time: int
+    split_time: bool
+    relay_part: bool
     date: date
     location: str
 
 
-def format_time(ms: int | None) -> str:
-    if ms is None:
-        return ""
-    minutes, rem_ms = divmod(ms, 60_000)
-    seconds, milliseconds = divmod(rem_ms, 1_000)
-    return f"{minutes:02}:{seconds:02}.{milliseconds // 10:02}"
+class TimeData:
+    def __init__(
+        self, time: int, location: str, date: date, split_time: bool, relay_part: bool
+    ):
+        self.time = format_time(time)
+        self.location = location
+        self.date = date.strftime("%d.%m.%Y")
+        self.split_time = split_time
+        self.relay_part = relay_part
+
+    def get_commentary_string(self):
+        comment = f"{self.location}, {self.date}"
+        if self.split_time:
+            comment += " - mezičas"
+        if self.relay_part:
+            comment += " - štafeta"
+        return comment
+
+    def get_time(self):
+        return self.time
 
 
 def discipline_sort_key(disc_key: str) -> tuple:
@@ -85,6 +109,8 @@ def load_personal_bests():
             Discipline.code,
             Course.type,
             PersonalBest.time,
+            PersonalBest.split_time,
+            PersonalBest.relay_part,
             PersonalBest.date,
             PersonalBest.competition_location,
         )
@@ -106,7 +132,7 @@ def get_all_swimmers():
 
     groups = ["Z1", "Z2", "P1", "veteran"]
 
-    swimmers = db.query(Swimmer).filter(Swimmer.group.in_(groups)).all()
+    swimmers = db.query(Swimmer).filter(Swimmer.group.in_(groups)).order_by(Swimmer.surname, Swimmer.name, Swimmer.id).all()
 
     db.close()
 
@@ -146,6 +172,8 @@ red_font = Font(color="FF0000")
 # Color setup
 gray_fill_1 = PatternFill("solid", start_color="8D8D8D")
 gray_fill_2 = PatternFill("solid", start_color="D6D6D6")
+split_fill = PatternFill("solid", start_color="FFCC00")
+relay_fill = PatternFill("solid", start_color="FF9900")
 red_fill_1 = PatternFill("solid", start_color="732B29")
 red_fill_2 = PatternFill("solid", start_color="953735")
 title_fill = PatternFill("solid", start_color="000000")
@@ -171,7 +199,7 @@ group_display_name = {
 today = date.today().strftime("%d.%m.%Y")
 
 
-def generate_excel_from_pbs(pbs: list[PBInfo], filename: str = "personal_bests.xlsx"):
+def generate_excel_from_pbs(pbs: list[PBInfo], filename: str = "osobaky.xlsx"):
     # Organize data by course type -> group -> swimmer_id -> {discipline: PBInfo}
     all_discipline_keys = defaultdict(set)
 
@@ -259,18 +287,16 @@ def generate_excel_from_pbs(pbs: list[PBInfo], filename: str = "personal_bests.x
                 for disc in discipline_keys:
                     pb = pb_map.get(disc)
                     if pb:
-                        row_data.append(
-                            (
-                                format_time(pb.time),
-                                f"{pb.location}, {pb.date.strftime('%d.%m.%Y')}",
-                            )
+                        time_data = TimeData(
+                            pb.time, pb.location, pb.date, pb.split_time, pb.relay_part
                         )
+                        row_data.append(time_data)
                     else:
-                        row_data.append(("", None))
+                        row_data.append(None)
 
                 fill = gray_fill_1 if current_row % 2 == 0 else gray_fill_2
 
-                for col_index, val in enumerate(row_data, start=1):
+                for col_index, cell_data in enumerate(row_data, start=1):
                     cell = ws.cell(row=current_row, column=col_index)
                     cell.border = border
                     cell.alignment = Alignment(wrap_text=True)
@@ -279,14 +305,19 @@ def generate_excel_from_pbs(pbs: list[PBInfo], filename: str = "personal_bests.x
                     if col_index in (1, 2):  # name, surname
                         cell.fill = red_fill_1 if current_row % 2 == 0 else red_fill_2
                         cell.font = bold_font
-                        cell.alignment = Alignment(horizontal="left", vertical="center")
+                        alignement = "left" if col_index == 1 else "center"
+                        cell.alignment = Alignment(horizontal=alignement, vertical="center")
+                        cell.value = cell_data
 
-                    if isinstance(val, tuple):
-                        cell.value = val[0]
-                        if val[1]:
-                            cell.comment = Comment(val[1], "PB Export")
-                    else:
-                        cell.value = val
+                    if isinstance(cell_data, TimeData):
+                        cell.value = cell_data.get_time()
+                        cell.comment = Comment(
+                            cell_data.get_commentary_string(), "PB Export"
+                        )
+                        if cell_data.split_time:
+                            cell.fill = split_fill
+                        if cell_data.relay_part:
+                            cell.fill = relay_fill
                 ws.row_dimensions[current_row].height = 30
                 current_row += 1
 
