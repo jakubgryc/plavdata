@@ -46,3 +46,8 @@ htmlcov/
 *.db
 
 .backup/
+
+
+# -- Excel files
+
+**/*.xlsx
