@@ -11,6 +11,8 @@ from openpyxl.comments import Comment
 from openpyxl.styles import Border, Side, Font, Alignment, PatternFill
 from openpyxl.utils import get_column_letter
 
+from .records import best_records_query
+
 
 def format_time(ms: int | None) -> str:
     if ms is None:
@@ -132,7 +134,12 @@ def get_all_swimmers():
 
     groups = ["Z1", "Z2", "P1", "veteran"]
 
-    swimmers = db.query(Swimmer).filter(Swimmer.group.in_(groups)).order_by(Swimmer.surname, Swimmer.name, Swimmer.id).all()
+    swimmers = (
+        db.query(Swimmer)
+        .filter(Swimmer.group.in_(groups))
+        .order_by(Swimmer.surname, Swimmer.name, Swimmer.id)
+        .all()
+    )
 
     db.close()
 
@@ -199,6 +206,65 @@ group_display_name = {
 today = date.today().strftime("%d.%m.%Y")
 
 
+def generate_records(wb: Workbook):
+    """Generate a record sheet with the best times for each discipline."""
+    ws = wb.create_sheet(title="Records")
+    ws.column_dimensions["A"].width = 20
+    ws.column_dimensions["B"].width = 8
+
+    # Header row
+    headers = ["Disciplína", "Z1", "Z2", "P1", "Bývalí"]
+    for col_index, header in enumerate(headers, start=1):
+        cell = ws.cell(row=1, column=col_index, value=header)
+        cell.fill = header_fill
+        cell.font = white_font
+        cell.alignment = Alignment(horizontal="center", vertical="center")
+        cell.border = border
+
+    # Fetch records from the database
+    db: Session = SessionLocal()
+    records = (
+        db.query(
+            Discipline.code,
+            Swimmer.group,
+            PersonalBest.time,
+            PersonalBest.date,
+            PersonalBest.competition_location,
+        )
+        .join(PersonalBest.swimmer)
+        .join(PersonalBest.discipline)
+        .order_by(Discipline.code, Swimmer.group, PersonalBest.time)
+        .all()
+    )
+    db.close()
+
+    # Organize records by discipline and group
+    record_data = defaultdict(lambda: defaultdict(list))
+    for code, group, time, date, location in records:
+        record_data[code][group].append((time, date, location))
+
+    current_row = 2
+    for code, groups in sorted(
+        record_data.items(), key=lambda x: stroke_order.get(x[0][0], 99)
+    ):
+        ws.cell(row=current_row, column=1, value=code).font = bold_font
+
+        for col_index, group in enumerate(["Z1", "Z2", "P1", "veteran"], start=2):
+            if group in groups:
+                # Get the best time for this group
+                time_data = groups[group][0]
+                time_str = format_time(time_data[0])
+                comment_str = f"{time_data[1]} - {time_data[2]}"
+                cell = ws.cell(row=current_row,
+                               column=col_index, value=time_str)
+                cell.comment = Comment(comment_str, "PB Export")
+            else:
+                cell = ws.cell(row=current_row, column=col_index)
+
+            cell.alignment = Alignment(horizontal="center", vertical="center")
+            cell.fill = gray_fill_1 if current_row % 2 == 0 else gray_fill_2
+
+
 def generate_excel_from_pbs(pbs: list[PBInfo], filename: str = "osobaky.xlsx"):
     # Organize data by course type -> group -> swimmer_id -> {discipline: PBInfo}
     all_discipline_keys = defaultdict(set)
@@ -229,7 +295,8 @@ def generate_excel_from_pbs(pbs: list[PBInfo], filename: str = "osobaky.xlsx"):
         structured_data[course][group][swimmer_key][disc_key] = pb
         all_discipline_keys[course].add(disc_key)
 
-    discipline_keys = sorted(all_discipline_keys["SCM"], key=discipline_sort_key)
+    discipline_keys = sorted(
+        all_discipline_keys["SCM"], key=discipline_sort_key)
     headers = ["Jméno", "Ročník"] + [disc for disc in discipline_keys]
     total_columns = len(headers)
 
@@ -272,7 +339,8 @@ def generate_excel_from_pbs(pbs: list[PBInfo], filename: str = "osobaky.xlsx"):
             # Header row
             for col_index, header in enumerate(headers, start=1):
                 cell = ws.cell(row=current_row, column=col_index, value=header)
-                cell.alignment = Alignment(horizontal="center", vertical="center")
+                cell.alignment = Alignment(
+                    horizontal="center", vertical="center")
                 cell.fill = header_fill
                 cell.font = bold_font
                 cell.border = border
@@ -306,7 +374,9 @@ def generate_excel_from_pbs(pbs: list[PBInfo], filename: str = "osobaky.xlsx"):
                         cell.fill = red_fill_1 if current_row % 2 == 0 else red_fill_2
                         cell.font = bold_font
                         alignement = "left" if col_index == 1 else "center"
-                        cell.alignment = Alignment(horizontal=alignement, vertical="center")
+                        cell.alignment = Alignment(
+                            horizontal=alignement, vertical="center"
+                        )
                         cell.value = cell_data
 
                     if isinstance(cell_data, TimeData):
@@ -324,121 +394,55 @@ def generate_excel_from_pbs(pbs: list[PBInfo], filename: str = "osobaky.xlsx"):
             ws.row_dimensions[current_row].height = 10
             current_row += 1  # spacer between groups
 
+    # generate_records(wb)
+
     wb.save(filename)
 
 
+def print_records(records, gender, course_length):
+    """Prints the records in a formatted way."""
+    print("\n\n\n==========================================")
+    print(f"Rekordy {course_length}m - {'muži' if gender == 'M' else 'ženy'}")
+    for record in records:
+        discipline, time, name, surname, course_type, course_length, date = record
+        print(f"{discipline:25} {format_time(time):10} {name:10} {surname:10}  {date}")
+
+
 def debug():
-    pbs = load_personal_bests()
+    # pbs = load_personal_bests()
 
-    generate_excel_from_pbs(pbs)
+    # generate_excel_from_pbs(pbs)
 
-    # wb = Workbook()
-    # ws = wb.active
-    # ws.title = "Results"
+    db: Session = SessionLocal()
+    # men_short = best_records_query(db, gender="M", course_length=25)
 
-    # print("=== Swimmers ===")
-    # for swimmer in db.query(Swimmer).limit(10).all():
-    #     print(f"{swimmer.id}: {swimmer.name} {swimmer.surname} ({swimmer.group})")
-    #
-    # print("\n=== Disciplines ===")
-    # for d in db.query(Discipline).order_by(Discipline.code).limit(10):
-    #     print(f"{d.id}: {d.code} - {d.title} ({d.gender})")
-    #
-    # print("\n=== Courses ===")
-    # for c in db.query(Course).all():
-    #     print(f"{c.id}: {c.type} ({c.length}m)")
-    #
-    # print("\n=== Personal Bests ===")
-    # for pb in db.query(PersonalBest).limit(10):
-    #     print(
-    #         f"{pb.id}: {pb.swimmer.name} {pb.swimmer.surname} - "
-    #         f"{pb.discipline.code} ({pb.course.length}m): {pb.time}s on {pb.date}"
-    #     )
-    #
+    # women_short = best_records_query(db, gender="Z", course_length=25)
 
-    # thin = Side(border_style="thin", color="000000")
-    # border = Border(top=thin, left=thin, right=thin, bottom=thin)
-    #
-    # stroke = "100 P"
-    # results = (
-    #     db.query(Result)
-    #     .join(Swimmer)
-    #     .join(Course)
-    #     .join(Discipline)
-    #     .filter(Discipline.code == stroke, Course.length == 25, Swimmer.gender == "M")
-    #     .order_by(Result.time)
-    #     .limit(20)
-    #     .all()
-    # )
-    #
-    # header = ["Rank", "Surname", "Name", "Time", "Split Time", "Date", "Location"]
-    # data = []
-    # data.append(header)
-    # for i, r in enumerate(results, start=1):
-    #     formatted_time = format_time(r.time)
-    #     split_time = "mezicas" if r.split_time else ""
-    #     data.append(
-    #         [
-    #             i,
-    #             r.swimmer.surname,
-    #             r.swimmer.name,
-    #             formatted_time,
-    #             split_time,
-    #             str(r.date),
-    #             r.competition_location,
-    #         ]
-    #     )
-    #
-    # rows = len(data)
-    # cols = len(data[0])
-    # # ws.add_table(table)
-    # for row in data:
-    #     ws.append(row)
-    #
-    # for row in ws.iter_rows(min_row=2, max_row=rows, min_col=1, max_col=cols):
-    #     for cell in row:
-    #         cell.border = border
-    # wb.save("results.xlsx")
+    # men_long = best_records_query(db, gender="M", course_length=50)
 
-    # print(f"\n=== Results for {stroke} (25m)===")
-    # for i, r in enumerate(results, start=1):
-    #     print(
-    #         f"{i:<3} {r.swimmer.surname:<10} {r.swimmer.name:<20}"
-    #         f"{format_time(r.time):<14} {'mezičas' if r.split_time else '':^10} {r.date}  {r.competition_location:<20} "
-    #     )
+    # women_long = best_records_query(db, gender="Z", course_length=50)
 
-    # swimmer = (
-    #     db.query(Swimmer)
-    #     .filter(Swimmer.name.ilike("Lukáš"), Swimmer.surname.ilike("Orlík"))
-    #     .first()
-    # )
-    #
-    # results = (
-    #     db.query(PersonalBest)
-    #     .join(Swimmer)
-    #     .join(Course)
-    #     .filter(Swimmer.gender == "M", Course.length == 25)
-    #     .order_by(PersonalBest.points.desc())
-    #     .limit(30)
-    #     .all()
-    # )
-    #
-    # print("-" * 40)
-    # for i, pb in enumerate(results, start=1):
-    #     print(
-    #         f"{i:>2} "
-    #         f"{pb.swimmer.name:<10} {pb.swimmer.surname:<10} "
-    #         f"{pb.discipline.title:<20} "
-    #         f"{format_time(pb.time):>9}  "
-    #         f"{pb.points:>4}"
-    #     )
-    #
-    # print_personal_bests(swimmer)
-    # for pb in swimmer.personal_bests:
-    #     print(
-    #         f"{pb.swimmer.name} {pb.swimmer.surname} - "
-    #         f"{pb.discipline.code} ({pb.course.length}m): {format_time(pb.time)}s on {pb.date}"
-    #     )
+    limit = 20
+    top = (db.query(
+        Swimmer.name,
+        Swimmer.surname,
+        Discipline.title,
+        PersonalBest.points
+    ).join(Swimmer, PersonalBest.swimmer_id == Swimmer.id)
+        .join(Discipline, PersonalBest.discipline_id == Discipline.id)
+        .order_by(PersonalBest.points.desc())
+        .limit(limit)
+        .all()
+    )
+
+    print(top)
+
+    db.close()
+
+    print_records(men_short, "M", 25)
+    print_records(women_short, "M", 25)
+    print_records(men_long, "M", 50)
+    print_records(women_long, "Z", 50)
 
 
 if __name__ == "__main__":

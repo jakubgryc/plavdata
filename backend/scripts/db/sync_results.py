@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import NamedTuple
 
 import requests
 from sqlalchemy.orm import Session
@@ -14,17 +15,31 @@ API_URL = "https://vysledky.czechswimming.cz/cz.zma.csps.portal.rest/api/public/
 VALID_GROUPS = ["Z1", "Z2", "P1", "veteran"]
 
 
+class ResultEntry(NamedTuple):
+    time: str
+    discipline_code: str
+    pool_length: int
+    improvement: bool
+    comparison_to_best: bool
+    split_time: bool
+    relay_part: bool
+    competition_location: str
+    date_str: str
+
+
 def fetch_results(
     user_id: int, discipline_code: str, pool_length: int, limit: int = 100
 ):
     page = 1
     all_results = []
+    headers = HEADERS.copy()
     while True:
         url = API_URL.format(
             user_id, discipline_code.replace(" ", "+"), str(page), pool_length
         )
         try:
-            response = requests.get(url, timeout=5, headers=HEADERS)
+            headers["Referer"] = f"https://vysledky.czechswimming.cz/lide/{user_id}"
+            response = requests.get(url, timeout=5, headers=headers)
             response.raise_for_status()
             data = response.json()
 
@@ -67,6 +82,9 @@ def save_data(
                 discipline_id=discipline.id,
                 course_id=course.id,
                 date=datetime.fromisoformat(date_str),
+                time=time,
+                split_time=split_time,
+                relay_part=relay_part,
             )
             .first()
         )
@@ -103,7 +121,6 @@ def sync():
                 if discipline.code == "100 O" and course.length == "50":
                     continue
 
-                print(f"{discipline.title} ({course.length}m)")
                 results_data = fetch_results(
                     swimmer.swimmer_id, discipline.code, course.length
                 )

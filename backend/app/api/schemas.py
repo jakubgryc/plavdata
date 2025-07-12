@@ -1,0 +1,127 @@
+from datetime import datetime
+import pprint as pp
+
+from pydantic import BaseModel
+from typing import Optional, List
+
+
+class BaseSwimmerOut(BaseModel):
+    id: int
+    surname: str
+    name: str
+
+
+class SwimmerOut(BaseModel):
+    id: int
+    name: str
+    surname: str
+    birth_year: int
+    current_age: Optional[int] = None
+    group: str
+    gender: str
+
+    @classmethod
+    def with_age(cls, swimmer):
+        """
+        Create a SwimmerOut instance with the current age calculated from the birth year.
+        """
+        current_year = datetime.now().year
+        current_age = current_year - swimmer.birth_year
+        return cls(
+            id=swimmer.id,
+            name=swimmer.name,
+            surname=swimmer.surname,
+            birth_year=swimmer.birth_year,
+            current_age=current_age,
+            group=swimmer.group,
+            gender=swimmer.gender,
+        )
+
+    class Config:
+        from_attributes = True
+
+
+class DisciplineOut(BaseModel):
+    title: str
+    code: str
+
+    @classmethod
+    def rename_freestyle(cls, discipline):
+        """
+        Rename the discipline code 'K' to 'VZ'.
+        """
+        length, abbrev = discipline.code.split()
+        if abbrev == 'K':
+            return cls(title=discipline.title, code=length + ' VZ')
+        return cls(title=discipline.title, code=discipline.code)
+
+    class Config:
+        from_attributes = True
+
+
+class CourseOut(BaseModel):
+    type: str
+    length: int
+
+    class Config:
+        from_attributes = True
+
+
+class PersonalBestOut(BaseModel):
+    swimmer: SwimmerOut
+    discipline: DisciplineOut
+    course: CourseOut
+    age_at_pb: Optional[int] = None
+    time: int
+    split_time: Optional[bool] = None
+    relay_part: Optional[bool] = None
+    competition_location: Optional[str] = None
+    date: datetime
+
+    @classmethod
+    def with_ages(cls, personal_best):
+        """
+        Create a PersonalBestOut instance with the swimmer's current age calculated from the birth year.
+        """
+        swimmer = personal_best.swimmer
+        discipline = personal_best.discipline
+        date_at_pb = personal_best.date.year
+        age_at_pb = date_at_pb - swimmer.birth_year if swimmer.birth_year else None
+
+        return cls(
+            swimmer=SwimmerOut.with_age(swimmer),
+            discipline=DisciplineOut.rename_freestyle(discipline),
+            course=CourseOut(type=personal_best.course.type,
+                             length=personal_best.course.length),
+            age_at_pb=age_at_pb,
+            time=personal_best.time,
+            split_time=personal_best.split_time,
+            relay_part=personal_best.relay_part,
+            competition_location=personal_best.competition_location,
+            date=personal_best.date
+        )
+
+    class Config:
+        from_attributes = True
+
+
+class PersonalBestStrippedOut(BaseModel):
+    discipline: DisciplineOut
+    course: CourseOut
+    age_at_pb: Optional[int] = None
+    time: int
+    split_time: Optional[bool] = None
+    relay_part: Optional[bool] = None
+    competition_location: Optional[str] = None
+    date: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class SwimmerPersonalBestOut(BaseModel):
+    swimmer: SwimmerOut
+    personal_bests: List[PersonalBestStrippedOut]
+
+    class Config:
+        from_attributes = True

@@ -3,14 +3,11 @@ import json
 from sqlalchemy.orm import Session
 
 from app.db import SessionLocal, engine, Base
+from app.constants import STROKE_TITLES, STROKE_CODES, DISTANCES
 from app.models import Swimmer, Discipline, Course
 from scripts.config import DATA_DIR
 
 SWIMMERS_FILE = DATA_DIR / "pkboh.json"
-
-STROKE_TITLES = ["Volný způsob", "Znak", "Prsa", "Motýlek", "Polohový závod"]
-STROKE_CODES = ["K", "Z", "P", "M", "O"]
-DISTANCES = [50, 100, 200, 400, 800, 1500]
 
 
 def init_static_tables(db: Session):
