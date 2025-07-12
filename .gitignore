@@ -6,6 +6,7 @@ backend/.mypy_cache/
 backend/.pytest_cache/
 backend/.pdm-python
 backend/__pypackages__/
+backend/data/*.json
 
 # If using .env files for secrets
 backend/.env
@@ -44,6 +45,7 @@ coverage/
 htmlcov/
 *.log
 *.db
+todo.md
 
 .backup/
 
@@ -51,3 +53,5 @@ htmlcov/
 # -- Excel files
 
 **/*.xlsx
+
+
