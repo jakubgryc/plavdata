@@ -7,7 +7,12 @@ from collections import defaultdict
 
 from app.models import PersonalBest, Swimmer, Discipline, Course
 from app.db import get_db
-from app.api.schemas import PersonalBestOut, PersonalBestStrippedOut, SwimmerPersonalBestOut
+from app.api.schemas import (
+    PersonalBestOut,
+    PersonalBestStrippedOut,
+    SwimmerPersonalBestOut,
+    SwimmerOut,
+)
 from app.constants import GROUPS_TO_LOOKUP, DISCIPLINE_ORDER
 
 router = APIRouter(
@@ -21,11 +26,9 @@ def discipline_case():
     Helper function to create a case statement for discipline ordering.
     """
     return case(
-        {title: index for index, title in enumerate(
-            DISCIPLINE_ORDER
-        )},
+        {title: index for index, title in enumerate(DISCIPLINE_ORDER)},
         value=Discipline.code,
-        else_=len(GROUPS_TO_LOOKUP)  # Default case for unknown disciplines
+        else_=len(GROUPS_TO_LOOKUP),  # Default case for unknown disciplines
     )
 
 
@@ -33,6 +36,7 @@ class PB_Payload(BaseModel):
     """
     Payload for filtering personal bests.
     """
+
     swimmer_ids: Optional[List[int]] = None
     discipline_ids: Optional[List[int]] = None
     course: Optional[int] = 25
@@ -40,8 +44,7 @@ class PB_Payload(BaseModel):
 
 @router.post("", response_model=list[PersonalBestOut])
 async def get_personal_bests(payload: PB_Payload, db: Session = Depends(get_db)):
-    """Get personal bests filtered by swimmer IDs, discipline IDs, and course length.
-    """
+    """Get personal bests filtered by swimmer IDs, discipline IDs, and course length."""
     payload = dict(payload)
     swimmer_ids = payload.get("swimmer_ids", [])
     discipline_ids = payload.get("discipline_ids", [])
@@ -54,8 +57,7 @@ async def get_personal_bests(payload: PB_Payload, db: Session = Depends(get_db))
     )
 
     if course and course not in [25, 50]:
-        raise HTTPException(
-            status_code=400, detail="Invalid course. Must be 25 or 50.")
+        raise HTTPException(status_code=400, detail="Invalid course. Must be 25 or 50.")
 
     if swimmer_ids:
         query = query.filter(PersonalBest.swimmer_id.in_(swimmer_ids))
@@ -81,13 +83,20 @@ async def get_personal_bests(payload: PB_Payload, db: Session = Depends(get_db))
 async def get_personal_bests_by_group(
     group: str,
     course: Optional[int] = Query(25, description="Course length (25 or 50)"),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """
     Get personal bests for a specific group.
     """
     if group not in GROUPS_TO_LOOKUP:
         raise HTTPException(status_code=400, detail="Invalid group")
+
+    swimmers_in_group = (
+        db.query(Swimmer)
+        .filter(Swimmer.group == group)
+        .order_by(Swimmer.surname.asc(), Swimmer.name.asc())
+        .all()
+    )
 
     pbs = (
         db.query(PersonalBest)
@@ -101,8 +110,7 @@ async def get_personal_bests_by_group(
             contains_eager(PersonalBest.discipline),
             contains_eager(PersonalBest.course),
         )
-        .order_by(Swimmer.surname.asc(), Swimmer.name,
-                  discipline_case().asc())
+        .order_by(Swimmer.surname.asc(), Swimmer.name, discipline_case().asc())
         .all()
     )
 
@@ -113,16 +121,29 @@ async def get_personal_bests_by_group(
 
     for pb in pbs_with_ages:
         swimmer_id = pb.swimmer.id
-        grouped_pbs[swimmer_id].append(PersonalBestStrippedOut(
-            **pb.model_dump(exclude={"swimmer"})))
+        grouped_pbs[swimmer_id].append(
+            PersonalBestStrippedOut(**pb.model_dump(exclude={"swimmer"}))
+        )
         swimmers[swimmer_id] = pb.swimmer
 
     result: List[SwimmerPersonalBestOut] = []
-    for swimmer_id, personal_bests in grouped_pbs.items():
-        result.append(SwimmerPersonalBestOut(
-            swimmer=swimmers[swimmer_id],
-            personal_bests=personal_bests
-        ))
+
+    for swimmer in swimmers_in_group:
+        # Get the PBs for the current swimmer. It will be an empty list if they have none.
+        personal_bests_for_swimmer = grouped_pbs[swimmer.id]
+
+        result.append(
+            SwimmerPersonalBestOut(
+                swimmer=SwimmerOut.with_age(swimmer),
+                personal_bests=personal_bests_for_swimmer,
+            )
+        )
+
+    # for swimmer_id, personal_bests in grouped_pbs.items():
+    #     result.append(SwimmerPersonalBestOut(
+    #         swimmer=swimmers[swimmer_id],
+    #         personal_bests=personal_bests
+    #     ))
 
     return result
 
@@ -137,8 +158,7 @@ async def get_personal_bests_by_swimmer(swimmer_id: int, db: Session = Depends(g
         raise HTTPException(status_code=404, detail="Swimmer not found")
 
     personal_bests = (
-        db.query(PersonalBest).filter(
-            PersonalBest.swimmer_id == swimmer_id).all()
+        db.query(PersonalBest).filter(PersonalBest.swimmer_id == swimmer_id).all()
     )
 
     return personal_bests
@@ -155,8 +175,7 @@ async def get_personal_best_by_discipline(
     if not swimmer:
         raise HTTPException(status_code=404, detail="Swimmer not found")
 
-    discipline = db.query(Discipline).filter(
-        Discipline.id == discipline_id).first()
+    discipline = db.query(Discipline).filter(Discipline.id == discipline_id).first()
     if not discipline:
         raise HTTPException(status_code=404, detail="Discipline not found")
 
@@ -186,14 +205,12 @@ async def get_personal_best_by_discipline_and_course(
     if not swimmer:
         raise HTTPException(status_code=404, detail="Swimmer not found")
 
-    discipline = db.query(Discipline).filter(
-        Discipline.id == discipline_id).first()
+    discipline = db.query(Discipline).filter(Discipline.id == discipline_id).first()
     if not discipline:
         raise HTTPException(status_code=404, detail="Discipline not found")
 
     if course not in [25, 50]:
-        raise HTTPException(
-            status_code=400, detail="Invalid course. Must be 25 or 50.")
+        raise HTTPException(status_code=400, detail="Invalid course. Must be 25 or 50.")
 
     personal_best = (
         db.query(PersonalBest)

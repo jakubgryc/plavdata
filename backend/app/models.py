@@ -1,7 +1,19 @@
-from sqlalchemy import Column, BigInteger, Integer, String, Date, ForeignKey, Boolean
+from datetime import datetime
+from sqlalchemy import (
+    Column,
+    BigInteger,
+    Integer,
+    String,
+    Date,
+    DateTime,
+    ForeignKey,
+    Boolean,
+)
 from sqlalchemy.orm import relationship
 
 from .db import Base
+
+EPOCH = datetime(1970, 1, 1)
 
 
 class Course(Base):
@@ -69,6 +81,14 @@ class PersonalBest(Base):
     discipline = relationship("Discipline")
     course = relationship("Course")
     swimmer = relationship("Swimmer", back_populates="personal_bests")
+
+
+class ApiSync(Base):
+    __tablename__ = "api_syncs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    personal_bests_last_fetch = Column(DateTime, nullable=False, default=EPOCH)
+    results_last_fetch = Column(DateTime, nullable=False, default=EPOCH)
 
 
 Swimmer.personal_bests = relationship(

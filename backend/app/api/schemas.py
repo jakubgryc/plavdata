@@ -1,5 +1,4 @@
 from datetime import datetime
-import pprint as pp
 
 from pydantic import BaseModel
 from typing import Optional, List
@@ -51,8 +50,8 @@ class DisciplineOut(BaseModel):
         Rename the discipline code 'K' to 'VZ'.
         """
         length, abbrev = discipline.code.split()
-        if abbrev == 'K':
-            return cls(title=discipline.title, code=length + ' VZ')
+        if abbrev == "K":
+            return cls(title=discipline.title, code=length + " VZ")
         return cls(title=discipline.title, code=discipline.code)
 
     class Config:
@@ -73,6 +72,7 @@ class PersonalBestOut(BaseModel):
     course: CourseOut
     age_at_pb: Optional[int] = None
     time: int
+    points: int
     split_time: Optional[bool] = None
     relay_part: Optional[bool] = None
     competition_location: Optional[str] = None
@@ -91,14 +91,16 @@ class PersonalBestOut(BaseModel):
         return cls(
             swimmer=SwimmerOut.with_age(swimmer),
             discipline=DisciplineOut.rename_freestyle(discipline),
-            course=CourseOut(type=personal_best.course.type,
-                             length=personal_best.course.length),
+            course=CourseOut(
+                type=personal_best.course.type, length=personal_best.course.length
+            ),
             age_at_pb=age_at_pb,
             time=personal_best.time,
             split_time=personal_best.split_time,
             relay_part=personal_best.relay_part,
             competition_location=personal_best.competition_location,
-            date=personal_best.date
+            date=personal_best.date,
+            points=personal_best.points,
         )
 
     class Config:
@@ -110,6 +112,7 @@ class PersonalBestStrippedOut(BaseModel):
     course: CourseOut
     age_at_pb: Optional[int] = None
     time: int
+    points: int
     split_time: Optional[bool] = None
     relay_part: Optional[bool] = None
     competition_location: Optional[str] = None

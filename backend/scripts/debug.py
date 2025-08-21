@@ -2,16 +2,15 @@ from collections import defaultdict
 from typing import NamedTuple
 from datetime import date
 
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session
 from app.db import SessionLocal
-from app.models import Swimmer, PersonalBest, Discipline, Course, Result
+from app.models import Swimmer, PersonalBest, Discipline, Course, ApiSync
 from openpyxl import Workbook
-from openpyxl.worksheet.table import Table, TableStyleInfo
 from openpyxl.comments import Comment
 from openpyxl.styles import Border, Side, Font, Alignment, PatternFill
 from openpyxl.utils import get_column_letter
 
-from .records import best_records_query
+from app.db import Base, engine
 
 
 def format_time(ms: int | None) -> str:
@@ -204,6 +203,7 @@ group_display_name = {
 }
 
 today = date.today().strftime("%d.%m.%Y")
+today_str = date.today().strftime("%Y_%m_%d")
 
 
 def generate_records(wb: Workbook):
@@ -240,8 +240,8 @@ def generate_records(wb: Workbook):
 
     # Organize records by discipline and group
     record_data = defaultdict(lambda: defaultdict(list))
-    for code, group, time, date, location in records:
-        record_data[code][group].append((time, date, location))
+    for code, group, time, record_date, location in records:
+        record_data[code][group].append((time, record_date, location))
 
     current_row = 2
     for code, groups in sorted(
@@ -255,9 +255,8 @@ def generate_records(wb: Workbook):
                 time_data = groups[group][0]
                 time_str = format_time(time_data[0])
                 comment_str = f"{time_data[1]} - {time_data[2]}"
-                cell = ws.cell(row=current_row,
-                               column=col_index, value=time_str)
-                cell.comment = Comment(comment_str, "PB Export")
+                cell = ws.cell(row=current_row, column=col_index, value=time_str)
+                cell.comment = Comment(comment_str)
             else:
                 cell = ws.cell(row=current_row, column=col_index)
 
@@ -265,7 +264,9 @@ def generate_records(wb: Workbook):
             cell.fill = gray_fill_1 if current_row % 2 == 0 else gray_fill_2
 
 
-def generate_excel_from_pbs(pbs: list[PBInfo], filename: str = "osobaky.xlsx"):
+def generate_excel_from_pbs(
+    pbs: list[PBInfo], filename: str = f"osobaky_{today_str}.xlsx"
+):
     # Organize data by course type -> group -> swimmer_id -> {discipline: PBInfo}
     all_discipline_keys = defaultdict(set)
 
@@ -295,16 +296,19 @@ def generate_excel_from_pbs(pbs: list[PBInfo], filename: str = "osobaky.xlsx"):
         structured_data[course][group][swimmer_key][disc_key] = pb
         all_discipline_keys[course].add(disc_key)
 
-    discipline_keys = sorted(
-        all_discipline_keys["SCM"], key=discipline_sort_key)
+    discipline_keys = sorted(all_discipline_keys["SCM"], key=discipline_sort_key)
     headers = ["Jméno", "Ročník"] + [disc for disc in discipline_keys]
     total_columns = len(headers)
 
     wb = Workbook()
 
     for i, (course, groups) in enumerate(structured_data.items()):
+
+        def _course_map(course):
+            return "25m" if course == "SCM" else "50m"
+
         ws = wb.active if i == 0 else wb.create_sheet(title=course)
-        ws.title = course
+        ws.title = _course_map(course)
         ws.column_dimensions["A"].width = 20
         ws.column_dimensions["B"].width = 8
 
@@ -339,8 +343,7 @@ def generate_excel_from_pbs(pbs: list[PBInfo], filename: str = "osobaky.xlsx"):
             # Header row
             for col_index, header in enumerate(headers, start=1):
                 cell = ws.cell(row=current_row, column=col_index, value=header)
-                cell.alignment = Alignment(
-                    horizontal="center", vertical="center")
+                cell.alignment = Alignment(horizontal="center", vertical="center")
                 cell.fill = header_fill
                 cell.font = bold_font
                 cell.border = border
@@ -381,9 +384,7 @@ def generate_excel_from_pbs(pbs: list[PBInfo], filename: str = "osobaky.xlsx"):
 
                     if isinstance(cell_data, TimeData):
                         cell.value = cell_data.get_time()
-                        cell.comment = Comment(
-                            cell_data.get_commentary_string(), "PB Export"
-                        )
+                        cell.comment = Comment(cell_data.get_commentary_string(), ".")
                         if cell_data.split_time:
                             cell.fill = split_fill
                         if cell_data.relay_part:
@@ -409,11 +410,11 @@ def print_records(records, gender, course_length):
 
 
 def debug():
-    # pbs = load_personal_bests()
+    pbs = load_personal_bests()
 
-    # generate_excel_from_pbs(pbs)
+    generate_excel_from_pbs(pbs)
 
-    db: Session = SessionLocal()
+    # db: Session = SessionLocal()
     # men_short = best_records_query(db, gender="M", course_length=25)
 
     # women_short = best_records_query(db, gender="Z", course_length=25)
@@ -422,28 +423,38 @@ def debug():
 
     # women_long = best_records_query(db, gender="Z", course_length=50)
 
-    limit = 20
-    top = (db.query(
-        Swimmer.name,
-        Swimmer.surname,
-        Discipline.title,
-        PersonalBest.points
-    ).join(Swimmer, PersonalBest.swimmer_id == Swimmer.id)
-        .join(Discipline, PersonalBest.discipline_id == Discipline.id)
-        .order_by(PersonalBest.points.desc())
-        .limit(limit)
-        .all()
-    )
+    # limit = 20
+    # top = (db.query(
+    #     Swimmer.name,
+    #     Swimmer.surname,
+    #     Discipline.title,
+    #     PersonalBest.points
+    # ).join(Swimmer, PersonalBest.swimmer_id == Swimmer.id)
+    #     .join(Discipline, PersonalBest.discipline_id == Discipline.id)
+    #     .order_by(PersonalBest.points.desc())
+    #     .limit(limit)
+    #     .all()
+    # )
+    #
+    # print(top)
+    #
+    # db.close()
 
-    print(top)
 
+def debugo():
+    Base.metadata.create_all(bind=engine)
+
+    db: Session = SessionLocal()
+
+    sync = db.query(ApiSync).first()
+
+    if not sync:
+        sync = ApiSync(id=1)
+        db.add(sync)
+    db.commit()
     db.close()
-
-    print_records(men_short, "M", 25)
-    print_records(women_short, "M", 25)
-    print_records(men_long, "M", 50)
-    print_records(women_long, "Z", 50)
 
 
 if __name__ == "__main__":
-    debug()
+    # debug()
+    debugo()

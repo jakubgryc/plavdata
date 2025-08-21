@@ -1,11 +1,11 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import NamedTuple
 
 import requests
 from sqlalchemy.orm import Session
 
 from app.db import SessionLocal
-from app.models import Swimmer, PersonalBest, Discipline, Course
+from app.models import Swimmer, PersonalBest, Discipline, Course, ApiSync
 from scripts.config import HEADERS
 
 
@@ -50,6 +50,8 @@ def update_swimmer(swimmer_row: Swimmer, pb: PBEntry):
 
 def sync_pbs():
     db: Session = SessionLocal()
+
+    last_sync = db.query(ApiSync).first()
 
     swimmers = db.query(Swimmer).filter(Swimmer.group.in_(VALID_GROUPS)).all()
 
@@ -105,6 +107,9 @@ def sync_pbs():
                     )
                 )
         print(f"Synced PBs for {swimmer.name} {swimmer.surname}")
+
+    if last_sync:
+        last_sync.personal_bests_last_fetch = datetime.now(timezone.utc)
 
     db.commit()
     db.close()

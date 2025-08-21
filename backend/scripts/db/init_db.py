@@ -4,13 +4,19 @@ from sqlalchemy.orm import Session
 
 from app.db import SessionLocal, engine, Base
 from app.constants import STROKE_TITLES, STROKE_CODES, DISTANCES
-from app.models import Swimmer, Discipline, Course
+from app.models import Swimmer, Discipline, Course, ApiSync
 from scripts.config import DATA_DIR
 
 SWIMMERS_FILE = DATA_DIR / "pkboh.json"
 
 
 def init_static_tables(db: Session):
+    sync = db.query(ApiSync).get(1)
+
+    if not sync:
+        sync = ApiSync(id=1)
+        db.add(sync)
+
     COURSES = [
         {"type": "SCM", "length": 25},
         {"type": "LCM", "length": 50},
@@ -39,11 +45,7 @@ def init_static_tables(db: Session):
             )
 
     for d in disciplines:
-        exists = (
-            db.query(Discipline)
-            .filter_by(code=d.get("code"))
-            .first()
-        )
+        exists = db.query(Discipline).filter_by(code=d.get("code")).first()
         if not exists:
             db.add(Discipline(**d))
 
