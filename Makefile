@@ -1,4 +1,10 @@
+ifneq (,$(wildcard .env))
+    include .env
+    export
+endif
 
+run:
+	echo ${DB_USER} ${DB_PASSWORD}
 
 dev:
 	docker compose up db backend
@@ -23,8 +29,11 @@ sync-pb:
 sync-results:
 	docker compose exec -it backend python -m scripts.db.sync_results
 
+pb-export:
+	docker compose exec -it backend python -m scripts.records
+
 debug:
 	docker compose exec -it backend python -m scripts.debug
 
 db:
-	docker exec -it postgres_db psql -U postgres -d plavdata
+	docker exec -it plavdata_db psql -U jakub -d plavdata_db

@@ -1,17 +1,13 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Row from "./Row";
 import Cell from "./Cell";
 import "./Grid.css";
 
 export interface Column<T> {
   key: string;
-
   header: string;
-
   render: (item: T) => React.ReactNode;
-
   width?: string | number;
-
   className?: string;
 }
 
@@ -20,6 +16,12 @@ export interface GridProps<T> {
   columns: Column<T>[];
   className?: string;
   onRowClick?: (item: T, index: number) => void;
+  onCellClick?: (
+    item: T,
+    column: Column<T>,
+    rowIndex: number,
+    colIndex: number
+  ) => void;
   keyExtractor?: (item: T, index: number) => string | number;
   caption?: string;
   style?: React.CSSProperties;
@@ -33,11 +35,12 @@ function Grid<T>({
   columns,
   className = "",
   onRowClick,
+  onCellClick,
   keyExtractor = (_, index) => index,
   caption,
   style,
   emptyText = "No data available",
-  headerClassName = "",
+  headerClassName,
   bodyClassName = "",
 }: GridProps<T>) {
   return (
@@ -89,6 +92,11 @@ function Grid<T>({
                           ? "#d3d3d3"
                           : undefined,
                     }}
+                    onClick={
+                      onCellClick
+                        ? () => onCellClick(item, column, rowindex, index)
+                        : undefined
+                    }
                   />
                 ))}
               </Row>

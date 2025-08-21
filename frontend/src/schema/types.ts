@@ -27,6 +27,7 @@ interface BasePersonalBest {
   course: Course;
   age_at_pb?: number;
   time: number; // Time in milliseconds
+  points: number;
   split_time?: boolean;
   relay_part?: boolean;
   competition_location?: string;
