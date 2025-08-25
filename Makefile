@@ -35,11 +35,5 @@ pb-export:
 debug:
 	docker compose exec -it backend python -m scripts.debug
 
-db-explore:
-	docker compose exec -it backend python -m scripts.db_explorer
-
-db-query:
-	docker compose exec -it backend python -m scripts.db_explorer --interactive
-
 db:
 	docker exec -it plavdata_db psql -U jakub -d plavdata_db
