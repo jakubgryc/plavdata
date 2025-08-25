@@ -23,3 +23,22 @@ services:
         # Rebuild the image if dependencies change by checking uv.lock
         - action: rebuild
           path: ./backend/uv.lock
+
+  frontend:
+    build: ./frontend
+    container_name: plavdata_fe
+    ports:
+      - "3000:3000"
+    develop:
+      watch:
+        # Sync the working directory with the `/app` directory in the container
+        - action: sync
+          path: ./frontend/
+          target: /app
+          ignore:
+            - ./frontend/node_modules/
+            - ./frontend/dist/
+
+        # Rebuild the image if dependencies change
+        - action: rebuild
+          path: ./frontend/package*.json

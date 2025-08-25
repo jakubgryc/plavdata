@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 // import { Button } from "primereact/button";
 import { MultiSelect } from "primereact/multiselect";
 import type { PersonalBest } from "../schema/types";
