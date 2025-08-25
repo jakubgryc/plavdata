@@ -2,15 +2,10 @@ services:
   backend:
     build: ./backend
     container_name: plavdata_be
-    depends_on:
-      - db
-    environment:
-      POSTGRES_HOST: db
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
     ports:
       - "8000:8000"
+    volumes:
+      - "./backend/data/sql_app.db:/app/data/sql_app.db"
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     develop:
       # Create a `watch` configuration to update the app
@@ -28,52 +23,3 @@ services:
         # Rebuild the image if dependencies change by checking uv.lock
         - action: rebuild
           path: ./backend/uv.lock
-
-  db:
-    image: docker.io/library/postgres:16
-    container_name: plavdata_db
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # init-db:
-  #   build: ./backend
-  #   container_name: init_db_runner
-  #   working_dir: /app
-  #   depends_on:
-  #     - db
-  #   environment:
-  #     POSTGRES_HOST: db
-  #     POSTGRES_USER: postgres
-  #     POSTGRES_PASSWORD: postgres
-  #     POSTGRES_DB: plavdata
-  #   command: ["python", "-m", "scripts.db.init_db"]
-  #   restart: "no"   # run once and stop
-  #
-  # sync-pb:
-  #   build: ./backend
-  #   container_name: sync_pb_runner
-  #   working_dir: /app
-  #   depends_on:
-  #     - db
-  #   environment:
-  #     POSTGRES_HOST: db
-  #     POSTGRES_USER: postgres
-  #     POSTGRES_PASSWORD: postgres
-  #     POSTGRES_DB: plavdata
-  #   command: ["python", "-m", "scripts.db.sync_personal_bests"]
-  #   restart: "no"   # run once and stop
-
-volumes:
-  pgdata:
