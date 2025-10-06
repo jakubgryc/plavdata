@@ -14,7 +14,7 @@ function App() {
       <PrimeReactProvider>
         <Router>
           <nav className="nav flex items-center">
-            <h1 className="font-bold text-2xl pl-20">PlavData</h1>
+            <h1 className="font-bold text-2xl pl-20">plavdata</h1>
             <div className="nav-links">
               <Link to="/" style={{ margin: "0 10px" }}>
                 Home

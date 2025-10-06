@@ -1,8 +1,9 @@
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 // import { Button } from "primereact/button";
 import { MultiSelect } from "primereact/multiselect";
 import type { PersonalBest } from "../schema/types";
 import "./home.css";
+import { API_BASE_URL } from "../../config";
 
 interface Swimmer {
   id: number;
@@ -26,7 +27,7 @@ function Home() {
   useEffect(() => {
     const fetchSwimmers = async () => {
       try {
-        const response = await fetch("http://localhost:8000/api/swimmers");
+        const response = await fetch(`${API_BASE_URL}/api/swimmers`);
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }

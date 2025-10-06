@@ -5,6 +5,7 @@ import { Dropdown } from "primereact/dropdown";
 import Grid, { type Column } from "../components/Grid";
 import "./home.css";
 import { Modal } from "@mantine/core";
+import  { API_BASE_URL } from "../../config";
 
 const groups = [
   { label: "Z1", value: "Z1" },
@@ -160,7 +161,7 @@ function PersonalBests() {
       setLoading(true);
       try {
         const response = await fetch(
-          `http://localhost:8000/api/personal_bests/grouped?group=${group}&course=${course}`,
+          `${API_BASE_URL}/api/personal_bests/grouped?group=${group}&course=${course}`,
           { method: "GET" }
         );
         if (!response.ok) throw new Error("Failed to fetch personal bests");

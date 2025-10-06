@@ -2,8 +2,10 @@ services:
   backend:
     build: ./backend
     container_name: plavdata_be
+    networks:
+      - app-network
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     volumes:
       - "./backend/data/sql_app.db:/app/data/sql_app.db"
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
@@ -27,13 +29,17 @@ services:
   frontend:
     build: ./frontend
     container_name: plavdata_fe
+    networks:
+      - app-network
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:5173"
+    env_file:
+      - ./frontend/.env
     develop:
       watch:
         # Sync the working directory with the `/app` directory in the container
         - action: sync
-          path: ./frontend/
+          path: ./frontend
           target: /app
           ignore:
             - ./frontend/node_modules/
@@ -42,3 +48,7 @@ services:
         # Rebuild the image if dependencies change
         - action: rebuild
           path: ./frontend/package*.json
+
+networks:
+  app-network:
+    driver: bridge

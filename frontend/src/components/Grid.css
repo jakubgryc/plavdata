@@ -1,4 +1,4 @@
-.grid-cell {
+/* .grid-cell {
   padding: 8px 12px;
   border: 1px solid #e0e0e0;
   text-align: left;
@@ -8,7 +8,7 @@
 th.grid-cell {
   background-color: #f5f5f5;
   font-weight: 600;
-}
+} */
 
 .data-grid tbody tr:nth-child(even) {
   background-color: #d7d7d7;
