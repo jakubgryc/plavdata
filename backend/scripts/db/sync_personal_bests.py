@@ -56,7 +56,7 @@ def sync_pbs():
     swimmers = db.query(Swimmer).filter(Swimmer.group.in_(VALID_GROUPS)).all()
 
     for swimmer in swimmers:
-        pb_data = fetch_personal_bests(swimmer.swimmer_id)
+        pb_data = fetch_personal_bests(swimmer.csps_id)
 
         for entry in pb_data:
             pb = PBEntry(

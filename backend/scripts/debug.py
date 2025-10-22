@@ -3,14 +3,18 @@ from typing import NamedTuple
 from datetime import date
 
 from sqlalchemy.orm import Session
-from app.db import SessionLocal
-from app.models import Swimmer, PersonalBest, Discipline, Course, ApiSync
 from openpyxl import Workbook
 from openpyxl.comments import Comment
 from openpyxl.styles import Border, Side, Font, Alignment, PatternFill
 from openpyxl.utils import get_column_letter
 
-from app.db import Base, engine
+from app.db import SessionLocal
+from app.models import Swimmer, PersonalBest, Discipline, Course
+from .config import DATA_DIR
+
+today = date.today().strftime("%d.%m.%Y")
+today_str = date.today().strftime("%Y_%m_%d")
+RESULT_FILE = DATA_DIR / f"osobaky{today_str}.xlsx"
 
 
 def format_time(ms: int | None) -> str:
@@ -202,9 +206,6 @@ group_display_name = {
     None: "Nezařazení",
 }
 
-today = date.today().strftime("%d.%m.%Y")
-today_str = date.today().strftime("%Y_%m_%d")
-
 
 def generate_records(wb: Workbook):
     """Generate a record sheet with the best times for each discipline."""
@@ -264,9 +265,7 @@ def generate_records(wb: Workbook):
             cell.fill = gray_fill_1 if current_row % 2 == 0 else gray_fill_2
 
 
-def generate_excel_from_pbs(
-    pbs: list[PBInfo], filename: str = f"osobaky_{today_str}.xlsx"
-):
+def generate_excel_from_pbs(pbs: list[PBInfo], filename: str = RESULT_FILE):
     # Organize data by course type -> group -> swimmer_id -> {discipline: PBInfo}
     all_discipline_keys = defaultdict(set)
 
@@ -442,19 +441,36 @@ def debug():
 
 
 def debugo():
-    Base.metadata.create_all(bind=engine)
+    # Base.metadata.create_all(bind=engine)
 
     db: Session = SessionLocal()
 
-    sync = db.query(ApiSync).first()
+    print("are we here?")
 
-    if not sync:
-        sync = ApiSync(id=1)
-        db.add(sync)
-    db.commit()
+    ## get the veteran swimmers, sorted by surname
+    veterans = (
+        db.query(Swimmer)
+        .filter(Swimmer.group == "veteran")
+        .order_by(Swimmer.surname, Swimmer.name)
+        .all()
+    )
+
+    # print output in yml format,
+    # like
+    # - surname: SURNAME
+    #   name: NAME
+    for v in veterans:
+        print(f'- surname: "{v.surname}"\n  name: "{v.name}"')
+
+    # sync = db.query(ApiSync).first()
+    #
+    # if not sync:
+    #     sync = ApiSync(id=1)
+    #     db.add(sync)
+    # db.commit()
     db.close()
 
 
 if __name__ == "__main__":
-    # debug()
-    debugo()
+    debug()
+    # debugo()

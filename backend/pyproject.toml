@@ -9,6 +9,7 @@ dependencies = [
     "fastapi>=0.115.12",
     "lxml>=6.0.1",
     "openpyxl>=3.1.5",
+    "pyaml>=25.7.0",
     "requests>=2.32.3",
     "sqlalchemy>=2.0.40",
     "sqlmodel>=0.0.24",
