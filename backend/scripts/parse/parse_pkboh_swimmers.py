@@ -36,8 +36,6 @@ class Swimmer:
 def fetch_swimmers_from_pkboh_site() -> list[dict]:
     response = requests.get(PKBOH_URL, headers=HEADERS)
     response.raise_for_status()
-    if response.status_code != 200:
-        raise Exception(f"Failed to fetch data: {response.status_code}")
 
     soup = BeautifulSoup(response.content.decode("utf-8"), "html.parser")
     table = soup.find("tbody")
@@ -105,7 +103,6 @@ def get_swimmer_profile(csps_id: int) -> dict | None:
         Swimmer profile data dictionary, or None if not found.
     """
     response = requests.get(CSPS_USER_URL + str(csps_id), headers=HEADERS)
-    response.raise_for_status()
     if response.status_code != 200:
         print(
             f"Failed to fetch swimmer profile for CSPS ID {csps_id}: {response.status_code}"
@@ -123,7 +120,7 @@ def get_membership_dates(
     membership in PKBoh.
 
     Args:
-        swimmer_profile_data: [TODO:description]
+        swimmer_profile_data: Parsed swimmer profile data from CSPS.
 
     Returns:
         Tuple of membership start and end dates or None if not found.
@@ -183,7 +180,12 @@ def fetch_valid_swimmer_id_from_csps(swimmer: dict) -> int | None:
         f"{swimmer['surname'].replace(' ', '+')}+{swimmer['name'].replace(' ', '+')}"
     )
     response = requests.get(CSPS_QUERY + query, headers=HEADERS)
-    response.raise_for_status()
+    if response.status_code != 200:
+        print(
+            f"Failed to fetch CSPS data for swimmer {swimmer['name']} {swimmer['surname']}: {response.status_code}"
+        )
+        return None
+
     results = response.json()
 
     valid_swimmer_data = get_valid_pkboh_swimmer(results)
@@ -196,6 +198,35 @@ def fetch_valid_swimmer_id_from_csps(swimmer: dict) -> int | None:
 
     csps_id = valid_swimmer_data.get("userId")
     return csps_id
+
+
+def fetch_and_save_swimmers_data(
+    swimmers: list[dict] | None,
+    parsed_swimmers: list[Swimmer],
+    inactive: bool,
+) -> None:
+    if not swimmers:
+        return
+
+    group = "former" if inactive else "veteran"
+    for swimmer in swimmers:
+        if inactive:
+            csps_id = swimmer.get("csps_id")
+        else:
+            csps_id = fetch_valid_swimmer_id_from_csps(swimmer)
+        swimmer_profile_data = get_swimmer_profile(csps_id)
+
+        if not swimmer_profile_data:
+            wait_random()
+            continue
+
+        swimmer_group = swimmer.get("group", group)
+        swimmer_data = parse_swimmer_data(swimmer, swimmer_profile_data, swimmer_group)
+        parsed_swimmers.append(swimmer_data)
+        print(
+            f"Parsed {'inactive' if inactive else 'active'} swimmer: {swimmer_data.name} {swimmer_data.surname}, CSPS ID: {swimmer_data.csps_id}"
+        )
+        wait_random()
 
 
 def parse_data_from_csps(
@@ -216,51 +247,32 @@ def parse_data_from_csps(
     """
     parsed_swimmers: list[Swimmer] = []
 
-    active_swimmers.extend(former_swimmers.get("active", []))
+    if former_swimmers:
+        active_swimmers.extend(former_swimmers.get("active", []))
 
-    for swimmer in active_swimmers:
-        csps_id = fetch_valid_swimmer_id_from_csps(swimmer)
-        swimmer_profile_data = get_swimmer_profile(csps_id)
-
-        if not swimmer_profile_data:
-            wait_random()
-            continue
-
-        swimmer_group = swimmer.get("group", "veteran")
-        swimmer_data = parse_swimmer_data(swimmer, swimmer_profile_data, swimmer_group)
-        parsed_swimmers.append(swimmer_data)
-        print(
-            f"Parsed swimmer: {swimmer_data.name} {swimmer_data.surname}, CSPS ID: {swimmer_data.csps_id}"
-        )
-        wait_random()
+    fetch_and_save_swimmers_data(active_swimmers, parsed_swimmers, inactive=False)
 
     inactive_swimmers = former_swimmers.get("inactive", []) if former_swimmers else []
 
-    # udpate manually the group for former (but still active in the CSPS system) swimmers to 'veteran'
-    inactive_swimmers = [s.update({"group": "veteran"}) or s for s in inactive_swimmers]
-    runaway_inactive_swimmers = (
-        former_swimmers.get("runaway", []).get("inactive", [])
-        if former_swimmers
-        else []
-    )
-    runaway_active_swimmers = (
-        former_swimmers.get("runaway", []).get("active", []) if former_swimmers else []
-    )
+    # update manually the group for former (but still active in the CSPS system) swimmers to 'veteran'
+    if inactive_swimmers:
+        for swimmer in inactive_swimmers:
+            swimmer["group"] = "veteran"
+
+    runaway_swimmers = former_swimmers.get("runaway", []) if former_swimmers else []
+
+    runaway_inactive_swimmers: list[dict] = []
+    runaway_active_swimmers: list[dict] = []
+
+    if runaway_swimmers:
+        runaway_inactive_swimmers = runaway_swimmers.get("inactive", [])
+        runaway_active_swimmers = runaway_swimmers.get("active", [])
 
     all_inactive_swimmers = (
         inactive_swimmers + runaway_inactive_swimmers + runaway_active_swimmers
     )
 
-    for swimmer in all_inactive_swimmers:
-        csps_id = swimmer.get("csps_id")
-        swimmer_profile_data = get_swimmer_profile(csps_id)
-        swimmer_group = swimmer.get("group", "former")
-        swimmer_data = parse_swimmer_data(swimmer, swimmer_profile_data, swimmer_group)
-        parsed_swimmers.append(swimmer_data)
-        print(
-            f"Parsed inactive swimmer: {swimmer_data.name} {swimmer_data.surname}, CSPS ID: {swimmer_data.csps_id}"
-        )
-        wait_random()
+    fetch_and_save_swimmers_data(all_inactive_swimmers, parsed_swimmers, inactive=True)
 
     return parsed_swimmers
 
@@ -278,7 +290,7 @@ def save_json(data: dict, path: Path) -> None:
 def parse_pkboh_swimmers(
     former_swimmers_path: Path | None = None, output_path: Path = RESULT_FILE
 ):
-    """[TODO:summary]
+    """
 
     Main function to parse PKBoh swimmers from the club website and save to output file.
 
