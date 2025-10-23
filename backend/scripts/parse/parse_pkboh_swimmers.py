@@ -327,7 +327,7 @@ def parse_args():
         "--output",
         type=Path,
         default=RESULT_FILE,
-        help="Path to the output YAML file.",
+        help="Path to the output JSON file.",
     )
     return parser.parse_args()
 

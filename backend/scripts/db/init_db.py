@@ -106,7 +106,6 @@ def parse_args():
         "--input",
         type=Path,
         default=SWIMMERS_FILE,
-        optional=True,
         help="Initialize the database with static data and swimmers.",
     )
     return parser.parse_args()
