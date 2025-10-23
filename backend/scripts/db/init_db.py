@@ -1,4 +1,7 @@
+import argparse
 import json
+from datetime import datetime
+from pathlib import Path
 
 from sqlalchemy.orm import Session
 
@@ -7,7 +10,7 @@ from app.constants import STROKE_TITLES, STROKE_CODES, DISTANCES
 from app.models import Swimmer, Discipline, Course, ApiSync
 from scripts.config import DATA_DIR
 
-SWIMMERS_FILE = DATA_DIR / "pkboh.json"
+SWIMMERS_FILE = DATA_DIR / "swimmers.json"
 
 
 def init_static_tables(db: Session):
@@ -55,16 +58,22 @@ def init_swimmers(db: Session):
         swimmers = json.load(f)
 
     for s in swimmers:
-        exists = db.query(Swimmer).filter_by(swimmer_id=s.get("userId")).first()
+        exists = db.query(Swimmer).filter_by(csps_id=s.get("csps_id")).first()
         if exists:
             continue
+        membership_start_str = s.get("membership_start")
+        membership_end_str = s.get("membership_end")
         swimmer = Swimmer(
-            swimmer_id=s.get("userId"),
-            name=s.get("firstName"),
-            surname=s.get("lastName").capitalize(),
-            birth_year=s.get("birthYear"),
+            csps_id=s.get("csps_id"),
+            name=s.get("name"),
+            surname=s.get("surname"),
+            birth_year=s.get("birth_year"),
             group=s.get("group"),
-            gender=s.get("gender"),
+            sex=s.get("sex"),
+            membership_start=datetime.fromisoformat(membership_start_str).date(),
+            membership_end=datetime.fromisoformat(membership_end_str).date()
+            if membership_end_str
+            else None,
         )
         db.add(swimmer)
 
@@ -88,6 +97,18 @@ def init_db():
     db.close()
 
     print("Database initialized.")
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Initialize the database.")
+
+    parser.add_argument(
+        "--input",
+        type=Path,
+        default=SWIMMERS_FILE,
+        help="Initialize the database with static data and swimmers.",
+    )
+    return parser.parse_args()
 
 
 if __name__ == "__main__":

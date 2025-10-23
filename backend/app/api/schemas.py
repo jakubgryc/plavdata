@@ -17,7 +17,7 @@ class SwimmerOut(BaseModel):
     birth_year: int
     current_age: Optional[int] = None
     group: str
-    gender: str
+    sex: str
 
     @classmethod
     def with_age(cls, swimmer):
@@ -33,7 +33,7 @@ class SwimmerOut(BaseModel):
             birth_year=swimmer.birth_year,
             current_age=current_age,
             group=swimmer.group,
-            gender=swimmer.gender,
+            sex=swimmer.sex,
         )
 
     class Config:

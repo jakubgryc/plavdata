@@ -36,12 +36,14 @@ class Swimmer(Base):
     __tablename__ = "swimmers"
 
     id = Column(Integer, primary_key=True, index=True)
-    swimmer_id = Column(BigInteger, unique=True, nullable=False)
+    csps_id = Column(BigInteger, unique=True, nullable=False)
     name = Column(String, nullable=False)
     surname = Column(String, nullable=False)
     birth_year = Column(Integer, nullable=False)
     group = Column(String, nullable=True)
-    gender = Column(String)
+    sex = Column(String)
+    membership_start = Column(Date, nullable=True)
+    membership_end = Column(Date, nullable=True)
 
 
 class Result(Base):
