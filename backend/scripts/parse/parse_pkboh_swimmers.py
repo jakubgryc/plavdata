@@ -308,7 +308,7 @@ def parse_pkboh_swimmers(
 
     save_json(
         [asdict(swimmer) for swimmer in parsed_data_from_csps],
-        args.output,
+        output_path,
     )
 
 
