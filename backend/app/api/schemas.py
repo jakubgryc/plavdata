@@ -9,6 +9,17 @@ class BaseSwimmerOut(BaseModel):
     surname: str
     name: str
 
+    class Config:
+        from_attributes = True
+
+
+class GroupedSwimmersOut(BaseModel):
+    group: str
+    swimmers: List[BaseSwimmerOut]
+
+    class Config:
+        from_attributes = True
+
 
 class SwimmerOut(BaseModel):
     id: int
@@ -117,6 +128,26 @@ class PersonalBestStrippedOut(BaseModel):
     relay_part: Optional[bool] = None
     competition_location: Optional[str] = None
     date: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class ResultOut(BaseModel):
+    discipline: DisciplineOut
+    course: CourseOut
+    time: int
+    comparison_to_best: int
+    split_time: Optional[bool] = None
+    relay_part: Optional[bool] = None
+    improvement: Optional[bool] = None
+    competition_location: Optional[str] = None
+    date: datetime
+
+
+class SwimmerResultOut(BaseModel):
+    swimmer: SwimmerOut
+    results: List[ResultOut]
 
     class Config:
         from_attributes = True

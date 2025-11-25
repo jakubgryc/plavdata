@@ -47,11 +47,12 @@ services:
           ignore:
             - ./frontend/node_modules/
             - ./frontend/dist/
+            - ./frontend/package*.json
 
         # Rebuild the image if dependencies change
         - action: rebuild
           path: ./frontend/package*.json
-
+    command: npm run dev
 networks:
   app-network:
     driver: bridge

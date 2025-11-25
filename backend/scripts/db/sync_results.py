@@ -122,7 +122,7 @@ def sync():
                     continue
 
                 results_data = fetch_results(
-                    swimmer.swimmer_id, discipline.code, course.length
+                    swimmer.csps_id, discipline.code, course.length
                 )
 
                 if len(results_data) == 0:
