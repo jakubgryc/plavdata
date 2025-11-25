@@ -46,8 +46,10 @@ async def get_swimmers_grouped(db: Session = Depends(get_db)):
         result.append(
             GroupedSwimmersOut(
                 group=group,
-                swimmers=[BaseSwimmerOut.model_validate(
-                    swimmer) for swimmer in swimmers_in_group],
+                swimmers=[
+                    BaseSwimmerOut.model_validate(swimmer)
+                    for swimmer in swimmers_in_group
+                ],
             )
         )
 

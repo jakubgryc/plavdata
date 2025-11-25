@@ -1,7 +1,5 @@
-import { PrimeReactProvider } from "primereact/api";
 import { Outlet } from "react-router";
 import Navbar from "./components/Navbar";
-import "primereact/resources/themes/lara-light-cyan/theme.css";
 
 function App() {
   return (

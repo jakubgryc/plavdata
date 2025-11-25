@@ -1,29 +1,24 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session, joinedload, contains_eager
-from sqlalchemy import case
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session, contains_eager
 from typing import List, Optional
 from pydantic import BaseModel
-from datetime import datetime
 from collections import defaultdict
 
-from app.models import PersonalBest, Swimmer, Discipline, Course, Result
+from app.models import Swimmer, Discipline, Course, Result
 from app.db import get_db
 from app.api.schemas import (
     SwimmerResultOut,
     ResultOut,
-    PersonalBestOut,
-    PersonalBestStrippedOut,
-    SwimmerPersonalBestOut,
     SwimmerOut,
     DisciplineOut,
     CourseOut,
 )
-from app.constants import GROUPS_TO_LOOKUP, DISCIPLINE_ORDER
 
 results_router = APIRouter(
     prefix="/results",
     tags=["results"],
 )
+
 
 class ComparisonRequest(BaseModel):
     swimmer_ids: List[int]
@@ -31,7 +26,9 @@ class ComparisonRequest(BaseModel):
     course: Optional[int] = 25
 
 
-@results_router.post("/temp", summary="Get results for given swimmers grouped by swimmer")
+@results_router.post(
+    "/compare", summary="Get results for given swimmers grouped by swimmer"
+)
 async def get_results(
     request: ComparisonRequest,
     db: Session = Depends(get_db),
@@ -46,7 +43,7 @@ async def get_results(
 
     swimmer_ids = request.swimmer_ids
     discipline_code = request.discipline_code
-    course = request.course if request.course is not None else 25
+    course = request.course
 
     query = (
         db.query(Result)
@@ -103,6 +100,7 @@ async def get_results(
             )
             results_out.append(result_out)
 
-        swimmer_results.append(SwimmerResultOut(
-            swimmer=swimmer_out, results=results_out))
+        swimmer_results.append(
+            SwimmerResultOut(swimmer=swimmer_out, results=results_out)
+        )
     return swimmer_results

@@ -36,7 +36,6 @@ function PersonalBests() {
         console.error("Error fetching personal bests:", error);
       } finally {
         setIsFetching(false);
-        console.log("fetchPersonalBests successful");
       }
     };
 
@@ -50,10 +49,6 @@ function PersonalBests() {
     }
   }, [selectedGroup, selectedCourse, cache]);
 
-  useEffect(() => {
-    console.log(selectedGroup);
-  }, [selectedGroup]);
-
   return (
     <div className="flex flex-col  h-full w-full py-5">
       <div className="flex w-full justify-between items-center">
@@ -64,9 +59,6 @@ function PersonalBests() {
           color="rgba(60, 60, 60, 1)"
           radius="md"
           size="sm"
-          onClick={() => {
-            console.log(buildTableData(personalBests));
-          }}
         >
           Stáhnout
         </Button>

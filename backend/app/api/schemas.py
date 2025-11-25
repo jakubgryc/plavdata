@@ -144,6 +144,9 @@ class ResultOut(BaseModel):
     competition_location: Optional[str] = None
     date: datetime
 
+    class Config:
+        from_attributes = True
+
 
 class SwimmerResultOut(BaseModel):
     swimmer: SwimmerOut

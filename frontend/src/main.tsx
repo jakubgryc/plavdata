@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { createTheme, MantineProvider, SegmentedControl } from "@mantine/core";
+import { MantineProvider } from "@mantine/core";
 import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import "@mantine/core/styles.css";

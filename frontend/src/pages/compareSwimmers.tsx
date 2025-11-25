@@ -143,7 +143,7 @@ function CompareSwimmers() {
   const [results, setResults] = useState<SwimmerResults[]>([]);
   const [groupedSwimmers, setGroupedSwimmers] = useState<GroupedSwimmers[]>([]);
   const [selectedSwimmers, setSelectedSwimmers] = useState<string[]>([]);
-  const [pool, setPool] = useState<string>("25m");
+  const [pool, setPool] = useState<string>("25");
   const [timeAxis, setTimeAxis] = useState<string>("absolute");
   const [intermediateTimes, setIntermediateTimes] =
     useState<string>("onlyFinal");
@@ -164,11 +164,11 @@ function CompareSwimmers() {
     setRelativeDomainTicks(ticks);
   }, [parsedResults, timeAxis]);
 
-  const dateFormatterAbsolute = (date) => {
+  const dateFormatterAbsolute = (date: number) => {
     return format(new Date(date), "MM/yy");
   };
 
-  const dateFormatterRelative = (date) => {
+  const dateFormatterRelative = (date: number) => {
     if (oldestBirthYear === null) return "";
     const year = new Date(date).getFullYear();
     const age = year - oldestBirthYear;
@@ -220,7 +220,7 @@ function CompareSwimmers() {
           discipline = selectedDiscipline;
         }
       }
-      const response = await fetch(`${API_BASE_URL}/api/results/temp`, {
+      const response = await fetch(`${API_BASE_URL}/api/results/compare`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -228,6 +228,7 @@ function CompareSwimmers() {
         body: JSON.stringify({
           swimmer_ids: swimmerIds,
           discipline_code: discipline,
+          course: pool,
         }),
       });
 
@@ -280,8 +281,8 @@ function CompareSwimmers() {
                 defaultValue={"25m"}
                 color="rgba(18, 160, 216, 1)"
                 data={[
-                  { label: "25m", value: "25m" },
-                  { label: "50m", value: "50m" },
+                  { label: "25m", value: "25" },
+                  { label: "50m", value: "50" },
                 ]}
               />
             </div>

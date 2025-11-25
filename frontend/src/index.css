@@ -1,24 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Work+Sans:wght@400;600;700&display=swap');
 @import "tailwindcss";
 
-html, body {
-  height: 100%;
-  overflow: hidden;
-}
-
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
 
 
 
@@ -34,8 +16,8 @@ code {
   --color-secondary-hover: #4b5563; /* gray-600 */
   --color-border: #e5e7eb; /* gray-200 */
   --color-input-background: #f9fafb; /* gray-50 */
-    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    --font-heading: "Work Sans", var(--font-sans);
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-heading: "Work Sans", var(--font-sans);
 
 }
 html, body {
