@@ -361,7 +361,6 @@ function CompareSwimmers() {
               padding={{ bottom: 20 }}
             />
             <CartesianGrid strokeDasharray="9 9" />
-            <Tooltip />
             <Legend />
             {parsedResults.map((swimmerData, index) => {
               const colors = [
