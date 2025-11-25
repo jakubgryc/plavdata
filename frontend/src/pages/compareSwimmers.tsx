@@ -7,7 +7,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@mantine/core";
-import { GROUPS, POOLS, DISCIPLINES } from "../utils/constants";
+import { DISCIPLINES } from "../utils/constants";
 import { MultiSelect, SegmentedControl, Select } from "@mantine/core";
 import { format } from "date-fns";
 import type { SwimmerResults, GroupedSwimmers } from "../schema/types";
