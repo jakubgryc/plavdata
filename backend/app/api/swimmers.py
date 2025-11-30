@@ -41,6 +41,6 @@ async def get_swimmers_grouped(db: Session = Depends(get_db)):
     result = [
         GroupedSwimmersOut(group=group, swimmers=swimmers_in_group)
         for group, swimmers_in_group in grouped.items()
-        ]
+    ]
 
     return result

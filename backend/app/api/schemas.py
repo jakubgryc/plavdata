@@ -24,7 +24,7 @@ class SpecialNameMixin:
         if isinstance(swimmer_out, dict):
             first_name = swimmer_out.get("name")
             surname = swimmer_out.get("surname")
-        else: # SQLAlchemy model instance
+        else:  # SQLAlchemy model instance
             first_name = getattr(swimmer_out, "name", None)
             surname = getattr(swimmer_out, "surname", None)
 
