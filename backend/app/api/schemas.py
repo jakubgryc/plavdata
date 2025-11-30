@@ -1,16 +1,57 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 from typing import Optional, List
 
+SPECIAL_CASES = {
+    # Special cases for renaming swimmer names
+    "Khim Anna": "Anna",
+    "Le Ngoc Nhi": "Le",
+}
 
-class BaseSwimmerOut(BaseModel):
-    id: int
-    surname: str
-    name: str
 
+class SpecialNameMixin:
+    """
+    Mixin to handle special cases in swimmer names.
+    """
+
+    @model_validator(mode="before")
+    @classmethod
+    def rename_special_cases(cls, swimmer_out):
+        """
+        Rename swimmers with special cases in their names.
+        """
+        if isinstance(swimmer_out, dict):
+            first_name = swimmer_out.get("name")
+            surname = swimmer_out.get("surname")
+        else: # SQLAlchemy model instance
+            first_name = getattr(swimmer_out, "name", None)
+            surname = getattr(swimmer_out, "surname", None)
+
+        if first_name in SPECIAL_CASES:
+            new_name = SPECIAL_CASES[first_name]
+            if isinstance(swimmer_out, dict):
+                swimmer_out["name"] = new_name
+            else:
+                setattr(swimmer_out, "name", new_name)
+        if surname in SPECIAL_CASES:
+            new_surname = SPECIAL_CASES[surname]
+            if isinstance(swimmer_out, dict):
+                swimmer_out["surname"] = new_surname
+            else:
+                setattr(swimmer_out, "surname", new_surname)
+        return swimmer_out
+
+
+class BaseSwimmerModel(BaseModel, SpecialNameMixin):
     class Config:
         from_attributes = True
+
+
+class BaseSwimmerOut(BaseSwimmerModel):
+    id: int
+    name: str
+    surname: str
 
 
 class GroupedSwimmersOut(BaseModel):
@@ -21,7 +62,7 @@ class GroupedSwimmersOut(BaseModel):
         from_attributes = True
 
 
-class SwimmerOut(BaseModel):
+class SwimmerOut(BaseSwimmerModel):
     id: int
     name: str
     surname: str
@@ -46,9 +87,6 @@ class SwimmerOut(BaseModel):
             group=swimmer.group,
             sex=swimmer.sex,
         )
-
-    class Config:
-        from_attributes = True
 
 
 class DisciplineOut(BaseModel):

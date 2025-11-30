@@ -36,21 +36,11 @@ async def get_swimmers_grouped(db: Session = Depends(get_db)):
 
     grouped = {}
     for swimmer in swimmers:
-        group = swimmer.group
-        if group not in grouped:
-            grouped[group] = []
-        grouped[group].append(swimmer)
+        grouped.setdefault(swimmer.group, []).append(swimmer)
 
-    result = []
-    for group, swimmers_in_group in grouped.items():
-        result.append(
-            GroupedSwimmersOut(
-                group=group,
-                swimmers=[
-                    BaseSwimmerOut.model_validate(swimmer)
-                    for swimmer in swimmers_in_group
-                ],
-            )
-        )
+    result = [
+        GroupedSwimmersOut(group=group, swimmers=swimmers_in_group)
+        for group, swimmers_in_group in grouped.items()
+        ]
 
     return result
