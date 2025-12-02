@@ -2,19 +2,6 @@ import type { SwimmerPersonalBest } from "../schema/types.ts";
 import { DISCIPLINES } from "./constants.ts";
 import { parseTimeFromMillis } from "./timeUtils.ts";
 
-// create a type for discipline description
-// it will be inside the TableRow type
-// like  { "100 K": "1:04.23",
-//         "100 K_description": {
-//           date: "2023-05-12",
-//           split_time: true|false,
-//           relay_part: true|false,
-//           },
-//
-//         ...
-//         }
-//
-
 type DisciplineDescription = {
   time: string;
   date: string | undefined;
