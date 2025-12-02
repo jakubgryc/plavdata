@@ -9,19 +9,8 @@ export const parseTimeFromMillis = (ms: number): string => {
   return `${minutes}:${paddedSeconds}.${paddedMillis}`;
 };
 
-// Helper to format date as dd.mm.yyyy
-export function formatDate(dateString: string): string {
-  if (!dateString) return "";
-  const d = new Date(dateString);
-  if (isNaN(d.getTime())) return dateString; // fallback if invalid
-  const day = String(d.getDate()).padStart(2, "0");
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const year = d.getFullYear();
-  return `${day}.${month}.${year}`;
-}
-
-export function formatDateFromString(timestamp: number): string {
-  const date = new Date(timestamp);
+export function formatDateFromString(timestampMs: number): string {
+  const date = new Date(timestampMs);
   const day = String(date.getDate()).padStart(2, "0");
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const year = date.getFullYear();

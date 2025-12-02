@@ -1,4 +1,5 @@
 import type { SwimmerResults, GroupedSwimmers } from "../schema/types";
+import { DNF_TIME } from "./constants";
 
 export function findYoungestAndOldestYear(data: SwimmerResults[]) {
   if (data.length === 0) return { youngest: null, oldest: null };
@@ -180,12 +181,12 @@ export function findMinMaxTimes(
   let maxTime = -Infinity;
 
   data.forEach((swimmerData) => {
-    // loop only through results that are not DNF (6039990)
+    // loop only through results that are not DNF
     // and based on improvements and split times
     swimmerData.results
       .filter(
         (result, index) =>
-          result.time !== 6039990 &&
+          result.time !== DNF_TIME &&
           (index === 0 || !onlyFinal || !result.split_time) &&
           (index === 0 || !onlyImprovements || result.improvement),
       )

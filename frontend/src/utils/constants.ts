@@ -33,6 +33,8 @@ export const DISCIPLINES = [
   "400 O",
 ];
 
+export const DNF_TIME = 6039990; // magic number representing DNF in milliseconds
+
 const GRAPH_COLORS = [
   "#ff5733",
   "#00bc1d",

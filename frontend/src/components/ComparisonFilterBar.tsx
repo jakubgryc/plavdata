@@ -83,7 +83,7 @@ function ComparisonFilterBar({
             <SegmentedControl
               value={pool}
               onChange={setPool}
-              defaultValue={"25m"}
+              defaultValue={"25"}
               color="rgba(18, 160, 216, 1)"
               data={[
                 { label: "25m", value: "25" },
@@ -129,9 +129,9 @@ function ComparisonFilterBar({
           </div>
         </div>
         <div>
-          <p className="text-sm pl-1 pb-1 font-semibold text-white">S</p>
           <Button
-            disabled={lastFetchedFilterHash !== "" ? !isOutdated : false}
+            className="mt-6"
+            disabled={!isOutdated && lastFetchedFilterHash !== ""}
             variant={isOutdated ? "filled" : "light"}
             color={isOutdated ? "#FFA500" : "rgba(18, 160, 216, 1)"}
             radius="md"
