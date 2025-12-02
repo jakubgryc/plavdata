@@ -32,3 +32,18 @@ export const DISCIPLINES = [
   "200 O",
   "400 O",
 ];
+
+const GRAPH_COLORS = [
+  "#ff5733",
+  "#00bc1d",
+  "#4162ff",
+  "#fc1894",
+  "#8e0cff",
+  "#b69300",
+  "#d10000",
+  "#00ebd5",
+];
+
+export function getGraphColor(index: number): string {
+  return GRAPH_COLORS[index % GRAPH_COLORS.length];
+}
