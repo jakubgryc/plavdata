@@ -30,7 +30,7 @@ const Navbar = () => {
             <NavLink to="/compare-swimmers" style={navLinkStyle}>
               Porovnání plavců
             </NavLink>
-            <NavLink to="/osobaky" style={navLinkStyle}>
+            <NavLink to="/personal-bests" style={navLinkStyle}>
               Osobní rekordy
             </NavLink>
           </div>

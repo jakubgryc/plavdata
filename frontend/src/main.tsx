@@ -25,7 +25,7 @@ const router = createBrowserRouter([
         element: <CompareSwimmers />,
       },
       {
-        path: "osobaky",
+        path: "personal-bests",
         element: <PersonalBests />,
       },
     ],
