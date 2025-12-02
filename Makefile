@@ -20,20 +20,17 @@ clean:
 
 
 init-db:
-	docker compose exec -it backend python -m scripts.db.init_db
+	docker compose exec -it backend uv run python -m scripts.db.init_db
 
 
 sync-pb:
-	docker compose exec -it backend python -m scripts.db.sync_personal_bests
+	docker compose exec -it backend uv run python -m scripts.db.sync_personal_bests
 
 sync-results:
-	docker compose exec -it backend python -m scripts.db.sync_results
+	docker compose exec -it backend uv run python -m scripts.db.sync_results
 
 pb-export:
-	docker compose exec -it backend python -m scripts.records
+	docker compose exec -it backend uv run python -m scripts.records
 
 debug:
-	docker compose exec -it backend python -m scripts.debug
-
-db:
-	docker exec -it plavdata_db psql -U jakub -d plavdata_db
+	docker compose exec -it backend uv run python -m scripts.debug
