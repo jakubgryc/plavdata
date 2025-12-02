@@ -116,7 +116,7 @@ function ComparisonFilterBar({
             />
           </div>
           <div>
-            <p className="text-sm pl-1 pb-1 font-semibold">Výsledky</p>
+            <p className="text-sm pl-1 pb-1 font-semibold">Zobrazení časů</p>
             <SegmentedControl
               value={resultType}
               onChange={setResultType}
