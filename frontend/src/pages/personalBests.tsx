@@ -1,168 +1,31 @@
 import { useEffect, useState } from "react";
-import { SegmentedControl, Tooltip, Loader } from "@mantine/core";
+import { SegmentedControl } from "@mantine/core";
+import { Button, Chip, Group } from "@mantine/core";
+import { DataTable } from "mantine-datatable";
+import { GROUPS, POOLS, DISCIPLINES } from "../utils/constants";
+import { IconFileSpreadsheet } from "@tabler/icons-react";
 import type { SwimmerPersonalBest } from "../schema/types";
-import { Dropdown } from "primereact/dropdown";
-import Grid, { type Column } from "../components/Grid";
-import "./home.css";
-import { Modal } from "@mantine/core";
-import  { API_BASE_URL } from "../../config";
-
-const groups = [
-  { label: "Z1", value: "Z1" },
-  { label: "Z2", value: "Z2" },
-  { label: "P1", value: "P1" },
-  { label: "bývalí", value: "veteran" },
-];
-
-const DISCIPLINES = [
-  "50 Z",
-  "100 Z",
-  "200 Z",
-  "50 P",
-  "100 P",
-  "200 P",
-  "50 M",
-  "100 M",
-  "200 M",
-  "50 VZ",
-  "100 VZ",
-  "200 VZ",
-  "400 VZ",
-  "800 VZ",
-  "1500 VZ",
-  "100 O",
-  "200 O",
-  "400 O",
-];
-
-const parseTimeFromMillis = (ms: number): string => {
-  const minutes = Math.floor(ms / 60000); // 1 min = 60000 ms
-  const seconds = Math.floor((ms % 60000) / 1000); // get remaining seconds
-  const milliseconds = Math.floor((ms % 1000) / 10); // first 2 digits of ms
-
-  const paddedSeconds = seconds.toString().padStart(2, "0");
-  const paddedMillis = milliseconds.toString().padStart(2, "0");
-
-  return `${minutes}:${paddedSeconds}.${paddedMillis}`;
-};
-
-// Helper to format date as dd.mm.yyyy
-function formatDate(dateString: string): string {
-  if (!dateString) return "";
-  const d = new Date(dateString);
-  if (isNaN(d.getTime())) return dateString; // fallback if invalid
-  const day = String(d.getDate()).padStart(2, "0");
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const year = d.getFullYear();
-  return `${day}.${month}.${year}`;
-}
-
-function setColumns(
-  disciplines: string[],
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- API data structure
-  onTimeClick: (item: SwimmerPersonalBest, best: any) => void
-): Column<SwimmerPersonalBest>[] {
-  const columns = disciplines.map((discipline) => ({
-    key: discipline,
-    header: discipline,
-    render: (item: SwimmerPersonalBest) => {
-      const best = item.personal_bests.find(
-        (pb) => pb.discipline.code === discipline
-      );
-      if (best) {
-        return (
-          <Tooltip label="Klikni pro detaily" withArrow>
-            <span
-              className="cursor-pointer  transition-colors"
-              onClick={(e) => {
-                e.stopPropagation();
-                onTimeClick(item, best);
-              }}
-            >
-              {parseTimeFromMillis(best.time)}
-            </span>
-          </Tooltip>
-        );
-      }
-      return "-";
-    },
-  }));
-
-  columns.unshift({
-    key: "swimmer",
-    header: "Name",
-    render: (item) => (
-      <span>
-        {item.swimmer.surname} {item.swimmer.name}
-      </span>
-    ),
-  });
-  return columns;
-}
+import { API_BASE_URL } from "../../config";
+import { buildTableData } from "../utils/tableUtils";
 
 function PersonalBests() {
-  const [containerHeight, setContainerHeight] = useState<string>("100vh");
-  const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
+  const [selectedGroup, setSelectedGroup] = useState<string | null>("Z1");
   const [selectedCourse, setSelectedCourse] = useState<string>("25");
   const [personalBests, setPersonalBests] = useState<
     Array<SwimmerPersonalBest>
   >([]);
+  const [isFetching, setIsFetching] = useState<boolean>(false);
 
   const [cache, setCache] = useState<
     Record<string, Array<SwimmerPersonalBest>>
   >({});
-
-  // Modal state
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalInfo, setModalInfo] = useState<{
-    discipline: string;
-    time: string;
-    date: string;
-    swimmer: string;
-    location: string;
-    points: number;
-    relay_part?: boolean;
-    split_time?: boolean;
-  } | null>(null);
-
-  const [loading, setLoading] = useState(false);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- API data structure
-  const handleTimeClick = (item: SwimmerPersonalBest, best: any) => {
-    setModalInfo({
-      discipline: best.discipline.code,
-      time: parseTimeFromMillis(best.time),
-      date: formatDate(best.date ?? ""),
-      location: best.competition_location ?? "",
-      swimmer:
-        (item.swimmer.surname ? item.swimmer.surname : "") +
-        " " +
-        (item.swimmer.name ? item.swimmer.name : ""),
-      points: best.points,
-      relay_part: best.relay_part,
-      split_time: best.split_time,
-    });
-    setModalOpen(true);
-  };
-
-  const cols: Column<SwimmerPersonalBest>[] = setColumns(
-    DISCIPLINES,
-    handleTimeClick
-  );
-
-  useEffect(() => {
-    const navbar = document.querySelector(".nav");
-    const navbarHeight = navbar ? navbar.clientHeight : 0;
-    setContainerHeight(`calc(100vh - ${navbarHeight}px)`);
-  }, []);
-
   useEffect(() => {
     const fetchPersonalBests = async (group: string, course: string) => {
-      setLoading(true);
+      setIsFetching(true);
       try {
         const response = await fetch(
           `${API_BASE_URL}/api/personal_bests/grouped?group=${group}&course=${course}`,
-          { method: "GET" }
+          { method: "GET" },
         );
         if (!response.ok) throw new Error("Failed to fetch personal bests");
         const data = await response.json();
@@ -172,7 +35,7 @@ function PersonalBests() {
       } catch (error) {
         console.error("Error fetching personal bests:", error);
       } finally {
-        setLoading(false);
+        setIsFetching(false);
       }
     };
 
@@ -187,84 +50,74 @@ function PersonalBests() {
   }, [selectedGroup, selectedCourse, cache]);
 
   return (
-    <div
-      className="home-container bg-blue-300 "
-      style={{ height: containerHeight }}
-    >
-      <div className="flex flex-row justify-between  h-15 bg-amber-100 border-amber-500 border-4">
-        {/* <div className="card flex  gap-20 h-15 bg-am5er-100 border-amber-500 border-4"> */}
-        <div>
-          <Dropdown
-            value={selectedGroup}
-            onChange={(e) => setSelectedGroup(e.value)}
-            options={groups}
-            optionLabel="label"
-            placeholder="Select a group"
-            className="w-20rem md:w-14rem"
-          />
-        </div>
-        <div>
-          <SegmentedControl
-            defaultValue="25"
-            color="blue"
-            size="lg"
-            data={["25", "50"]}
-            onChange={setSelectedCourse}
-          />
-        </div>
+    <div className="flex flex-col  h-full w-full py-5">
+      <div className="flex w-full justify-between items-center">
+        <h2 className="text-2xl font-semibold mb-4">Osobní rekordy</h2>
+        <Button
+          leftSection={<IconFileSpreadsheet size={20} stroke={1.5} />}
+          variant="outline"
+          color="rgba(60, 60, 60, 1)"
+          radius="md"
+          size="sm"
+        >
+          Stáhnout
+        </Button>
       </div>
-      {loading ? (
-        <div className="flex justify-center items-center h-full">
-          <Loader size="lg" color="blue" />
-        </div>
-      ) : personalBests.length === 0 ? (
-        ""
-      ) : (
-        <div className="h-full overflow-auto ">
-          <Grid<SwimmerPersonalBest>
-            data={personalBests}
-            columns={cols}
-            caption={`Osobní rekordy - ${
-              groups.find((g) => g.value === selectedGroup)?.label || ""
-            } (${selectedCourse} m)`}
-            keyExtractor={(item) => item.swimmer.id.toString()}
-            className="w-full  overflow-auto"
-            headerClassName="height-10"
-          />
-          <Modal
-            opened={modalOpen}
-            onClose={() => setModalOpen(false)}
-            title={
-              modalInfo ? (
-                <div className="text-xl font-bold flex items-center">
-                  {modalInfo.swimmer} – {modalInfo.discipline}
-                </div>
-              ) : null
-            }
-            centered
-          >
-            {modalInfo && (
-              <div style={{ fontSize: "1.1rem" }}>
-                {(modalInfo.relay_part || modalInfo.split_time) && (
-                  <div className="text-amber-700 italic text-2xl">
-                    {modalInfo.relay_part
-                      ? "štafeta"
-                      : modalInfo.split_time
-                      ? "mezičas"
-                      : ""}
-                  </div>
-                )}
-                <b>Čas:</b> {modalInfo.time} <br />
-                <b>Místo:</b> {modalInfo.location} <br />
-                <b>Datum:</b> {modalInfo.date} <br />
-                <b>Body:</b> {modalInfo.points} <br />
-              </div>
-            )}
-          </Modal>
-        </div>
-      )}
+      <div className="flex justify-between w-full mx-auto bg-gray-300  border-black border-0 rounded py-2 text-black">
+        <Chip.Group
+          multiple={false}
+          value={selectedGroup}
+          onChange={setSelectedGroup}
+        >
+          <Group justify="center">
+            {GROUPS.map((group) => (
+              <Chip
+                key={group.value}
+                value={group.value}
+                variant="filled"
+                size="md"
+                color="rgba(18, 160, 216, 1)"
+              >
+                {group.label}
+              </Chip>
+            ))}
+          </Group>
+        </Chip.Group>
+        <SegmentedControl
+          value={selectedCourse}
+          onChange={setSelectedCourse}
+          withItemsBorders={false}
+          data={POOLS}
+          defaultValue={POOLS[0]?.value}
+          radius="xl"
+          color="rgba(18, 160, 216, 1)"
+        />
+      </div>
+      <div className="max-h-10/12 pt-2">
+        <DataTable
+          className="shadow-xl"
+          withTableBorder
+          borderRadius="lg"
+          horizontalSpacing="xs"
+          withColumnBorders
+          maxHeight={600}
+          striped
+          pinFirstColumn={true}
+          highlightOnHover
+          fetching={isFetching}
+          columns={[
+            { accessor: "name", width: 170, noWrap: true, title: "" },
+            ...DISCIPLINES.filter((discipline) => {
+              return !(selectedCourse === "50" && discipline === "100 O");
+            }).map((discipline) => ({
+              accessor: discipline,
+              title: discipline,
+            })),
+          ]}
+          records={buildTableData(personalBests)}
+        />
+      </div>
     </div>
   );
 }
-
 export default PersonalBests;

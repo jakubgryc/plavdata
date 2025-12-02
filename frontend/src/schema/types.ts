@@ -1,3 +1,14 @@
+export interface BaseSwimmer {
+  id: number;
+  name: string;
+  surname: string;
+}
+
+export interface GroupedSwimmers {
+  group: string;
+  swimmers: BaseSwimmer[];
+}
+
 export interface Swimmer {
   name: string;
   surname: string;
@@ -38,7 +49,24 @@ export interface PersonalBest extends BasePersonalBest {
   swimmer: Swimmer;
 }
 
+interface Result {
+  discipline: Discipline;
+  course: Course;
+  time: number;
+  comparison_to_best: number;
+  split_time?: boolean;
+  relay_part?: boolean;
+  improvement?: boolean;
+  competition_location?: string;
+  date: string; // ISO date string
+}
+
 export interface SwimmerPersonalBest {
   swimmer: SwimmerWithID;
   personal_bests: BasePersonalBest[];
+}
+
+export interface SwimmerResults {
+  swimmer: SwimmerWithID;
+  results: Result[];
 }

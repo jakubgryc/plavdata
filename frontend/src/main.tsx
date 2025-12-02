@@ -1,10 +1,41 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { MantineProvider } from "@mantine/core";
+import { createBrowserRouter } from "react-router";
+import { RouterProvider } from "react-router/dom";
+import "@mantine/core/styles.css";
+import "mantine-datatable/styles.css";
+import "./index.css";
+import App from "./App.tsx";
+import Home from "./pages/home";
+import CompareSwimmers from "./pages/compareSwimmers";
+import PersonalBests from "./pages/personalBests";
 
-createRoot(document.getElementById('root')!).render(
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />,
+    children: [
+      {
+        index: true,
+        element: <Home />,
+      },
+      {
+        path: "compare-swimmers",
+        element: <CompareSwimmers />,
+      },
+      {
+        path: "personal-bests",
+        element: <PersonalBests />,
+      },
+    ],
+  },
+]);
+
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <MantineProvider>
+      <RouterProvider router={router} />
+    </MantineProvider>
   </StrictMode>,
-)
+);
