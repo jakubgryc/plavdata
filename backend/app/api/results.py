@@ -85,7 +85,7 @@ async def get_results(
 
             date_dt = r.date
 
-            comparison = r.comparison_to_best if r.comparison_to_best is not None else 0
+            comparison = r.comparison_to_best
 
             result_out = ResultOut(
                 discipline=discipline_out,
