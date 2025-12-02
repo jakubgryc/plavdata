@@ -19,7 +19,7 @@ import {
 } from "../utils/chartUtils.ts";
 
 import { getGraphColor, DNF_TIME } from "../utils/constants";
-import { parseTimeFromMillis, formatDateFromString } from "../utils/timeUtils";
+import { parseTimeFromMillis, formatDateFromMs } from "../utils/timeUtils";
 
 import type { SwimmerResults } from "../schema/types";
 
@@ -138,7 +138,7 @@ function ComparisonSwimmerChart({
             parseTimeFromMillis(Number(value)),
             name,
           ]}
-          labelFormatter={formatDateFromString}
+          labelFormatter={timeAxis === "absolute" ? formatDateFromMs : () => ""}
         />
       </LineChart>
     </div>

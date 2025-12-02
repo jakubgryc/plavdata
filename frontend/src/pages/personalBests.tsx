@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { SegmentedControl } from "@mantine/core";
-import { Button, Chip, Group } from "@mantine/core";
+import { Button, Chip, Group, Modal, Text, Stack } from "@mantine/core";
 import { DataTable } from "mantine-datatable";
-import { GROUPS, POOLS, DISCIPLINES } from "../utils/constants";
 import { IconFileSpreadsheet } from "@tabler/icons-react";
-import type { SwimmerPersonalBest } from "../schema/types";
+
 import { API_BASE_URL } from "../../config";
+import { GROUPS, POOLS, DISCIPLINES } from "../utils/constants";
 import { buildTableData } from "../utils/tableUtils";
+import { formatDate } from "../utils/timeUtils";
+
+import type { SwimmerPersonalBest } from "../schema/types";
 
 function PersonalBests() {
   const [selectedGroup, setSelectedGroup] = useState<string | null>("Z1");
@@ -19,6 +22,18 @@ function PersonalBests() {
   const [cache, setCache] = useState<
     Record<string, Array<SwimmerPersonalBest>>
   >({});
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalData, setModalData] = useState<{
+    time: string;
+    location?: string;
+    isSplit?: boolean;
+    isRelayPart?: boolean;
+    date?: string;
+    name: string;
+    discipline: string;
+  } | null>(null);
+
   useEffect(() => {
     const fetchPersonalBests = async (group: string, course: string) => {
       setIsFetching(true);
@@ -59,11 +74,14 @@ function PersonalBests() {
           color="rgba(60, 60, 60, 1)"
           radius="md"
           size="sm"
+          onClick={() => {
+            console.log(buildTableData(personalBests));
+          }}
         >
           Stáhnout
         </Button>
       </div>
-      <div className="flex justify-between w-full mx-auto bg-gray-300  border-black border-0 rounded py-2 text-black">
+      <div className="flex justify-between w-full mx-auto bg-gray-300  py-2 ">
         <Chip.Group
           multiple={false}
           value={selectedGroup}
@@ -112,10 +130,64 @@ function PersonalBests() {
             }).map((discipline) => ({
               accessor: discipline,
               title: discipline,
+              render: (record: any) => {
+                const descriptionKey = `${discipline}_description`;
+                const description = record[descriptionKey];
+                return description ? (
+                  <button
+                    onClick={() => {
+                      setModalData({
+                        ...description,
+                        name: record.name,
+                        discipline,
+                      });
+                      setModalOpen(true);
+                    }}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      color: "inherit",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {record[discipline]}
+                  </button>
+                ) : (
+                  record[discipline]
+                );
+              },
             })),
           ]}
           records={buildTableData(personalBests)}
         />
+        <Modal
+          opened={modalOpen}
+          onClose={() => setModalOpen(false)}
+          title={
+            <Text size="lg" fw={700} c="rgba(18, 160, 216, 1)">
+              {modalData?.name} - {modalData?.discipline}
+            </Text>
+          }
+          centered
+        >
+          {modalData && (
+            <Stack>
+              <Text>Čas: {modalData.time}</Text>
+              {modalData.location && (
+                <Text>Místo zaplavání: {modalData.location}</Text>
+              )}
+              {modalData.date && (
+                <Text>Datum: {formatDate(modalData.date)}</Text>
+              )}
+              {modalData.isSplit && (
+                <Text style={{ color: "green" }}>mezičas</Text>
+              )}
+              {modalData.isRelayPart && (
+                <Text style={{ color: "purple" }}>štafeta</Text>
+              )}
+            </Stack>
+          )}
+        </Modal>
       </div>
     </div>
   );
