@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { SegmentedControl } from "@mantine/core";
-import { Button, Chip, Group, Modal, Text, Stack } from "@mantine/core";
+import { Button, Chip, Modal, Text, Stack, Flex } from "@mantine/core";
 import { DataTable } from "mantine-datatable";
 import { IconFileSpreadsheet } from "@tabler/icons-react";
 
@@ -65,8 +65,8 @@ function PersonalBests() {
   }, [selectedGroup, selectedCourse, cache]);
 
   return (
-    <div className="flex flex-col  h-full w-full py-5">
-      <div className="flex w-full justify-between items-center">
+    <Flex direction="column" h="100%" w="100%" py="md" pb="xl">
+      <Flex justify="space-between" align="center" w="100%">
         <h2 className="text-2xl font-semibold mb-4">Osobní rekordy</h2>
         <Button
           leftSection={<IconFileSpreadsheet size={20} stroke={1.5} />}
@@ -80,27 +80,29 @@ function PersonalBests() {
         >
           Stáhnout
         </Button>
-      </div>
-      <div className="flex justify-between w-full mx-auto bg-gray-300  py-2 ">
-        <Chip.Group
-          multiple={false}
-          value={selectedGroup}
-          onChange={setSelectedGroup}
-        >
-          <Group justify="center">
-            {GROUPS.map((group) => (
-              <Chip
-                key={group.value}
-                value={group.value}
-                variant="filled"
-                size="md"
-                color="rgba(18, 160, 216, 1)"
-              >
-                {group.label}
-              </Chip>
-            ))}
-          </Group>
-        </Chip.Group>
+      </Flex>
+      <Flex
+        direction={{ base: "column", md: "row" }}
+        justify={{ md: "space-between" }}
+        align={{ base: "stretch", md: "center" }}
+        gap="md"
+        className="w-full mx-auto bg-gray-300 py-2"
+      >
+        <Flex gap="xs" wrap="wrap" justify="flex-start">
+          {GROUPS.map((group) => (
+            <Chip
+              key={group.value}
+              checked={selectedGroup === group.value}
+              onClick={() => setSelectedGroup(group.value)}
+              variant="filled"
+              size="sm"
+              color="rgba(18, 160, 216, 1)"
+              style={{ flex: "1 1 auto", minWidth: 0 }}
+            >
+              {group.label}
+            </Chip>
+          ))}
+        </Flex>
         <SegmentedControl
           value={selectedCourse}
           onChange={setSelectedCourse}
@@ -110,21 +112,20 @@ function PersonalBests() {
           radius="xl"
           color="rgba(18, 160, 216, 1)"
         />
-      </div>
-      <div className="max-h-10/12 pt-2">
+      </Flex>
+      <Flex direction="column" mah="80vh" pt="sm" style={{ overflowY: "auto" }}>
         <DataTable
           className="shadow-xl"
           withTableBorder
           borderRadius="lg"
           horizontalSpacing="xs"
           withColumnBorders
-          maxHeight={600}
           striped
           pinFirstColumn={true}
           highlightOnHover
           fetching={isFetching}
           columns={[
-            { accessor: "name", width: 170, noWrap: true, title: "" },
+            { accessor: "name", width: 145, noWrap: true, title: "" },
             ...DISCIPLINES.filter((discipline) => {
               return !(selectedCourse === "50" && discipline === "100 O");
             }).map((discipline) => ({
@@ -188,8 +189,8 @@ function PersonalBests() {
             </Stack>
           )}
         </Modal>
-      </div>
-    </div>
+      </Flex>
+    </Flex>
   );
 }
 export default PersonalBests;
