@@ -35,7 +35,7 @@ export function createRelativeDomainTicks(data: SwimmerResults[]): number[] {
 
   const ticks: number[] = [];
   if (youngest !== null && oldest !== null) {
-    for (let year = oldest + 1; year <= youngest; year++) {
+    for (let year = oldest + 1; year <= youngest + 1; year++) {
       const date = new Date(year, 0, 1); // January 1st of the year
       ticks.push(date.getTime());
     }
@@ -77,6 +77,13 @@ export function createAbsoluteDomainTicks(data: SwimmerResults[]): number[] {
     year++
   ) {
     ticks.push(new Date(year, 0, 1).getTime());
+  }
+
+  if (
+    maxDate.getMonth() > 6 &&
+    !ticks.includes(new Date(maxDate.getFullYear() + 1, 0, 1).getTime())
+  ) {
+    ticks.push(new Date(maxDate.getFullYear() + 1, 0, 1).getTime());
   }
 
   return ticks;
