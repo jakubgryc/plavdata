@@ -9,6 +9,7 @@ from app.models import Swimmer, Result, Discipline, Course
 from scripts.config import HEADERS
 
 API_URL = "https://vysledky.czechswimming.cz/cz.zma.csps.portal.rest/api/public/user-profiles/{}/improvements?disciplineAbbrev={}&improvementsOnly=false&limit=100&page={}&poolLength={}"
+REFERER_URL = "https://vysledky.czechswimming.cz/lide/{}"
 
 
 # Hardcoded list of allowed groups
@@ -38,7 +39,7 @@ def fetch_results(
             user_id, discipline_code.replace(" ", "+"), str(page), pool_length
         )
         try:
-            headers["Referer"] = f"https://vysledky.czechswimming.cz/lide/{user_id}"
+            headers["Referer"] = REFERER_URL.format(user_id)
             response = requests.get(url, timeout=5, headers=headers)
             response.raise_for_status()
             data = response.json()
@@ -66,7 +67,6 @@ def save_data(
     results: list[dict],
 ):
     for entry in results:
-        # Adjust these fields based on actual API response keys
         time = entry.get("time")
         competition_location = entry.get("location")
         improvement = entry.get("improvement")

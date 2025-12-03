@@ -14,7 +14,7 @@ SWIMMERS_FILE = DATA_DIR / "swimmers.json"
 
 
 def init_static_tables(db: Session):
-    sync = db.query(ApiSync).get(1)
+    sync = db.query(ApiSync).first()
 
     if not sync:
         sync = ApiSync(id=1)
@@ -53,8 +53,8 @@ def init_static_tables(db: Session):
             db.add(Discipline(**d))
 
 
-def init_swimmers(db: Session):
-    with open(SWIMMERS_FILE) as f:
+def init_swimmers(db: Session, swimmers_file: Path):
+    with open(swimmers_file) as f:
         swimmers = json.load(f)
 
     for s in swimmers:
@@ -78,12 +78,11 @@ def init_swimmers(db: Session):
         db.add(swimmer)
 
 
-def init_db():
-    # Drop all tables
-    Base.metadata.drop_all(bind=engine)
+def init_db(swimmers_file: Path, drop_all: bool):
+    if drop_all:
+        Base.metadata.drop_all(bind=engine)
 
-    # Create all tables
-    Base.metadata.create_all(bind=engine)
+        Base.metadata.create_all(bind=engine)
 
     db: Session = SessionLocal()
 
@@ -91,7 +90,7 @@ def init_db():
     init_static_tables(db)
 
     # Initialize swimmers
-    init_swimmers(db)
+    init_swimmers(db, swimmers_file)
 
     db.commit()
     db.close()
@@ -108,8 +107,16 @@ def parse_args():
         default=SWIMMERS_FILE,
         help="Initialize the database with static data and swimmers.",
     )
+
+    parser.add_argument(
+        "--drop-all",
+        action="store_true",
+        help="Drop all existing tables before initializing.",
+        default=False,
+    )
     return parser.parse_args()
 
 
 if __name__ == "__main__":
-    init_db()
+    args = parse_args()
+    init_db(args.input, args.drop_all)

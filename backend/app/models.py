@@ -77,7 +77,7 @@ class PersonalBest(Base):
     split_time = Column(Boolean)
     relay_part = Column(Boolean)
     points = Column(Integer, nullable=True)
-    competition_location = Column(String, nullable=False)
+    competition_location = Column(String, nullable=True)
     date = Column(Date, nullable=False)
 
     discipline = relationship("Discipline")
