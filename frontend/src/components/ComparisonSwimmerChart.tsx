@@ -78,10 +78,7 @@ function ComparisonSwimmerChart({
       withBorder
       className="mt-4 w-full border-2 border-gray-900"
     >
-      <Title
-        order={3}
-        className="text-lg md:text-xl font-semibold mb-4 pt-2 items-center"
-      >
+      <Title order={3} size="xl" fw={600} mb="md" pt="xs">
         Srovnání - {currentDiscipline}
       </Title>
       <Flex direction="column" w="100%" gap="md">
