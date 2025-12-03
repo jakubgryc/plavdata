@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { SegmentedControl } from "@mantine/core";
+import { SegmentedControl, Title } from "@mantine/core";
 import { Button, Chip, Modal, Text, Stack, Flex } from "@mantine/core";
 import { DataTable } from "mantine-datatable";
 import { IconFileSpreadsheet } from "@tabler/icons-react";
@@ -67,7 +67,9 @@ function PersonalBests() {
   return (
     <Flex direction="column" h="100%" w="100%" py="md" pb="xl">
       <Flex justify="space-between" align="center" w="100%">
-        <h2 className="text-2xl font-semibold mb-4">Osobní rekordy</h2>
+        <Title order={2} mb="md">
+          Osobní rekordy
+        </Title>
         <Button
           leftSection={<IconFileSpreadsheet size={20} stroke={1.5} />}
           variant="outline"

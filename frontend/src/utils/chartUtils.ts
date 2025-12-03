@@ -79,8 +79,9 @@ export function createAbsoluteDomainTicks(data: SwimmerResults[]): number[] {
     ticks.push(new Date(year, 0, 1).getTime());
   }
 
+  // if maxDate is after August, add an extra tick for Jan 1st of the next year
   if (
-    maxDate.getMonth() > 6 &&
+    maxDate.getMonth() > 7 &&
     !ticks.includes(new Date(maxDate.getFullYear() + 1, 0, 1).getTime())
   ) {
     ticks.push(new Date(maxDate.getFullYear() + 1, 0, 1).getTime());
