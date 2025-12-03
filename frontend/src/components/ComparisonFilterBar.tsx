@@ -93,9 +93,9 @@ function ComparisonFilterBar({
         p="sm"
       >
         <SimpleGrid
-          cols={{ base: 2, md: 2, lg: 4 }}
+          cols={{ base: 2, md: 2, xl: 4 }}
           spacing="sm"
-          w={{ base: "100%", md: "66%" }}
+          w={{ base: "100%", md: "75%" }}
         >
           <div>
             <p className="text-sm pl-1 pb-1 font-semibold">Bazén</p>
@@ -108,7 +108,7 @@ function ComparisonFilterBar({
                 { label: "25m", value: "25" },
                 { label: "50m", value: "50" },
               ]}
-              w="100%"
+              w="90%"
             />
           </div>
           <div>
@@ -128,7 +128,7 @@ function ComparisonFilterBar({
                       { label: "Věková", value: "relative" },
                     ]
               }
-              w="100%"
+              w="90%"
             />
           </div>
           <div>
@@ -148,7 +148,7 @@ function ComparisonFilterBar({
                       { label: "Pouze cílové", value: "onlyFinal" },
                     ]
               }
-              w="100%"
+              w="90%"
             />
           </div>
           <div>
@@ -168,7 +168,7 @@ function ComparisonFilterBar({
                       { label: "Pouze zlepšení", value: "onlyImprovements" },
                     ]
               }
-              w="100%"
+              w="90%"
             />
           </div>
         </SimpleGrid>

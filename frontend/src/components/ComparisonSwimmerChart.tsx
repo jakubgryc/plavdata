@@ -89,7 +89,7 @@ function ComparisonSwimmerChart({
           responsive
           style={{
             width: "100%",
-            height: isMobile ? 400 : 570,
+            height: isMobile ? 370 : 570,
           }}
           margin={
             isMobile
