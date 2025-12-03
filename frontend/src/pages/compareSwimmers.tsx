@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Flex, Title } from "@mantine/core";
 import { DISCIPLINES } from "../utils/constants";
 import type { SwimmerResults, GroupedSwimmers } from "../schema/types";
 import ComparisonFilterBar from "../components/ComparisonFilterBar";
@@ -100,8 +101,10 @@ function CompareSwimmers() {
   };
 
   return (
-    <div className="flex flex-col w-full py-5 ">
-      <h2 className="text-2xl font-semibold mb-4">Srovnání výsledků</h2>
+    <Flex direction="column" w="100%" py="md" pb="xl">
+      <Title order={2} mb="4">
+        Srovnání výsledků
+      </Title>
       <ComparisonFilterBar
         groupedSwimmers={groupedSwimmers}
         selectedSwimmers={selectedSwimmers}
@@ -126,7 +129,7 @@ function CompareSwimmers() {
         intermediateTimes={intermediateTimes}
         resultType={resultType}
       />
-    </div>
+    </Flex>
   );
 }
 
