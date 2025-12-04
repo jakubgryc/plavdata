@@ -21,7 +21,7 @@ def get_swimmer_profile(csps_id: int) -> dict | None:
     """
     headers = HEADERS.copy()
     headers["Referer"] = REFERER_URL.format(csps_id)
-    response = requests.get(CSPS_USER_URL + str(csps_id), headers=HEADERS)
+    response = requests.get(CSPS_USER_URL + str(csps_id), headers=headers)
     if response.status_code != 200:
         print(
             f"Failed to fetch swimmer profile for CSPS ID {csps_id}: {response.status_code}"
@@ -32,7 +32,7 @@ def get_swimmer_profile(csps_id: int) -> dict | None:
 
 def _get_membership_dates(
     swimmer_profile_data: dict,
-) -> tuple[str | None, str | None]:
+) -> tuple[str | None, str | None, bool]:
     """
 
     Get the membership start and end dates (if any) for the duration of the swimmer's
@@ -42,7 +42,10 @@ def _get_membership_dates(
         swimmer_profile_data: Parsed swimmer profile data from CSPS.
 
     Returns:
-        Tuple of membership start and end dates or None if not found.
+        tuple:
+            membership_start (str | None): The start date of the swimmer's membership in PKBoh, or None if not found.
+            membership_end (str | None): The end date of the swimmer's membership in PKBoh, or None if not found.
+            runaway (bool): True if the swimmer has more than one club in their history, False otherwise.
     """
     club_history = swimmer_profile_data.get("membershipHistory")
     runaway = False

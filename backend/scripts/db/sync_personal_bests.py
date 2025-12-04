@@ -148,7 +148,7 @@ def parse_args():
     )
 
     parser.add_argument(
-        "--csps_ids",
+        "--csps-ids",
         type=str,
         help="List of swimmer CSPS IDs, comma separated",
         default=None,

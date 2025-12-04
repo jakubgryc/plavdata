@@ -1,5 +1,5 @@
 """
-This script parses all PKBoh swimmers IDs an names  that have ever swam for PKBoh
+This script parses all PKBoh swimmers IDs and names that have ever swam for PKBoh
 It parses all results swam in 50 freestyle on short course, because almost everybody
 that has ever swam has swam this event at least once.
 
@@ -43,7 +43,7 @@ def get_existing_swimmers(db: Session) -> set[int]:
     return {swimmer.csps_id for swimmer in db.query(Swimmer).all()}
 
 
-def parse_page_resutls(
+def parse_page_resutlts(
     results: list[dict], existing_csps_ids: set[int], all_swimmers: list[SwimmerEntry]
 ) -> None:
     for entry in results:
@@ -85,7 +85,7 @@ def parse_all_swimmers() -> list[SwimmerEntry]:
                 results = data.get("publicStatisticDtos", [])
                 total = data.get("numberOfResults", 0)
 
-                parse_page_resutls(results, existing_csps_ids, all_swimmers)
+                parse_page_resutlts(results, existing_csps_ids, all_swimmers)
                 if (page * page_size) >= total:
                     wait_random(1, 2)
                     break

@@ -16,6 +16,7 @@ CSPS_QUERY = (
 )
 CSPS_USER_URL = "https://vysledky.czechswimming.cz/cz.zma.csps.portal.rest/api/public/user-profiles/"
 PKBOH_URL = "https://www.plavanibohumin.cz/cz/treninky/rozdeleni-plavcu/"
+REFERER_URL = "https://vysledky.czechswimming.cz/prehled"
 
 RESULT_FILE = DATA_DIR / "swimmers.json"
 TARGET_CLUB = "PKBoh"
@@ -87,7 +88,9 @@ def fetch_valid_swimmer_id_from_csps(swimmer: dict) -> int | None:
     query = (
         f"{swimmer['surname'].replace(' ', '+')}+{swimmer['name'].replace(' ', '+')}"
     )
-    response = requests.get(CSPS_QUERY + query, headers=HEADERS)
+    headers = HEADERS.copy()
+    headers["Referer"] = REFERER_URL
+    response = requests.get(CSPS_QUERY + query, headers=headers)
     if response.status_code != 200:
         print(
             f"Failed to fetch CSPS data for swimmer {swimmer['name']} {swimmer['surname']}: {response.status_code}"

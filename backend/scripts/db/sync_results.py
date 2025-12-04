@@ -242,6 +242,6 @@ if __name__ == "__main__":
         args.csps_ids = [int(csps_id) for csps_id in args.csps_ids.split(",")]
 
     if args.course:
-        if args.course not in ["25", "50"]:
+        if args.course not in [25, 50]:
             raise ValueError("Course must be either 25 or 50")
     sync_results(args.groups, args.csps_ids, args.course)
