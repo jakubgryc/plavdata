@@ -1,18 +1,22 @@
+import argparse
 from datetime import datetime, timezone
 from typing import NamedTuple
 
 import requests
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.db import SessionLocal
 from app.models import Swimmer, PersonalBest, Discipline, Course, ApiSync
 from scripts.config import HEADERS
+from scripts.utils import wait_random
 
 
 # Hardcoded list of allowed groups
 VALID_GROUPS = ["Z1", "Z2", "P1", "veteran"]
 
 API_URL = "https://vysledky.czechswimming.cz/cz.zma.csps.portal.rest/api/public/user-profiles/{}/outputs?mastersOnly=false"
+REFERER_URL = "https://vysledky.czechswimming.cz/lide/{}"
 
 
 class PBEntry(NamedTuple):
@@ -30,7 +34,7 @@ def fetch_personal_bests(user_id: int):
     url = API_URL.format(user_id)
     header = HEADERS.copy()
     try:
-        header["Referer"] = f"https://vysledky.czechswimming.cz/lide/{user_id}"
+        header["Referer"] = REFERER_URL.format(user_id)
         response = requests.get(url, timeout=5, headers=header)
         response.raise_for_status()
         return response.json()
@@ -48,12 +52,31 @@ def update_swimmer(swimmer_row: Swimmer, pb: PBEntry):
     swimmer_row.relay_part = pb.relay_part
 
 
-def sync_pbs():
+def sync_pbs(groups_to_update: list[str], csps_ids: list[int] | None = None):
     db: Session = SessionLocal()
 
     last_sync = db.query(ApiSync).first()
 
-    swimmers = db.query(Swimmer).filter(Swimmer.group.in_(VALID_GROUPS)).all()
+    filters = []
+
+    if groups_to_update:
+        filters.append(Swimmer.group.in_(groups_to_update))
+
+    if csps_ids:
+        filters.append(Swimmer.csps_id.in_(csps_ids))
+
+    if not filters:
+        print("No groups or swimmer IDs specified for update.")
+        db.close()
+        return
+
+    combined_filter = or_(*filters)
+
+    disciplines = {d.code: d for d in db.query(Discipline).all()}
+
+    courses = {c.length: c for c in db.query(Course).all()}
+
+    swimmers = db.query(Swimmer).filter(combined_filter).distinct().all()
 
     for swimmer in swimmers:
         pb_data = fetch_personal_bests(swimmer.csps_id)
@@ -70,14 +93,12 @@ def sync_pbs():
                 relay_part=entry.get("relayPart"),
             )
 
-            discipline = db.query(Discipline).filter_by(code=pb.discipline_code).first()
+            discipline = disciplines.get(pb.discipline_code)
             if not discipline:
-                print(f"Discipline {pb.discipline_code} not found.")
                 continue
 
-            course = db.query(Course).filter_by(length=pb.pool_length).first()
+            course = courses.get(pb.pool_length)
             if not course:
-                print(f"Course {pb.pool_length} not found.")
                 continue
 
             swimmer_row = (
@@ -106,7 +127,9 @@ def sync_pbs():
                         relay_part=pb.relay_part,
                     )
                 )
+
         print(f"Synced PBs for {swimmer.name} {swimmer.surname}")
+        wait_random()
 
     if last_sync:
         last_sync.personal_bests_last_fetch = datetime.now(timezone.utc)
@@ -115,5 +138,33 @@ def sync_pbs():
     db.close()
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(description="Sync personal bests from CSPS.")
+
+    parser.add_argument(
+        "--groups",
+        type=str,
+        help="List of swimmer groups, comma separated",
+    )
+
+    parser.add_argument(
+        "--csps-ids",
+        type=str,
+        help="List of swimmer CSPS IDs, comma separated",
+        default=None,
+    )
+
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
-    sync_pbs()
+    args = parse_args()
+
+    if args.groups:
+        args.groups = args.groups.split(",")
+    else:
+        args.groups = VALID_GROUPS
+
+    if args.csps_ids:
+        args.csps_ids = [int(sid) for sid in args.csps_ids.split(",")]
+    sync_pbs(args.groups, args.csps_ids)

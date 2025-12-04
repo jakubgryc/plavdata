@@ -27,12 +27,7 @@ async def get_swimmers(db: Session = Depends(get_db)):
 @router.get("/grouped", response_model=list[GroupedSwimmersOut])
 async def get_swimmers_grouped(db: Session = Depends(get_db)):
     """Get swimmers grouped by their group."""
-    swimmers = (
-        db.query(Swimmer)
-        .filter(Swimmer.group.in_(GROUPS_TO_LOOKUP))
-        .options(joinedload(Swimmer.personal_bests))
-        .all()
-    )
+    swimmers = db.query(Swimmer).filter(Swimmer.group.in_(GROUPS_TO_LOOKUP)).all()
 
     grouped = {}
     for swimmer in swimmers:

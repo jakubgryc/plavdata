@@ -1,8 +1,6 @@
 import argparse
 import json
-import random
-import time
-from dataclasses import dataclass, asdict
+from dataclasses import asdict
 from pathlib import Path
 
 import requests
@@ -10,27 +8,18 @@ import yaml
 from bs4 import BeautifulSoup
 
 from scripts.config import DATA_DIR, HEADERS
+from scripts.utils import wait_random, SwimmerData
+from scripts.parse.utils import get_swimmer_profile, parse_swimmer_data
 
 CSPS_QUERY = (
     "https://vysledky.czechswimming.cz/cz.zma.csps.portal.rest/api/public/search?query="
 )
 CSPS_USER_URL = "https://vysledky.czechswimming.cz/cz.zma.csps.portal.rest/api/public/user-profiles/"
 PKBOH_URL = "https://www.plavanibohumin.cz/cz/treninky/rozdeleni-plavcu/"
+REFERER_URL = "https://vysledky.czechswimming.cz/prehled"
 
-RESULT_FILE = DATA_DIR / "swimmers.yml"
+RESULT_FILE = DATA_DIR / "swimmers.json"
 TARGET_CLUB = "PKBoh"
-
-
-@dataclass
-class Swimmer:
-    csps_id: int
-    name: str
-    surname: str
-    group: str
-    birth_year: int
-    sex: str
-    membership_start: str | None
-    membership_end: str | None
 
 
 def fetch_swimmers_from_pkboh_site() -> list[dict]:
@@ -67,12 +56,6 @@ def fetch_swimmers_from_pkboh_site() -> list[dict]:
     return swimmers
 
 
-def wait_random():
-    wait_time = random.uniform(0.2, 1)
-    print(f"Waiting for {wait_time:.2f} seconds to avoid rate limiting...")
-    time.sleep(wait_time)
-
-
 def get_valid_pkboh_swimmer(result_query: list[dict]) -> dict | None:
     """
 
@@ -91,80 +74,6 @@ def get_valid_pkboh_swimmer(result_query: list[dict]) -> dict | None:
     return None
 
 
-def get_swimmer_profile(csps_id: int) -> dict | None:
-    """
-
-    Get the detailed swimmer profile from CSPS by CSPS ID.
-
-    Args:
-        csps_id: CSPS swimmer ID.
-
-    Returns:
-        Swimmer profile data dictionary, or None if not found.
-    """
-    response = requests.get(CSPS_USER_URL + str(csps_id), headers=HEADERS)
-    if response.status_code != 200:
-        print(
-            f"Failed to fetch swimmer profile for CSPS ID {csps_id}: {response.status_code}"
-        )
-        return None
-    return response.json()
-
-
-def get_membership_dates(
-    swimmer_profile_data: dict,
-) -> tuple[str | None, str | None]:
-    """
-
-    Get the membership start and end dates (if any) for the duration of the swimmer's
-    membership in PKBoh.
-
-    Args:
-        swimmer_profile_data: Parsed swimmer profile data from CSPS.
-
-    Returns:
-        Tuple of membership start and end dates or None if not found.
-    """
-    club_history = swimmer_profile_data.get("membershipHistory")
-    for membership in club_history:
-        if membership.get("clubAbbrev") == TARGET_CLUB:
-            membership_start_str = membership.get("membershipStart")
-            membership_end_str = membership.get("membershipEnd", None)
-            return membership_start_str, membership_end_str
-
-    return None, None
-
-
-def parse_swimmer_data(
-    swimmer: dict,
-    swimmer_profile_data: dict,
-    group: str,
-) -> Swimmer:
-    """
-
-    Get the swimmer data from CSPS profile and parse it into Swimmer dataclass.
-
-    Args:
-        swimmer: Swimmer basic data dictionary.
-        swimmer_profile_data: Parsed swimmer profile data from CSPS.
-        group : Swimmer group.
-
-    Returns:
-        Swimmer dataclass instance with parsed data.
-    """
-    membership_start, membership_end = get_membership_dates(swimmer_profile_data)
-    return Swimmer(
-        csps_id=swimmer_profile_data.get("userId"),
-        name=swimmer["name"],
-        surname=swimmer["surname"],
-        group=group,
-        sex=swimmer_profile_data.get("sex").lower(),
-        birth_year=swimmer_profile_data.get("birthYear"),
-        membership_start=membership_start,
-        membership_end=membership_end,
-    )
-
-
 def fetch_valid_swimmer_id_from_csps(swimmer: dict) -> int | None:
     """
 
@@ -179,7 +88,9 @@ def fetch_valid_swimmer_id_from_csps(swimmer: dict) -> int | None:
     query = (
         f"{swimmer['surname'].replace(' ', '+')}+{swimmer['name'].replace(' ', '+')}"
     )
-    response = requests.get(CSPS_QUERY + query, headers=HEADERS)
+    headers = HEADERS.copy()
+    headers["Referer"] = REFERER_URL
+    response = requests.get(CSPS_QUERY + query, headers=headers)
     if response.status_code != 200:
         print(
             f"Failed to fetch CSPS data for swimmer {swimmer['name']} {swimmer['surname']}: {response.status_code}"
@@ -202,7 +113,7 @@ def fetch_valid_swimmer_id_from_csps(swimmer: dict) -> int | None:
 
 def fetch_and_save_swimmers_data(
     swimmers: list[dict] | None,
-    parsed_swimmers: list[Swimmer],
+    parsed_swimmers: list[SwimmerData],
     inactive: bool,
 ) -> None:
     if not swimmers:
@@ -232,7 +143,7 @@ def fetch_and_save_swimmers_data(
 def parse_data_from_csps(
     active_swimmers: list[dict],
     former_swimmers: dict | None = None,
-) -> list[Swimmer]:
+) -> list[SwimmerData]:
     """
 
     Main function to parse swimmer data from CSPS.
@@ -245,7 +156,7 @@ def parse_data_from_csps(
     Returns:
         List of Swimmer dataclass instances with parsed data.
     """
-    parsed_swimmers: list[Swimmer] = []
+    parsed_swimmers: list[SwimmerData] = []
 
     if former_swimmers:
         active_swimmers.extend(former_swimmers.get("active", []))
