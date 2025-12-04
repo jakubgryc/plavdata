@@ -86,16 +86,17 @@ function ComparisonFilterBar({
         />
       </Flex>
       <Flex
-        direction={{ base: "column", md: "row" }}
+        direction={{ base: "column", lg: "row" }}
         justify="space-between"
-        align={{ base: "stretch", md: "center" }}
+        align={{ base: "stretch", lg: "center" }}
         gap="md"
         p="sm"
       >
         <SimpleGrid
-          cols={{ base: 2, md: 2, xl: 4 }}
-          spacing="sm"
-          w={{ base: "100%", md: "75%" }}
+          cols={{ base: 2, md: 4 }}
+          spacing="xs"
+          verticalSpacing="sm"
+          w={{ base: "100%", lg: "80%" }}
         >
           <div>
             <p className="text-sm pl-1 pb-1 font-semibold">Bazén</p>
