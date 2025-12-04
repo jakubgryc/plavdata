@@ -7,6 +7,7 @@ CSPS_USER_URL = "https://vysledky.czechswimming.cz/cz.zma.csps.portal.rest/api/p
 REFERER_URL = "https://vysledky.czechswimming.cz/lide/{}"
 TARGET_CLUB = "PKBoh"
 
+
 def get_swimmer_profile(csps_id: int) -> dict | None:
     """
 
@@ -29,7 +30,7 @@ def get_swimmer_profile(csps_id: int) -> dict | None:
     return response.json()
 
 
-def get_membership_dates(
+def _get_membership_dates(
     swimmer_profile_data: dict,
 ) -> tuple[str | None, str | None]:
     """
@@ -55,6 +56,7 @@ def get_membership_dates(
 
     return None, None, runaway
 
+
 def parse_swimmer_data(
     swimmer: dict,
     swimmer_profile_data: dict,
@@ -72,7 +74,9 @@ def parse_swimmer_data(
     Returns:
         SwimmerData dataclass instance with parsed data.
     """
-    membership_start, membership_end, runaway = get_membership_dates(swimmer_profile_data)
+    membership_start, membership_end, runaway = _get_membership_dates(
+        swimmer_profile_data
+    )
     group = "runaway" if runaway else group
     return SwimmerData(
         csps_id=swimmer_profile_data.get("userId"),

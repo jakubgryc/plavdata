@@ -14,6 +14,7 @@ class SwimmerData:
     membership_start: str | None
     membership_end: str | None
 
+
 def wait_random(lower: float = 0.5, upper: float = 1.5) -> None:
     wait_time = random.uniform(lower, upper)
     print(f"Waiting for {wait_time:.2f} seconds to avoid rate limiting...")

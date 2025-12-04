@@ -10,7 +10,7 @@ HEADERS = {
     "Sec-Fetch-Dest": "empty",
     "Sec-Fetch-Mode": "cors",
     "Sec-Fetch-Site": "same-origin",
-    "Cookie": "cookiesAccepted=true;"
+    "Cookie": "cookiesAccepted=true;",
 }
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
