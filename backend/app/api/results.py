@@ -149,7 +149,6 @@ def get_best_times_for_age(
             Swimmer.sex == sex,
             age_at_result <= max_age,
             Result.time < DNF_THRESHOLD,
-
         )
     ).subquery()
 
