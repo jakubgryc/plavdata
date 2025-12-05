@@ -511,31 +511,60 @@ def create_club_records_excel():
         top=Side(style='thin'),
         bottom=Side(style='thin')
     )
+    # Stronger borders for separating categories and disciplines
+    thick_right_border = Border(
+        left=Side(style='thin'),
+        right=Side(style='medium'),
+        top=Side(style='thin'),
+        bottom=Side(style='thin')
+    )
+    thick_bottom_border = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='thin'),
+        bottom=Side(style='medium')
+    )
+    thick_bottom_right_border = Border(
+        left=Side(style='thin'),
+        right=Side(style='medium'),
+        top=Side(style='thin'),
+        bottom=Side(style='medium')
+    )
 
     # Create headers
-    # Row 1: Age categories
+    # Row 1: Title row spanning entire table
+    total_cols = 1 + (len(ages) * 3)  # 1 discipline column + 3 columns per age
+    ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=total_cols)
+    title_cell = ws.cell(row=1, column=1, value=f"Klubové rekordy PKBoh - aktualizováno {today}")
+    title_cell.font = Font(bold=True, size=16, color="FFFFFF")
+    title_cell.fill = PatternFill(start_color="B00D08", end_color="B00D08", fill_type="solid")
+    title_cell.alignment = Alignment(horizontal='center', vertical='center')
+    title_cell.border = border
+    ws.row_dimensions[1].height = 30
+
+    # Row 2: Age categories
     col = 2
     for age in ages:
         age_title = f"{age}letí" if age < 15 else "Dorost" if age < 19 else "Absolutní"
-        cell = ws.cell(row=1, column=col, value=age_title)
+        cell = ws.cell(row=2, column=col, value=age_title)
         cell.font = header_font
         cell.fill = header_fill
         cell.alignment = Alignment(horizontal='center', vertical='center')
         cell.border = border
-        ws.merge_cells(start_row=1, start_column=col, end_row=1, end_column=col+2)
+        ws.merge_cells(start_row=2, start_column=col, end_row=2, end_column=col+2)
         col += 3
 
-    # Row 2: Sub-headers
-    ws.cell(row=2, column=1, value="Disciplína")
-    ws.cell(row=2, column=1).font = discipline_font
-    ws.cell(row=2, column=1).fill = discipline_fill
-    ws.cell(row=2, column=1).border = border
-    ws.cell(row=2, column=1).alignment = Alignment(horizontal='center', vertical='center')
+    # Row 3: Sub-headers
+    ws.cell(row=3, column=1, value="Disciplína")
+    ws.cell(row=3, column=1).font = discipline_font
+    ws.cell(row=3, column=1).fill = discipline_fill
+    ws.cell(row=3, column=1).border = border
+    ws.cell(row=3, column=1).alignment = Alignment(horizontal='center', vertical='center')
 
     col = 2
     for _ in ages:
         for header in ["Jméno", "Čas", "Termín"]:
-            cell = ws.cell(row=2, column=col, value=header)
+            cell = ws.cell(row=3, column=col, value=header)
             cell.font = subheader_font
             cell.fill = subheader_fill
             cell.alignment = Alignment(horizontal='center', vertical='center')
@@ -543,7 +572,7 @@ def create_club_records_excel():
             col += 1
 
     # Set column widths
-    ws.column_dimensions['A'].width = 35
+    ws.column_dimensions['A'].width = 18  # Narrower discipline column
     for col_idx in range(2, col):
         letter = get_column_letter(col_idx)
         if (col_idx - 2) % 3 == 0:
@@ -554,11 +583,11 @@ def create_club_records_excel():
             ws.column_dimensions[letter].width = 15
 
     # Populate data
-    current_row = 3
+    current_row = 4  # Start from row 4 now (after title, age headers, and sub-headers)
     db = SessionLocal()
 
     try:
-        for stroke_code, distances in disciplines:
+        for stroke_idx, (stroke_code, distances) in enumerate(disciplines):
             for distance in distances:
                 for sex in ["female", "male"]:
                     discipline_code = f"{distance} {stroke_code}"
@@ -566,13 +595,24 @@ def create_club_records_excel():
                     stroke_name = stroke_names.get(stroke_code, stroke_code)
                     discipline_label = f"{distance} {stroke_name} - {gender_label}"
 
+                    # Determine if this is the last row of a discipline group (last gender of last distance)
+                    is_last_distance = distance == distances[-1]
+                    is_last_gender = sex == "male"
+                    is_discipline_boundary = is_last_distance and is_last_gender
+
                     cell = ws.cell(row=current_row, column=1, value=discipline_label)
                     cell.font = Font(size=10)
-                    cell.border = border
                     cell.alignment = Alignment(horizontal='left', vertical='center')
+                    # Apply thick bottom border for discipline boundaries
+                    if is_discipline_boundary and stroke_idx < len(disciplines) - 1:
+                        cell.border = thick_bottom_border
+                    else:
+                        cell.border = border
 
                     col = 2
-                    for age in ages:
+                    for age_idx, age in enumerate(ages):
+                        is_last_age_col = (age_idx == len(ages) - 1)
+
                         try:
                             records = get_best_times_for_age(
                                 db=db,
@@ -588,30 +628,83 @@ def create_club_records_excel():
                                 record = records[0]
                                 # Name
                                 name_cell = ws.cell(row=current_row, column=col,
-                                                    value=f"{record.name} {record.surname}")
-                                name_cell.border = border
+                                                    value=f"{record.surname} {record.name}")
                                 name_cell.alignment = Alignment(horizontal='left', vertical='center')
 
                                 # Time
                                 time_cell = ws.cell(row=current_row, column=col+1, value=format_time(record.time))
-                                time_cell.border = border
                                 time_cell.alignment = Alignment(horizontal='center', vertical='center')
 
-                                # Place
+                                # Place and Date (two lines in same cell)
+                                date_formatted = record.date.strftime("%d.%m.%Y") if isinstance(record.date, date) else str(record.date)
                                 place_cell = ws.cell(row=current_row, column=col+2,
-                                                     value=record.competition_location)
-                                place_cell.border = border
-                                place_cell.alignment = Alignment(horizontal='center', vertical='center')
+                                                     value=f"{record.competition_location}\n{date_formatted}")
+                                place_cell.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+
+                                # Apply borders - thick right border at age category boundaries
+                                if is_discipline_boundary and stroke_idx < len(disciplines) - 1:
+                                    # Thick bottom border
+                                    if is_last_age_col:
+                                        name_cell.border = thick_bottom_right_border
+                                        time_cell.border = thick_bottom_right_border
+                                        place_cell.border = thick_bottom_right_border
+                                    else:
+                                        name_cell.border = thick_bottom_border
+                                        time_cell.border = thick_bottom_border
+                                        place_cell.border = thick_bottom_right_border
+                                else:
+                                    # Normal borders with thick right at age boundaries
+                                    if is_last_age_col:
+                                        name_cell.border = thick_right_border
+                                        time_cell.border = thick_right_border
+                                        place_cell.border = thick_right_border
+                                    else:
+                                        name_cell.border = border
+                                        time_cell.border = border
+                                        place_cell.border = thick_right_border
                             else:
+                                # Empty cells
                                 for offset in range(3):
                                     empty_cell = ws.cell(row=current_row, column=col+offset)
-                                    empty_cell.border = border
+                                    # Apply appropriate borders
+                                    if is_discipline_boundary and stroke_idx < len(disciplines) - 1:
+                                        # At discipline boundary
+                                        if offset == 2:
+                                            # Last column of age category (Termín)
+                                            empty_cell.border = thick_bottom_right_border
+                                        else:
+                                            # Other columns (Name, Time)
+                                            empty_cell.border = thick_bottom_border
+                                    else:
+                                        # Not at discipline boundary
+                                        if offset == 2:
+                                            # Last column of age category (Termín)
+                                            empty_cell.border = thick_right_border
+                                        else:
+                                            # Other columns
+                                            empty_cell.border = border
 
                         except Exception as e:
                             print(f"Error: {discipline_label}, age {age}: {e}")
                             for offset in range(3):
                                 empty_cell = ws.cell(row=current_row, column=col+offset)
-                                empty_cell.border = border
+                                # Apply appropriate borders even on error
+                                if is_discipline_boundary and stroke_idx < len(disciplines) - 1:
+                                    # At discipline boundary
+                                    if offset == 2:
+                                        # Last column of age category (Termín)
+                                        empty_cell.border = thick_bottom_right_border
+                                    else:
+                                        # Other columns (Name, Time)
+                                        empty_cell.border = thick_bottom_border
+                                else:
+                                    # Not at discipline boundary
+                                    if offset == 2:
+                                        # Last column of age category (Termín)
+                                        empty_cell.border = thick_right_border
+                                    else:
+                                        # Other columns
+                                        empty_cell.border = border
 
                         col += 3
 
@@ -620,7 +713,7 @@ def create_club_records_excel():
     finally:
         db.close()
 
-    ws.freeze_panes = 'B3'
+    ws.freeze_panes = 'B4'  # Freeze first 3 rows (title, age categories, sub-headers) and first column
 
     wb.save(RESULT_CLUB_FILE)
     print(f"Saved to {RESULT_CLUB_FILE}")
