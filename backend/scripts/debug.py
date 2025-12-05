@@ -10,11 +10,13 @@ from openpyxl.utils import get_column_letter
 
 from app.db import SessionLocal
 from app.models import Swimmer, PersonalBest, Discipline, Course
+from app.api.results import get_best_times_for_age
 from .config import DATA_DIR
 
 today = date.today().strftime("%d.%m.%Y")
 today_str = date.today().strftime("%Y_%m_%d")
 RESULT_FILE = DATA_DIR / f"osobaky{today_str}.xlsx"
+RESULT_CLUB_FILE = DATA_DIR / f"club_records_{today_str}.xlsx"
 
 
 def format_time(ms: int | None) -> str:
@@ -470,7 +472,164 @@ def debugo():
     # db.commit()
     db.close()
 
+def create_club_records_excel():
+    """Create club records Excel file with categories as columns"""
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Club Records"
+
+    # Define disciplines structure
+    disciplines = [
+        ("M", [50, 100, 200]),  # Butterfly
+        ("Z", [50, 100, 200]),  # Backstroke
+        ("P", [50, 100, 200]),  # Breaststroke
+        ("K", [50, 100, 200, 400, 800, 1500]),  # Freestyle
+        ("O", [100, 200, 400])  # Individual Medley
+    ]
+
+    stroke_names = {
+        "M": "M",
+        "Z": "Z",
+        "P": "P",
+        "K": "VZ",
+        "O": "O"
+    }
+
+    # Age categories
+    ages = list(range(9, 15)) + [18, 99]  # 9-14, Dorost (15-18), Absolutní (25)
+
+    # Styles
+    header_fill = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
+    header_font = Font(bold=True, color="FFFFFF", size=11)
+    subheader_fill = PatternFill(start_color="B4C7E7", end_color="B4C7E7", fill_type="solid")
+    subheader_font = Font(bold=True, size=10)
+    discipline_fill = PatternFill(start_color="E7E6E6", end_color="E7E6E6", fill_type="solid")
+    discipline_font = Font(bold=True, size=10)
+    border = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='thin'),
+        bottom=Side(style='thin')
+    )
+
+    # Create headers
+    # Row 1: Age categories
+    col = 2
+    for age in ages:
+        age_title = f"{age}letí" if age < 15 else "Dorost" if age < 19 else "Absolutní"
+        cell = ws.cell(row=1, column=col, value=age_title)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = Alignment(horizontal='center', vertical='center')
+        cell.border = border
+        ws.merge_cells(start_row=1, start_column=col, end_row=1, end_column=col+2)
+        col += 3
+
+    # Row 2: Sub-headers
+    ws.cell(row=2, column=1, value="Disciplína")
+    ws.cell(row=2, column=1).font = discipline_font
+    ws.cell(row=2, column=1).fill = discipline_fill
+    ws.cell(row=2, column=1).border = border
+    ws.cell(row=2, column=1).alignment = Alignment(horizontal='center', vertical='center')
+
+    col = 2
+    for _ in ages:
+        for header in ["Jméno", "Čas", "Termín"]:
+            cell = ws.cell(row=2, column=col, value=header)
+            cell.font = subheader_font
+            cell.fill = subheader_fill
+            cell.alignment = Alignment(horizontal='center', vertical='center')
+            cell.border = border
+            col += 1
+
+    # Set column widths
+    ws.column_dimensions['A'].width = 35
+    for col_idx in range(2, col):
+        letter = get_column_letter(col_idx)
+        if (col_idx - 2) % 3 == 0:
+            ws.column_dimensions[letter].width = 20
+        elif (col_idx - 2) % 3 == 1:
+            ws.column_dimensions[letter].width = 12
+        else:
+            ws.column_dimensions[letter].width = 15
+
+    # Populate data
+    current_row = 3
+    db = SessionLocal()
+
+    try:
+        for stroke_code, distances in disciplines:
+            for distance in distances:
+                for sex in ["female", "male"]:
+                    discipline_code = f"{distance} {stroke_code}"
+                    gender_label = "Muži" if sex == "male" else "Ženy"
+                    stroke_name = stroke_names.get(stroke_code, stroke_code)
+                    discipline_label = f"{distance} {stroke_name} - {gender_label}"
+
+                    cell = ws.cell(row=current_row, column=1, value=discipline_label)
+                    cell.font = Font(size=10)
+                    cell.border = border
+                    cell.alignment = Alignment(horizontal='left', vertical='center')
+
+                    col = 2
+                    for age in ages:
+                        try:
+                            records = get_best_times_for_age(
+                                db=db,
+                                discipline_code=discipline_code,
+                                course_length=25,
+                                sex=sex,
+                                max_age=age,
+                                limit=1,
+                                unique_swimmers=True
+                            )
+
+                            if records and len(records) > 0:
+                                record = records[0]
+                                # Name
+                                name_cell = ws.cell(row=current_row, column=col,
+                                                    value=f"{record.name} {record.surname}")
+                                name_cell.border = border
+                                name_cell.alignment = Alignment(horizontal='left', vertical='center')
+
+                                # Time
+                                time_cell = ws.cell(row=current_row, column=col+1, value=format_time(record.time))
+                                time_cell.border = border
+                                time_cell.alignment = Alignment(horizontal='center', vertical='center')
+
+                                # Place
+                                place_cell = ws.cell(row=current_row, column=col+2,
+                                                     value=record.competition_location)
+                                place_cell.border = border
+                                place_cell.alignment = Alignment(horizontal='center', vertical='center')
+                            else:
+                                for offset in range(3):
+                                    empty_cell = ws.cell(row=current_row, column=col+offset)
+                                    empty_cell.border = border
+
+                        except Exception as e:
+                            print(f"Error: {discipline_label}, age {age}: {e}")
+                            for offset in range(3):
+                                empty_cell = ws.cell(row=current_row, column=col+offset)
+                                empty_cell.border = border
+
+                        col += 3
+
+                    current_row += 1
+
+    finally:
+        db.close()
+
+    ws.freeze_panes = 'B3'
+
+    wb.save(RESULT_CLUB_FILE)
+    print(f"Saved to {RESULT_CLUB_FILE}")
+
+
+
 
 if __name__ == "__main__":
-    debug()
+    # debugi()
+    create_club_records_excel()
+    # debug()
     # debugo()

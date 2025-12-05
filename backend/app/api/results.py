@@ -1,8 +1,10 @@
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session, contains_eager
+from collections import defaultdict
 from typing import List, Optional
 from pydantic import BaseModel
-from collections import defaultdict
+
+from fastapi import APIRouter, Depends
+from sqlalchemy import func, cast, select, Integer
+from sqlalchemy.orm import Session, contains_eager
 
 from app.models import Swimmer, Discipline, Course, Result
 from app.db import get_db
@@ -104,3 +106,100 @@ async def get_results(
             SwimmerResultOut(swimmer=swimmer_out, results=results_out)
         )
     return swimmer_results
+
+
+def get_best_times_for_age(
+    db: Session,
+    discipline_code: str,
+    course_length: int,
+    sex: str,
+    max_age: int,
+    limit: int = 10,
+    unique_swimmers: bool = False,
+):
+    age_at_result = cast(func.strftime("%Y", Result.date), Integer) - Swimmer.birth_year
+
+    # set DNF THRESHOLD as 1 hour in milliseconds
+    DNF_THRESHOLD = 3600000
+    # Subquery with row_number to rank results per swimmer
+    ranked_subquery = (
+        select(
+            Swimmer.id.label("swimmer_id"),
+            Swimmer.name,
+            Swimmer.surname,
+            Swimmer.birth_year,
+            Discipline.code.label("discipline"),
+            Result.time,
+            Result.competition_location,
+            Result.date,
+            age_at_result.label("age_at_result"),
+            func.row_number()
+            .over(partition_by=Swimmer.id, order_by=[Result.time, age_at_result])
+            .label("swimmer_rank")
+            if unique_swimmers
+            else None,
+        )
+        .select_from(Result)
+        .join(Swimmer, Result.swimmer_id == Swimmer.id)
+        .join(Discipline, Result.discipline_id == Discipline.id)
+        .join(Course, Result.course_id == Course.id)
+        .where(
+            Discipline.code == discipline_code,
+            Course.length == course_length,
+            Swimmer.sex == sex,
+            age_at_result <= max_age,
+            Result.time < DNF_THRESHOLD,
+
+        )
+    ).subquery()
+
+    # Main query
+    query = select(ranked_subquery)
+
+    if unique_swimmers:
+        query = query.where(ranked_subquery.c.swimmer_rank == 1)
+
+    query = query.order_by(
+        ranked_subquery.c.time, ranked_subquery.c.age_at_result
+    ).limit(limit)
+
+    return db.execute(query).all()
+
+
+@results_router.get(
+    "/best-times",
+    summary="Get best times for given discipline",
+)
+async def best_times(
+    discipline_code: str = "100 Z",
+    course_length: int = 25,
+    sex: str = "male",
+    max_age: int = 25,
+    limit: int = 2,
+    unique_swimmers: bool = True,
+    db: Session = Depends(get_db),
+):
+    """
+    Returns best times for given discipline, course, sex, and max age.
+    """
+    results = get_best_times_for_age(
+        db, discipline_code, course_length, sex, max_age, limit, unique_swimmers
+    )
+    best_times_out = []
+
+    for row in results:
+        best_time = {
+            "swimmer": {
+                "id": row.swimmer_id,
+                "name": row.name,
+                "surname": row.surname,
+                "birth_year": row.birth_year,
+            },
+            "discipline": row.discipline,
+            "time": row.time,
+            "competition_location": row.competition_location,
+            "date": row.date,
+            "age_at_result": row.age_at_result,
+        }
+        best_times_out.append(best_time)
+    return best_times_out
