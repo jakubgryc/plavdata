@@ -506,6 +506,13 @@ def create_club_records_excel():
         start_color="E7E6E6", end_color="E7E6E6", fill_type="solid"
     )
     discipline_font = Font(bold=True, size=10)
+    # Alternating row colors
+    white_fill = PatternFill(
+        start_color="FFFFFF", end_color="FFFFFF", fill_type="solid"
+    )
+    light_gray_fill = PatternFill(
+        start_color="F5F5F5", end_color="F5F5F5", fill_type="solid"
+    )
     border = Border(
         left=Side(style="thin"),
         right=Side(style="thin"),
@@ -610,16 +617,16 @@ def create_club_records_excel():
                     cell = ws.cell(row=current_row, column=1, value=discipline_label)
                     cell.font = Font(size=10)
                     cell.alignment = Alignment(horizontal="left", vertical="center")
+                    # Apply alternating row colors
+                    cell.fill = white_fill if current_row % 2 == 0 else light_gray_fill
                     # Apply thick bottom border for discipline boundaries
-                    if is_discipline_boundary and stroke_idx < len(disciplines) - 1:
+                    if is_discipline_boundary and stroke_idx <= len(disciplines) - 1:
                         cell.border = thick_bottom_border
                     else:
                         cell.border = border
 
                     col = 2
                     for age_idx, age in enumerate(ages):
-                        is_last_age_col = age_idx == len(ages) - 1
-
                         try:
                             records = get_best_times_for_age(
                                 db=db,
@@ -670,40 +677,45 @@ def create_club_records_excel():
                                     wrap_text=True,
                                 )
 
+                                # Apply alternating row colors
+                                row_fill = (
+                                    white_fill
+                                    if current_row % 2 == 0
+                                    else light_gray_fill
+                                )
+                                name_cell.fill = row_fill
+                                time_cell.fill = row_fill
+                                place_cell.fill = row_fill
+
                                 # Apply borders - thick right border at age category boundaries
                                 if (
                                     is_discipline_boundary
-                                    and stroke_idx < len(disciplines) - 1
+                                    and stroke_idx <= len(disciplines) - 1
                                 ):
-                                    # Thick bottom border
-                                    if is_last_age_col:
-                                        name_cell.border = thick_bottom_right_border
-                                        time_cell.border = thick_bottom_right_border
-                                        place_cell.border = thick_bottom_right_border
-                                    else:
-                                        name_cell.border = thick_bottom_border
-                                        time_cell.border = thick_bottom_border
-                                        place_cell.border = thick_bottom_right_border
+                                    name_cell.border = thick_bottom_border
+                                    time_cell.border = thick_bottom_border
+                                    place_cell.border = thick_bottom_right_border
                                 else:
-                                    # Normal borders with thick right at age boundaries
-                                    if is_last_age_col:
-                                        name_cell.border = thick_right_border
-                                        time_cell.border = thick_right_border
-                                        place_cell.border = thick_right_border
-                                    else:
-                                        name_cell.border = border
-                                        time_cell.border = border
-                                        place_cell.border = thick_right_border
+                                    name_cell.border = border
+                                    time_cell.border = border
+                                    place_cell.border = thick_right_border
                             else:
                                 # Empty cells
+                                row_fill = (
+                                    white_fill
+                                    if current_row % 2 == 0
+                                    else light_gray_fill
+                                )
                                 for offset in range(3):
                                     empty_cell = ws.cell(
                                         row=current_row, column=col + offset
                                     )
+                                    # Apply alternating row colors
+                                    empty_cell.fill = row_fill
                                     # Apply appropriate borders
                                     if (
                                         is_discipline_boundary
-                                        and stroke_idx < len(disciplines) - 1
+                                        and stroke_idx <= len(disciplines) - 1
                                     ):
                                         # At discipline boundary
                                         if offset == 2:
@@ -725,10 +737,15 @@ def create_club_records_excel():
 
                         except Exception as e:
                             print(f"Error: {discipline_label}, age {age}: {e}")
+                            row_fill = (
+                                white_fill if current_row % 2 == 0 else light_gray_fill
+                            )
                             for offset in range(3):
                                 empty_cell = ws.cell(
                                     row=current_row, column=col + offset
                                 )
+                                # Apply alternating row colors
+                                empty_cell.fill = row_fill
                                 # Apply appropriate borders even on error
                                 if (
                                     is_discipline_boundary
