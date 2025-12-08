@@ -15,6 +15,7 @@ from app.api.schemas import (
     DisciplineOut,
     CourseOut,
 )
+from app.constants import DNF_THRESHOLD
 
 results_router = APIRouter(
     prefix="/results",
@@ -28,8 +29,19 @@ class ComparisonRequest(BaseModel):
     course: Optional[int] = 25
 
 
+class ClubRecordRequest(BaseModel):
+    discipline_code: str
+    course_length: Optional[int] = 25
+    sex: str
+    max_age: int
+    limit: int = 10
+    unique_swimmers: bool = False
+
+
 @results_router.post(
-    "/compare", summary="Get results for given swimmers grouped by swimmer"
+    "/compare",
+    summary="Get results for given swimmers grouped by swimmer",
+    response_model=List[SwimmerResultOut],
 )
 async def get_results(
     request: ComparisonRequest,
@@ -114,13 +126,11 @@ def get_best_times_for_age(
     course_length: int,
     sex: str,
     max_age: int,
-    limit: int = 10,
+    limit: int,
     unique_swimmers: bool = False,
 ):
     age_at_result = cast(func.strftime("%Y", Result.date), Integer) - Swimmer.birth_year
 
-    # set DNF THRESHOLD as 1 hour in milliseconds
-    DNF_THRESHOLD = 3600000
     # Subquery with row_number to rank results per swimmer
     ranked_subquery = (
         select(
@@ -165,22 +175,24 @@ def get_best_times_for_age(
     return db.execute(query).all()
 
 
-@results_router.get(
+@results_router.post(
     "/best-times",
     summary="Get best times for given discipline",
 )
 async def best_times(
-    discipline_code: str = "100 Z",
-    course_length: int = 25,
-    sex: str = "male",
-    max_age: int = 25,
-    limit: int = 2,
-    unique_swimmers: bool = True,
+    request: ClubRecordRequest,
     db: Session = Depends(get_db),
 ):
     """
     Returns best times for given discipline, course, sex, and max age.
     """
+    request = dict(request)
+    discipline_code = request.get("discipline_code")
+    course_length = request.get("course_length")
+    sex = request.get("sex")
+    max_age = request.get("max_age")
+    limit = request.get("limit")
+    unique_swimmers = request.get("unique_swimmers")
     results = get_best_times_for_age(
         db, discipline_code, course_length, sex, max_age, limit, unique_swimmers
     )
