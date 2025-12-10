@@ -222,5 +222,3 @@ class BestTimeResultOut(BaseModel):
         from_attributes = True
         alias_generator = to_camel
         validate_by_name = True
-
-
