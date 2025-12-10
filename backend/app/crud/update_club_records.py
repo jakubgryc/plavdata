@@ -14,7 +14,9 @@ def update_club_records():
         ("O", [100, 200, 400]),
     ]
 
-    ages = list(range(9, 15)) + [18, 99]
+    ages = [
+        ac.max_age for ac in db.query(AgeCategory).order_by(AgeCategory.max_age).all()
+    ]
 
     for stroke_code, distances in disciplines:
         for distance in distances:

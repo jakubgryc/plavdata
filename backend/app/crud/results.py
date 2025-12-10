@@ -13,8 +13,11 @@ def get_best_times_for_age(
     max_age: int,
     limit: int,
     unique_swimmers: bool = False,
+    only_current_age: bool = False,
 ):
     age_at_result = cast(func.strftime("%Y", Result.date), Integer) - Swimmer.birth_year
+    if only_current_age and max_age > 18:
+        only_current_age = False
 
     # Subquery with row_number to rank results per swimmer
     ranked_subquery = (
@@ -26,6 +29,8 @@ def get_best_times_for_age(
             Discipline.code.label("discipline"),
             Result.id,
             Result.time,
+            Result.split_time,
+            Result.relay_part,
             Result.competition_location,
             Result.date,
             age_at_result.label("age_at_result"),
@@ -43,7 +48,9 @@ def get_best_times_for_age(
             Discipline.code == discipline_code,
             Course.length == course_length,
             Swimmer.sex == sex,
-            age_at_result <= max_age,
+            age_at_result <= max_age
+            if not only_current_age
+            else age_at_result == max_age,
             Result.time < DNF_THRESHOLD,
         )
     ).subquery()

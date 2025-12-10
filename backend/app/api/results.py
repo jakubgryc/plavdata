@@ -1,6 +1,7 @@
 from collections import defaultdict
 from typing import List, Optional
 from pydantic import BaseModel
+from pydantic.alias_generators import to_camel
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session, contains_eager
@@ -14,6 +15,7 @@ from app.api.schemas import (
     SwimmerOut,
     DisciplineOut,
     CourseOut,
+    BestTimeResultOut,
 )
 
 results_router = APIRouter(
@@ -35,6 +37,11 @@ class ClubRecordRequest(BaseModel):
     max_age: int
     limit: int = 10
     unique_swimmers: bool = False
+    only_current_age: bool = False
+
+    class Config:
+        alias_generator = to_camel
+        validate_by_name = True
 
 
 @results_router.post(
@@ -122,6 +129,7 @@ async def get_results(
 @results_router.post(
     "/best-times",
     summary="Get best times for given discipline",
+    response_model=List[BestTimeResultOut],
 )
 async def best_times(
     request: ClubRecordRequest,
@@ -130,31 +138,38 @@ async def best_times(
     """
     Returns best times for given discipline, course, sex, and max age.
     """
-    request = dict(request)
-    discipline_code = request.get("discipline_code")
-    course_length = request.get("course_length")
-    sex = request.get("sex")
-    max_age = request.get("max_age")
-    limit = request.get("limit")
-    unique_swimmers = request.get("unique_swimmers")
+    discipline_code = request.discipline_code
+    course_length = request.course_length
+    sex = request.sex
+    max_age = request.max_age
+    limit = request.limit
+    unique_swimmers = request.unique_swimmers
+    only_current_age = request.only_current_age
     results = get_best_times_for_age(
-        db, discipline_code, course_length, sex, max_age, limit, unique_swimmers
+        db,
+        discipline_code,
+        course_length,
+        sex,
+        max_age,
+        limit,
+        unique_swimmers,
+        only_current_age,
     )
-    best_times_out = []
 
-    for row in results:
-        best_time = {
-            "swimmer": {
-                "id": row.swimmer_id,
-                "name": row.name,
-                "surname": row.surname,
-                "birth_year": row.birth_year,
-            },
-            "discipline": row.discipline,
-            "time": row.time,
-            "competition_location": row.competition_location,
-            "date": row.date,
-            "age_at_result": row.age_at_result,
-        }
-        best_times_out.append(best_time)
+    best_times_out = [
+        BestTimeResultOut(
+            swimmer_id=r.swimmer_id,
+            name=r.name,
+            surname=r.surname,
+            birth_year=r.birth_year,
+            time=r.time,
+            age_at_result=r.age_at_result,
+            split_time=r.split_time,
+            relay_part=r.relay_part,
+            competition_location=r.competition_location,
+            date=r.date,
+        )
+        for r in results
+    ]
+
     return best_times_out
