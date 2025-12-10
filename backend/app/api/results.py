@@ -30,7 +30,7 @@ class ComparisonRequest(BaseModel):
     course: Optional[int] = 25
 
 
-class ClubRecordRequest(BaseModel):
+class BestTimesRequest(BaseModel):
     discipline_code: str
     course_length: Optional[int] = 25
     sex: str
@@ -132,7 +132,7 @@ async def get_results(
     response_model=List[BestTimeResultOut],
 )
 async def best_times(
-    request: ClubRecordRequest,
+    request: BestTimesRequest,
     db: Session = Depends(get_db),
 ):
     """
