@@ -9,12 +9,21 @@ from openpyxl.styles import Border, Side, Font, Alignment, PatternFill
 from openpyxl.utils import get_column_letter
 
 from app.db import SessionLocal
-from app.models import Swimmer, PersonalBest, Discipline, Course
+from app.models import (
+    Swimmer,
+    PersonalBest,
+    Discipline,
+    Course,
+    ClubRecord,
+    AgeCategory,
+    Result,
+)
 from .config import DATA_DIR
 
 today = date.today().strftime("%d.%m.%Y")
 today_str = date.today().strftime("%Y_%m_%d")
 RESULT_FILE = DATA_DIR / f"osobaky{today_str}.xlsx"
+RESULT_CLUB_FILE = DATA_DIR / f"club_records_{today_str}.xlsx"
 
 
 def format_time(ms: int | None) -> str:
@@ -471,6 +480,313 @@ def debugo():
     db.close()
 
 
+def create_club_records_excel():
+    """Create club records Excel file with categories as columns"""
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Club Records"
+
+    # Define disciplines structure
+    disciplines = [
+        ("M", [50, 100, 200]),  # Butterfly
+        ("Z", [50, 100, 200]),  # Backstroke
+        ("P", [50, 100, 200]),  # Breaststroke
+        ("K", [50, 100, 200, 400, 800, 1500]),  # Freestyle
+        ("O", [100, 200, 400]),  # Individual Medley
+    ]
+
+    stroke_names = {"M": "M", "Z": "Z", "P": "P", "K": "VZ", "O": "O"}
+
+    # Age categories
+    ages = list(range(9, 15)) + [18, 99]  # 9-14, Dorost (15-18), Absolutní (25)
+
+    # Styles
+    header_fill = PatternFill(
+        start_color="4472C4", end_color="4472C4", fill_type="solid"
+    )
+    header_font = Font(bold=True, color="FFFFFF", size=11)
+    subheader_fill = PatternFill(
+        start_color="B4C7E7", end_color="B4C7E7", fill_type="solid"
+    )
+    subheader_font = Font(bold=True, size=10)
+    discipline_fill = PatternFill(
+        start_color="E7E6E6", end_color="E7E6E6", fill_type="solid"
+    )
+    discipline_font = Font(bold=True, size=10)
+    # Alternating row colors
+    white_fill = PatternFill(
+        start_color="FFFFFF", end_color="FFFFFF", fill_type="solid"
+    )
+    light_gray_fill = PatternFill(
+        start_color="F5F5F5", end_color="F5F5F5", fill_type="solid"
+    )
+    border = Border(
+        left=Side(style="thin"),
+        right=Side(style="thin"),
+        top=Side(style="thin"),
+        bottom=Side(style="thin"),
+    )
+    # Stronger borders for separating categories and disciplines
+    thick_right_border = Border(
+        left=Side(style="thin"),
+        right=Side(style="medium"),
+        top=Side(style="thin"),
+        bottom=Side(style="thin"),
+    )
+    thick_bottom_border = Border(
+        left=Side(style="thin"),
+        right=Side(style="thin"),
+        top=Side(style="thin"),
+        bottom=Side(style="medium"),
+    )
+    thick_bottom_right_border = Border(
+        left=Side(style="thin"),
+        right=Side(style="medium"),
+        top=Side(style="thin"),
+        bottom=Side(style="medium"),
+    )
+
+    # Create headers
+    # Row 1: Title row spanning entire table
+    total_cols = 1 + (len(ages) * 3)  # 1 discipline column + 3 columns per age
+    ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=total_cols)
+    title_cell = ws.cell(
+        row=1, column=1, value=f"Klubové rekordy PKBoh - aktualizováno {today}"
+    )
+    title_cell.font = Font(bold=True, size=16, color="FFFFFF")
+    title_cell.fill = PatternFill(
+        start_color="B00D08", end_color="B00D08", fill_type="solid"
+    )
+    title_cell.alignment = Alignment(horizontal="center", vertical="center")
+    title_cell.border = border
+    ws.row_dimensions[1].height = 30
+
+    # Row 2: Age categories
+    col = 2
+    for age in ages:
+        age_title = f"{age}letí" if age < 15 else "Dorost" if age < 19 else "Absolutní"
+        cell = ws.cell(row=2, column=col, value=age_title)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = Alignment(horizontal="center", vertical="center")
+        cell.border = border
+        ws.merge_cells(start_row=2, start_column=col, end_row=2, end_column=col + 2)
+        col += 3
+
+    # Row 3: Sub-headers
+    ws.cell(row=3, column=1, value="Disciplína")
+    ws.cell(row=3, column=1).font = discipline_font
+    ws.cell(row=3, column=1).fill = discipline_fill
+    ws.cell(row=3, column=1).border = border
+    ws.cell(row=3, column=1).alignment = Alignment(
+        horizontal="center", vertical="center"
+    )
+
+    col = 2
+    for _ in ages:
+        for header in ["Jméno", "Čas", "Termín"]:
+            cell = ws.cell(row=3, column=col, value=header)
+            cell.font = subheader_font
+            cell.fill = subheader_fill
+            cell.alignment = Alignment(horizontal="center", vertical="center")
+            cell.border = border
+            col += 1
+
+    # Set column widths
+    ws.column_dimensions["A"].width = 18  # Narrower discipline column
+    for col_idx in range(2, col):
+        letter = get_column_letter(col_idx)
+        if (col_idx - 2) % 3 == 0:
+            ws.column_dimensions[letter].width = 20
+        elif (col_idx - 2) % 3 == 1:
+            ws.column_dimensions[letter].width = 12
+        else:
+            ws.column_dimensions[letter].width = 15
+
+    # Populate data
+    current_row = 4  # Start from row 4 now (after title, age headers, and sub-headers)
+    db = SessionLocal()
+
+    try:
+        # Fetch all club records in one query with all necessary joins
+        club_records = (
+            db.query(
+                Discipline.code,
+                AgeCategory.max_age,
+                Swimmer.sex,
+                Swimmer.name,
+                Swimmer.surname,
+                Result.time,
+                Result.competition_location,
+                Result.date,
+            )
+            .join(ClubRecord.result)
+            .join(ClubRecord.age_category)
+            .join(Result.discipline)
+            .join(Result.swimmer)
+            .join(Result.course)
+            .filter(Course.length == 25)  # Only 25m pool records
+            .all()
+        )
+
+        # Build a lookup dictionary for fast access
+        # Key: (discipline_code, sex, max_age) -> record data
+        records_lookup = {}
+        for (
+            code,
+            max_age,
+            sex,
+            name,
+            surname,
+            time,
+            location,
+            record_date,
+        ) in club_records:
+            key = (code, sex, max_age)
+            records_lookup[key] = {
+                "name": name,
+                "surname": surname,
+                "time": time,
+                "location": location,
+                "date": record_date,
+            }
+
+        # Now iterate through the structure and populate the Excel
+        for stroke_idx, (stroke_code, distances) in enumerate(disciplines):
+            for distance in distances:
+                for sex in ["female", "male"]:
+                    discipline_code = f"{distance} {stroke_code}"
+                    gender_label = "Muži" if sex == "male" else "Ženy"
+                    stroke_name = stroke_names.get(stroke_code, stroke_code)
+                    discipline_label = f"{distance} {stroke_name} - {gender_label}"
+
+                    # Determine if this is the last row of a discipline group (last gender of last distance)
+                    is_last_distance = distance == distances[-1]
+                    is_last_gender = sex == "male"
+                    is_discipline_boundary = is_last_distance and is_last_gender
+
+                    cell = ws.cell(row=current_row, column=1, value=discipline_label)
+                    cell.font = Font(size=10)
+                    cell.alignment = Alignment(horizontal="left", vertical="center")
+                    # Apply alternating row colors
+                    cell.fill = white_fill if current_row % 2 == 0 else light_gray_fill
+                    # Apply thick bottom border for discipline boundaries
+                    if is_discipline_boundary and stroke_idx <= len(disciplines) - 1:
+                        cell.border = thick_bottom_border
+                    else:
+                        cell.border = border
+
+                    col = 2
+
+                    for age_idx, age in enumerate(ages):
+                        # Look up record from our pre-fetched data
+                        record = records_lookup.get((discipline_code, sex, age))
+
+                        if record:
+                            # Name
+                            name_cell = ws.cell(
+                                row=current_row,
+                                column=col,
+                                value=f"{record['surname']} {record['name']}",
+                            )
+                            name_cell.alignment = Alignment(
+                                horizontal="left", vertical="center"
+                            )
+
+                            # Time
+                            time_cell = ws.cell(
+                                row=current_row,
+                                column=col + 1,
+                                value=format_time(record["time"]),
+                            )
+                            time_cell.alignment = Alignment(
+                                horizontal="center", vertical="center"
+                            )
+
+                            # Place and Date (two lines in same cell)
+                            date_formatted = (
+                                record["date"].strftime("%d.%m.%Y")
+                                if isinstance(record["date"], date)
+                                else str(record["date"])
+                            )
+                            place_cell = ws.cell(
+                                row=current_row,
+                                column=col + 2,
+                                value=f"{record['location']}\n{date_formatted}",
+                            )
+                            place_cell.alignment = Alignment(
+                                horizontal="center",
+                                vertical="center",
+                                wrap_text=True,
+                            )
+
+                            # Apply alternating row colors
+                            row_fill = (
+                                white_fill if current_row % 2 == 0 else light_gray_fill
+                            )
+                            name_cell.fill = row_fill
+                            time_cell.fill = row_fill
+                            place_cell.fill = row_fill
+
+                            # Apply borders - thick right border at age category boundaries
+                            if (
+                                is_discipline_boundary
+                                and stroke_idx <= len(disciplines) - 1
+                            ):
+                                name_cell.border = thick_bottom_border
+                                time_cell.border = thick_bottom_border
+                                place_cell.border = thick_bottom_right_border
+                            else:
+                                name_cell.border = border
+                                time_cell.border = border
+                                place_cell.border = thick_right_border
+                        else:
+                            # Empty cells - no record for this combination
+                            row_fill = (
+                                white_fill if current_row % 2 == 0 else light_gray_fill
+                            )
+                            for offset in range(3):
+                                empty_cell = ws.cell(
+                                    row=current_row, column=col + offset
+                                )
+                                # Apply alternating row colors
+                                empty_cell.fill = row_fill
+                                # Apply appropriate borders
+                                if (
+                                    is_discipline_boundary
+                                    and stroke_idx <= len(disciplines) - 1
+                                ):
+                                    # At discipline boundary
+                                    if offset == 2:
+                                        # Last column of age category (Termín)
+                                        empty_cell.border = thick_bottom_right_border
+                                    else:
+                                        # Other columns (Name, Time)
+                                        empty_cell.border = thick_bottom_border
+                                else:
+                                    # Not at discipline boundary
+                                    if offset == 2:
+                                        # Last column of age category (Termín)
+                                        empty_cell.border = thick_right_border
+                                    else:
+                                        # Other columns
+                                        empty_cell.border = border
+
+                        col += 3
+
+                    current_row += 1
+
+    finally:
+        db.close()
+
+    ws.freeze_panes = "B4"  # Freeze first 3 rows (title, age categories, sub-headers) and first column
+
+    wb.save(RESULT_CLUB_FILE)
+    print(f"Saved to {RESULT_CLUB_FILE}")
+
+
 if __name__ == "__main__":
-    debug()
+    # debugi()
+    create_club_records_excel()
+    # debug()
     # debugo()

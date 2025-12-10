@@ -1,10 +1,13 @@
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session, contains_eager
+from collections import defaultdict
 from typing import List, Optional
 from pydantic import BaseModel
-from collections import defaultdict
+from pydantic.alias_generators import to_camel
+
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session, contains_eager
 
 from app.models import Swimmer, Discipline, Course, Result
+from app.crud.results import get_best_times_for_age
 from app.db import get_db
 from app.api.schemas import (
     SwimmerResultOut,
@@ -12,6 +15,7 @@ from app.api.schemas import (
     SwimmerOut,
     DisciplineOut,
     CourseOut,
+    BestTimeResultOut,
 )
 
 results_router = APIRouter(
@@ -26,8 +30,24 @@ class ComparisonRequest(BaseModel):
     course: Optional[int] = 25
 
 
+class BestTimesRequest(BaseModel):
+    discipline_code: str
+    course_length: Optional[int] = 25
+    sex: str
+    max_age: int
+    limit: int = 10
+    unique_swimmers: bool = False
+    only_current_age: bool = False
+
+    class Config:
+        alias_generator = to_camel
+        validate_by_name = True
+
+
 @results_router.post(
-    "/compare", summary="Get results for given swimmers grouped by swimmer"
+    "/compare",
+    summary="Get results for given swimmers grouped by swimmer",
+    response_model=List[SwimmerResultOut],
 )
 async def get_results(
     request: ComparisonRequest,
@@ -104,3 +124,52 @@ async def get_results(
             SwimmerResultOut(swimmer=swimmer_out, results=results_out)
         )
     return swimmer_results
+
+
+@results_router.post(
+    "/best-times",
+    summary="Get best times for given discipline",
+    response_model=List[BestTimeResultOut],
+)
+async def best_times(
+    request: BestTimesRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    Returns best times for given discipline, course, sex, and max age.
+    """
+    discipline_code = request.discipline_code
+    course_length = request.course_length
+    sex = request.sex
+    max_age = request.max_age
+    limit = request.limit
+    unique_swimmers = request.unique_swimmers
+    only_current_age = request.only_current_age
+    results = get_best_times_for_age(
+        db,
+        discipline_code,
+        course_length,
+        sex,
+        max_age,
+        limit,
+        unique_swimmers,
+        only_current_age,
+    )
+
+    best_times_out = [
+        BestTimeResultOut(
+            swimmer_id=r.swimmer_id,
+            name=r.name,
+            surname=r.surname,
+            birth_year=r.birth_year,
+            time=r.time,
+            age_at_result=r.age_at_result,
+            split_time=r.split_time,
+            relay_part=r.relay_part,
+            competition_location=r.competition_location,
+            date=r.date,
+        )
+        for r in results
+    ]
+
+    return best_times_out

@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from pydantic import BaseModel, model_validator
+from pydantic.alias_generators import to_camel
 from typing import Optional, List
 
 SPECIAL_CASES = {
@@ -171,9 +172,7 @@ class PersonalBestStrippedOut(BaseModel):
         from_attributes = True
 
 
-class ResultOut(BaseModel):
-    discipline: DisciplineOut
-    course: CourseOut
+class BaseResultOut(BaseModel):
     time: int
     comparison_to_best: int
     split_time: Optional[bool] = None
@@ -184,6 +183,11 @@ class ResultOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class ResultOut(BaseResultOut):
+    discipline: DisciplineOut
+    course: CourseOut
 
 
 class SwimmerResultOut(BaseModel):
@@ -200,3 +204,21 @@ class SwimmerPersonalBestOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class BestTimeResultOut(BaseModel):
+    swimmer_id: int
+    name: str
+    surname: str
+    birth_year: int
+    time: int
+    age_at_result: int
+    split_time: Optional[bool] = None
+    relay_part: Optional[bool] = None
+    competition_location: Optional[str] = None
+    date: datetime
+
+    class Config:
+        from_attributes = True
+        alias_generator = to_camel
+        validate_by_name = True

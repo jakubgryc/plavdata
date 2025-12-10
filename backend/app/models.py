@@ -8,6 +8,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Boolean,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
 
@@ -64,6 +65,11 @@ class Result(Base):
     discipline = relationship("Discipline")
     course = relationship("Course")
     swimmer = relationship("Swimmer", back_populates="results")
+    club_record = relationship(
+        "ClubRecord",
+        back_populates="result",
+        cascade="all, delete-orphan",
+    )
 
 
 class PersonalBest(Base):
@@ -83,6 +89,40 @@ class PersonalBest(Base):
     discipline = relationship("Discipline")
     course = relationship("Course")
     swimmer = relationship("Swimmer", back_populates="personal_bests")
+
+
+class AgeCategory(Base):
+    __tablename__ = "age_categories"
+
+    id = Column(Integer, primary_key=True, index=True)
+    code = Column(String(20), nullable=False)
+    min_age = Column(Integer, nullable=True)
+    max_age = Column(Integer, nullable=False)
+
+
+class ClubRecord(Base):
+    __tablename__ = "club_records"
+
+    id = Column(Integer, primary_key=True, index=True)
+    result_id = Column(Integer, ForeignKey("results.id"), nullable=False)
+    age_category_id = Column(Integer, ForeignKey("age_categories.id"), nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint(
+            "result_id", "age_category_id", name="uix_result_age_category"
+        ),
+    )
+
+    result = relationship(
+        "Result",
+        back_populates="club_record",
+        uselist=False,
+    )
+
+    age_category = relationship(
+        "AgeCategory",
+        uselist=False,
+    )
 
 
 class ApiSync(Base):
