@@ -9,8 +9,15 @@ from openpyxl.styles import Border, Side, Font, Alignment, PatternFill
 from openpyxl.utils import get_column_letter
 
 from app.db import SessionLocal
-from app.models import Swimmer, PersonalBest, Discipline, Course
-from app.api.results import get_best_times_for_age
+from app.models import (
+    Swimmer,
+    PersonalBest,
+    Discipline,
+    Course,
+    ClubRecord,
+    AgeCategory,
+    Result,
+)
 from .config import DATA_DIR
 
 today = date.today().strftime("%d.%m.%Y")
@@ -601,6 +608,50 @@ def create_club_records_excel():
     db = SessionLocal()
 
     try:
+        # Fetch all club records in one query with all necessary joins
+        club_records = (
+            db.query(
+                Discipline.code,
+                AgeCategory.max_age,
+                Swimmer.sex,
+                Swimmer.name,
+                Swimmer.surname,
+                Result.time,
+                Result.competition_location,
+                Result.date,
+            )
+            .join(ClubRecord.result)
+            .join(ClubRecord.age_category)
+            .join(Result.discipline)
+            .join(Result.swimmer)
+            .join(Result.course)
+            .filter(Course.length == 25)  # Only 25m pool records
+            .all()
+        )
+
+        # Build a lookup dictionary for fast access
+        # Key: (discipline_code, sex, max_age) -> record data
+        records_lookup = {}
+        for (
+            code,
+            max_age,
+            sex,
+            name,
+            surname,
+            time,
+            location,
+            record_date,
+        ) in club_records:
+            key = (code, sex, max_age)
+            records_lookup[key] = {
+                "name": name,
+                "surname": surname,
+                "time": time,
+                "location": location,
+                "date": record_date,
+            }
+
+        # Now iterate through the structure and populate the Excel
         for stroke_idx, (stroke_code, distances) in enumerate(disciplines):
             for distance in distances:
                 for sex in ["female", "male"]:
@@ -626,117 +677,71 @@ def create_club_records_excel():
                         cell.border = border
 
                     col = 2
+
                     for age_idx, age in enumerate(ages):
-                        try:
-                            records = get_best_times_for_age(
-                                db=db,
-                                discipline_code=discipline_code,
-                                course_length=25,
-                                sex=sex,
-                                max_age=age,
-                                limit=1,
-                                unique_swimmers=True,
+                        # Look up record from our pre-fetched data
+                        record = records_lookup.get((discipline_code, sex, age))
+
+                        if record:
+                            # Name
+                            name_cell = ws.cell(
+                                row=current_row,
+                                column=col,
+                                value=f"{record['surname']} {record['name']}",
+                            )
+                            name_cell.alignment = Alignment(
+                                horizontal="left", vertical="center"
                             )
 
-                            if records and len(records) > 0:
-                                record = records[0]
-                                # Name
-                                name_cell = ws.cell(
-                                    row=current_row,
-                                    column=col,
-                                    value=f"{record.surname} {record.name}",
-                                )
-                                name_cell.alignment = Alignment(
-                                    horizontal="left", vertical="center"
-                                )
+                            # Time
+                            time_cell = ws.cell(
+                                row=current_row,
+                                column=col + 1,
+                                value=format_time(record["time"]),
+                            )
+                            time_cell.alignment = Alignment(
+                                horizontal="center", vertical="center"
+                            )
 
-                                # Time
-                                time_cell = ws.cell(
-                                    row=current_row,
-                                    column=col + 1,
-                                    value=format_time(record.time),
-                                )
-                                time_cell.alignment = Alignment(
-                                    horizontal="center", vertical="center"
-                                )
+                            # Place and Date (two lines in same cell)
+                            date_formatted = (
+                                record["date"].strftime("%d.%m.%Y")
+                                if isinstance(record["date"], date)
+                                else str(record["date"])
+                            )
+                            place_cell = ws.cell(
+                                row=current_row,
+                                column=col + 2,
+                                value=f"{record['location']}\n{date_formatted}",
+                            )
+                            place_cell.alignment = Alignment(
+                                horizontal="center",
+                                vertical="center",
+                                wrap_text=True,
+                            )
 
-                                # Place and Date (two lines in same cell)
-                                date_formatted = (
-                                    record.date.strftime("%d.%m.%Y")
-                                    if isinstance(record.date, date)
-                                    else str(record.date)
-                                )
-                                place_cell = ws.cell(
-                                    row=current_row,
-                                    column=col + 2,
-                                    value=f"{record.competition_location}\n{date_formatted}",
-                                )
-                                place_cell.alignment = Alignment(
-                                    horizontal="center",
-                                    vertical="center",
-                                    wrap_text=True,
-                                )
+                            # Apply alternating row colors
+                            row_fill = (
+                                white_fill if current_row % 2 == 0 else light_gray_fill
+                            )
+                            name_cell.fill = row_fill
+                            time_cell.fill = row_fill
+                            place_cell.fill = row_fill
 
-                                # Apply alternating row colors
-                                row_fill = (
-                                    white_fill
-                                    if current_row % 2 == 0
-                                    else light_gray_fill
-                                )
-                                name_cell.fill = row_fill
-                                time_cell.fill = row_fill
-                                place_cell.fill = row_fill
-
-                                # Apply borders - thick right border at age category boundaries
-                                if (
-                                    is_discipline_boundary
-                                    and stroke_idx <= len(disciplines) - 1
-                                ):
-                                    name_cell.border = thick_bottom_border
-                                    time_cell.border = thick_bottom_border
-                                    place_cell.border = thick_bottom_right_border
-                                else:
-                                    name_cell.border = border
-                                    time_cell.border = border
-                                    place_cell.border = thick_right_border
+                            # Apply borders - thick right border at age category boundaries
+                            if (
+                                is_discipline_boundary
+                                and stroke_idx <= len(disciplines) - 1
+                            ):
+                                name_cell.border = thick_bottom_border
+                                time_cell.border = thick_bottom_border
+                                place_cell.border = thick_bottom_right_border
                             else:
-                                # Empty cells
-                                row_fill = (
-                                    white_fill
-                                    if current_row % 2 == 0
-                                    else light_gray_fill
-                                )
-                                for offset in range(3):
-                                    empty_cell = ws.cell(
-                                        row=current_row, column=col + offset
-                                    )
-                                    # Apply alternating row colors
-                                    empty_cell.fill = row_fill
-                                    # Apply appropriate borders
-                                    if (
-                                        is_discipline_boundary
-                                        and stroke_idx <= len(disciplines) - 1
-                                    ):
-                                        # At discipline boundary
-                                        if offset == 2:
-                                            # Last column of age category (Termín)
-                                            empty_cell.border = (
-                                                thick_bottom_right_border
-                                            )
-                                        else:
-                                            # Other columns (Name, Time)
-                                            empty_cell.border = thick_bottom_border
-                                    else:
-                                        # Not at discipline boundary
-                                        if offset == 2:
-                                            # Last column of age category (Termín)
-                                            empty_cell.border = thick_right_border
-                                        else:
-                                            # Other columns
-                                            empty_cell.border = border
-
-                        except Exception as e:
-                            print(f"Error: {discipline_label}, age {age}: {e}")
+                                name_cell.border = border
+                                time_cell.border = border
+                                place_cell.border = thick_right_border
+                        else:
+                            # Empty cells - no record for this combination
                             row_fill = (
                                 white_fill if current_row % 2 == 0 else light_gray_fill
                             )
@@ -746,10 +751,10 @@ def create_club_records_excel():
                                 )
                                 # Apply alternating row colors
                                 empty_cell.fill = row_fill
-                                # Apply appropriate borders even on error
+                                # Apply appropriate borders
                                 if (
                                     is_discipline_boundary
-                                    and stroke_idx < len(disciplines) - 1
+                                    and stroke_idx <= len(disciplines) - 1
                                 ):
                                     # At discipline boundary
                                     if offset == 2:

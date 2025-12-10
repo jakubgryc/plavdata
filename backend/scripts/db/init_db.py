@@ -7,10 +7,28 @@ from sqlalchemy.orm import Session
 
 from app.db import SessionLocal, engine, Base
 from app.constants import STROKE_TITLES, STROKE_CODES, DISTANCES
-from app.models import Swimmer, Discipline, Course, ApiSync
+from app.models import Swimmer, Discipline, Course, ApiSync, AgeCategory
 from scripts.config import DATA_DIR
 
 SWIMMERS_FILE = DATA_DIR / "swimmers.json"
+
+
+def init_age_categories(db: Session):
+    categories = [
+        {"code": "9", "min_age": 0, "max_age": 9},
+        {"code": "10", "min_age": 0, "max_age": 10},
+        {"code": "11", "min_age": 0, "max_age": 11},
+        {"code": "12", "min_age": 0, "max_age": 12},
+        {"code": "13", "min_age": 0, "max_age": 13},
+        {"code": "14", "min_age": 0, "max_age": 14},
+        {"code": "junior", "min_age": 0, "max_age": 18},
+        {"code": "open", "min_age": 0, "max_age": 99},
+    ]
+
+    for category in categories:
+        exists = db.query(AgeCategory).filter_by(code=category.get("code")).first()
+        if not exists:
+            db.add(AgeCategory(**category))
 
 
 def init_static_tables(db: Session):
@@ -19,6 +37,8 @@ def init_static_tables(db: Session):
     if not sync:
         sync = ApiSync(id=1)
         db.add(sync)
+
+    init_age_categories(db)
 
     COURSES = [
         {"type": "SCM", "length": 25},

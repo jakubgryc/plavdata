@@ -132,9 +132,9 @@ def save_data(
 
 
 def sync_results(
-    groups_to_update: list[str],
+    groups_to_update: list[str] | None = None,
     csps_ids: list[int] | None = None,
-    course_type: int | None = None,
+    course_type: int = 25,
 ):
     db: Session = SessionLocal()
 
@@ -225,6 +225,7 @@ def parse_args():
         "--course",
         type=int,
         help="Course type to update (25 or 50)",
+        default=25,
     )
 
     return parser.parse_args()
@@ -236,7 +237,7 @@ if __name__ == "__main__":
     if args.groups:
         args.groups = args.groups.split(",")
     else:
-        args.groups = VALID_GROUPS
+        args.groups = None
 
     if args.csps_ids:
         args.csps_ids = [int(csps_id) for csps_id in args.csps_ids.split(",")]
