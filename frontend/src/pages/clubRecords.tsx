@@ -115,7 +115,7 @@ function ClubRecords() {
     } else {
       fetchClubRecords(selectedCourse);
     }
-  }, [selectedCourse, cache]);
+  }, [selectedCourse]);
 
   // Helper function to get discipline type (M=butterfly, Z=backstroke, P=breaststroke, VZ=freestyle, O=medley)
   const getDisciplineType = (discipline: string) => {
@@ -194,13 +194,13 @@ function ClubRecords() {
           data={POOLS}
           defaultValue={POOLS[0]?.value}
           radius="xl"
-          color="rgba(18, 160, 216, 1)"
+          color="var(--color-primary)"
         />
       </Flex>
 
       <Flex direction="column" mah="80vh" style={{ overflowY: "auto" }}>
         <DataTable
-          className="shadow-x club-records-table"
+          className="shadow-xl club-records-table"
           withTableBorder
           borderRadius="lg"
           horizontalSpacing="sm"
@@ -330,7 +330,7 @@ function ClubRecords() {
           opened={modalOpen}
           onClose={() => setModalOpen(false)}
           title={
-            <Text size="lg" fw={700} c="rgba(18, 160, 216, 1)">
+            <Text size="lg" fw={700} c="var(--color-primary)">
               {modalData?.name} {modalData?.surname} - {modalData?.discipline}
             </Text>
           }

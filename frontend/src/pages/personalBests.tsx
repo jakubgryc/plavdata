@@ -99,7 +99,7 @@ function PersonalBests() {
               onClick={() => setSelectedGroup(group.value)}
               variant="filled"
               size="sm"
-              color="rgba(18, 160, 216, 1)"
+              color="var(--color-primary)"
               style={{ flex: "1 1 auto", minWidth: 0 }}
             >
               {group.label}
@@ -113,7 +113,7 @@ function PersonalBests() {
           data={POOLS}
           defaultValue={POOLS[0]?.value}
           radius="xl"
-          color="rgba(18, 160, 216, 1)"
+          color="var(--color-primary)"
         />
       </Flex>
       <Flex direction="column" mah="80vh" pt="sm" style={{ overflowY: "auto" }}>
@@ -167,7 +167,7 @@ function PersonalBests() {
           opened={modalOpen}
           onClose={() => setModalOpen(false)}
           title={
-            <Text size="lg" fw={700} c="rgba(18, 160, 216, 1)">
+            <Text size="lg" fw={700} c="var(--color-primary)">
               {modalData?.name} - {modalData?.discipline}
             </Text>
           }

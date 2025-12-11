@@ -104,7 +104,7 @@ function ComparisonFilterBar({
               value={pool}
               onChange={setPool}
               defaultValue={"25"}
-              color="rgba(18, 160, 216, 1)"
+              color="var(--color-primary)"
               data={[
                 { label: "25m", value: "25" },
                 { label: "50m", value: "50" },
@@ -117,7 +117,7 @@ function ComparisonFilterBar({
             <SegmentedControl
               value={timeAxis}
               onChange={setTimeAxis}
-              color="rgba(18, 160, 216, 1)"
+              color="var(--color-primary)"
               data={
                 isMobile
                   ? [
@@ -137,7 +137,7 @@ function ComparisonFilterBar({
             <SegmentedControl
               value={intermediateTimes}
               onChange={setIntermediateTimes}
-              color="rgba(18, 160, 216, 1)"
+              color="var(--color-primary)"
               data={
                 isMobile
                   ? [
@@ -157,7 +157,7 @@ function ComparisonFilterBar({
             <SegmentedControl
               value={resultType}
               onChange={setResultType}
-              color="rgba(18, 160, 216, 1)"
+              color="var(--color-primary)"
               data={
                 isMobile
                   ? [
@@ -176,7 +176,7 @@ function ComparisonFilterBar({
         <Button
           disabled={!isOutdated && lastFetchedFilterHash !== ""}
           variant={isOutdated ? "filled" : "light"}
-          color={isOutdated ? "#FFA500" : "rgba(18, 160, 216, 1)"}
+          color={isOutdated ? "#FFA500" : "var(--color-primary)"}
           radius="md"
           size="sm"
           onClick={onFetchResults}
