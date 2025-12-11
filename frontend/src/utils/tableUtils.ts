@@ -42,8 +42,7 @@ export function buildTableData(data: SwimmerPersonalBest[]): TableRow[] {
         };
       }
 
-      row[discipline] = pb ? parseTimeFromMillis(pb.time) : "";
-      row[`${discipline}_description`] = pbDescription;
+      row[discipline] = pbDescription;
     }
     return row;
   });
