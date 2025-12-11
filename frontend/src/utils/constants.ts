@@ -34,6 +34,7 @@ export const DISCIPLINES = [
 ];
 
 export const DNF_TIME = 6039990; // magic number representing DNF in milliseconds
+export const DNF_THRESHOLD = 6000000; // 100 minutes in milliseconds
 
 const GRAPH_COLORS = [
   "#ff5733",

@@ -1,3 +1,4 @@
+from datetime import datetime
 from collections import defaultdict
 from typing import List, Optional
 from pydantic import BaseModel
@@ -7,7 +8,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session, contains_eager
 
 from app.models import Swimmer, Discipline, Course, Result
-from app.crud.results import get_best_times_for_age
+from app.crud.results import get_best_times_for_age, get_club_records
 from app.db import get_db
 from app.api.schemas import (
     SwimmerResultOut,
@@ -42,6 +43,26 @@ class BestTimesRequest(BaseModel):
     class Config:
         alias_generator = to_camel
         validate_by_name = True
+
+
+class ClubRecordOut(BaseModel):
+    discipline_code: str
+    age_category: str
+    swimmer_id: int
+    name: str
+    surname: str
+    birth_year: int
+    sex: str
+    time: int
+    age_at_result: int
+    split_time: Optional[bool] = None
+    relay_part: Optional[bool] = None
+    competition_location: Optional[str] = None
+    date: datetime
+
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True
 
 
 @results_router.post(
@@ -173,3 +194,39 @@ async def best_times(
     ]
 
     return best_times_out
+
+
+@results_router.get(
+    "/club-records",
+    summary="Get all club records for a given course",
+    response_model=List[ClubRecordOut],
+)
+async def get_all_club_records(
+    course: int = 25,
+    db: Session = Depends(get_db),
+):
+    """
+    Returns all club records for the given course length.
+    """
+    records = get_club_records(db, course)
+
+    club_records_out = [
+        ClubRecordOut(
+            discipline_code=r.discipline_code,
+            age_category=r.age_category,
+            swimmer_id=r.swimmer_id,
+            name=r.name,
+            surname=r.surname,
+            birth_year=r.birth_year,
+            sex=r.sex,
+            time=r.time,
+            age_at_result=r.age_at_result,
+            split_time=r.split_time,
+            relay_part=r.relay_part,
+            competition_location=r.competition_location,
+            date=r.date,
+        )
+        for r in records
+    ]
+
+    return club_records_out

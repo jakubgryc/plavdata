@@ -20,7 +20,7 @@ import {
   findMinMaxTimes,
 } from "../utils/chartUtils.ts";
 
-import { getGraphColor, DNF_TIME } from "../utils/constants";
+import { getGraphColor, DNF_THRESHOLD } from "../utils/constants";
 import { parseTimeFromMillis, formatDateFromMs } from "../utils/timeUtils";
 
 import type { SwimmerResults } from "../schema/types";
@@ -128,7 +128,7 @@ function ComparisonSwimmerChart({
                 dataKey="time"
                 data={swimmerData.results
                   .filter((result, index) => {
-                    if (result.time === DNF_TIME) return false;
+                    if (result.time > DNF_THRESHOLD) return false;
                     if (
                       intermediateTimes === "onlyFinal" &&
                       result.split_time &&

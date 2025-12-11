@@ -70,18 +70,19 @@ function PersonalBests() {
         <Title order={2} mb="md">
           Osobní rekordy
         </Title>
-        <Button
-          leftSection={<IconFileSpreadsheet size={20} stroke={1.5} />}
-          variant="outline"
-          color="rgba(60, 60, 60, 1)"
-          radius="md"
-          size="sm"
-          onClick={() => {
-            console.log(buildTableData(personalBests));
-          }}
-        >
-          Stáhnout
-        </Button>
+        {/*This can be kept commented out. Will work on it in future.*/}
+        {/*<Button*/}
+        {/*  leftSection={<IconFileSpreadsheet size={20} stroke={1.5} />}*/}
+        {/*  variant="outline"*/}
+        {/*  color="rgba(60, 60, 60, 1)"*/}
+        {/*  radius="md"*/}
+        {/*  size="sm"*/}
+        {/*  onClick={() => {*/}
+        {/*    console.log(buildTableData(personalBests));*/}
+        {/*  }}*/}
+        {/*>*/}
+        {/*  Stáhnout*/}
+        {/*</Button>*/}
       </Flex>
       <Flex
         direction={{ base: "column", md: "row" }}
@@ -98,7 +99,7 @@ function PersonalBests() {
               onClick={() => setSelectedGroup(group.value)}
               variant="filled"
               size="sm"
-              color="rgba(18, 160, 216, 1)"
+              color="var(--color-primary)"
               style={{ flex: "1 1 auto", minWidth: 0 }}
             >
               {group.label}
@@ -112,12 +113,12 @@ function PersonalBests() {
           data={POOLS}
           defaultValue={POOLS[0]?.value}
           radius="xl"
-          color="rgba(18, 160, 216, 1)"
+          color="var(--color-primary)"
         />
       </Flex>
       <Flex direction="column" mah="80vh" pt="sm" style={{ overflowY: "auto" }}>
         <DataTable
-          className="shadow-xl"
+          className="shadow-xl responsive-table"
           withTableBorder
           borderRadius="lg"
           horizontalSpacing="xs"
@@ -134,9 +135,8 @@ function PersonalBests() {
               accessor: discipline,
               title: discipline,
               render: (record: any) => {
-                const descriptionKey = `${discipline}_description`;
-                const description = record[descriptionKey];
-                return description ? (
+                const description = record[discipline];
+                return description?.time !== "" ? (
                   <button
                     onClick={() => {
                       setModalData({
@@ -153,10 +153,10 @@ function PersonalBests() {
                       cursor: "pointer",
                     }}
                   >
-                    {record[discipline]}
+                    {record[discipline].time}
                   </button>
                 ) : (
-                  record[discipline]
+                  record[discipline].time
                 );
               },
             })),
@@ -167,7 +167,7 @@ function PersonalBests() {
           opened={modalOpen}
           onClose={() => setModalOpen(false)}
           title={
-            <Text size="lg" fw={700} c="rgba(18, 160, 216, 1)">
+            <Text size="lg" fw={700} c="var(--color-primary)">
               {modalData?.name} - {modalData?.discipline}
             </Text>
           }

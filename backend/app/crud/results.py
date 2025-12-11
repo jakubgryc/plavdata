@@ -1,7 +1,7 @@
-from sqlalchemy import func, cast, select, Integer
+from sqlalchemy import func, cast, select, Integer, case
 from sqlalchemy.orm import Session
 
-from app.models import Swimmer, Discipline, Course, Result
+from app.models import Swimmer, Discipline, Course, Result, ClubRecord, AgeCategory
 from app.constants import DNF_THRESHOLD
 
 
@@ -66,3 +66,45 @@ def get_best_times_for_age(
     ).limit(limit)
 
     return db.execute(query).all()
+
+
+def get_club_records(db: Session, course_length: int):
+    """
+    Get all club records for a given course length.
+    Returns club records grouped by discipline and age category.
+    """
+    age_at_result = cast(func.strftime("%Y", Result.date), Integer) - Swimmer.birth_year
+
+    # Replace "K" with "VZ" in discipline code
+    discipline_code = case(
+        (Discipline.code.like("% K"), func.replace(Discipline.code, " K", " VZ")),
+        else_=Discipline.code,
+    )
+
+    query = (
+        db.query(
+            discipline_code.label("discipline_code"),
+            AgeCategory.code.label("age_category"),
+            Swimmer.id.label("swimmer_id"),
+            Swimmer.name,
+            Swimmer.surname,
+            Swimmer.birth_year,
+            Swimmer.sex,
+            Result.time,
+            Result.split_time,
+            Result.relay_part,
+            Result.competition_location,
+            Result.date,
+            age_at_result.label("age_at_result"),
+        )
+        .select_from(ClubRecord)
+        .join(Result, ClubRecord.result_id == Result.id)
+        .join(AgeCategory, ClubRecord.age_category_id == AgeCategory.id)
+        .join(Swimmer, Result.swimmer_id == Swimmer.id)
+        .join(Discipline, Result.discipline_id == Discipline.id)
+        .join(Course, Result.course_id == Course.id)
+        .filter(Course.length == course_length)
+        .all()
+    )
+
+    return query

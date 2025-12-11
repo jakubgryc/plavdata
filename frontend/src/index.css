@@ -49,6 +49,76 @@ button {
     display: none; /* Chrome, Safari, Opera */
 }
 
+/* Responsive table font sizes */
+.responsive-table th,
+.responsive-table td {
+    font-size: 0.9rem;
+}
+
+.club-records-table th:not(:first-child),
+.club-records-table td:not(:first-child) {
+    border-left: 2px solid #898989 !important;
+}
+.club-records-table tr.first-of-type td {
+    border-top: 2px solid #898989 !important;
+}
+.club-records-table tbody td:not(:first-child),
+.club-records-table tbody td:not(:first-child) *,
+.club-records-table tbody td:not(:first-child) .mantine-Text-root {
+    font-size: 0.8rem !important;
+}
+
+@media (max-width: 768px) {
+    .responsive-table th,
+    .responsive-table td {
+        font-size: 0.7rem;
+    }
+
+    /* Make first column narrower on mobile */
+    .responsive-table th:first-child,
+    .responsive-table td:first-child {
+        width: 120px !important;
+        max-width: 120px !important;
+        min-width: 110px !important;
+    }
+
+    .club-records-table table {
+        table-layout: fixed !important;
+    }
+    .club-records-table th:not(:first-child),
+    .club-records-table td:not(:first-child) {
+        width: 240px !important;
+        max-width: 240px !important;
+        min-width: 240px !important;
+    }
+    .club-records-table th:first-child,
+    .club-records-table td:first-child {
+        width: 80px !important;
+        max-width: 80px !important;
+        min-width: 70px !important;
+        font-size: 9px !important;
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        line-height: 1.1 !important;
+    }
+    .club-records-table th,
+    .club-records-table td {
+        padding: 3px 3px !important;
+    }
+    .club-records-table tbody td:not(:first-child) {
+        font-size: 11px !important;
+        line-height: 1.2 !important;
+    }
+    .club-records-table tbody td:not(:first-child) * {
+        font-size: 11px !important;
+        line-height: 1.2 !important;
+    }
+    .club-records-table tbody td:not(:first-child) .mantine-Text-root {
+        font-size: 10px !important;
+        line-height: 1.2 !important;
+    }
+}
+
 .no-scrollbar {
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;     /* Firefox */

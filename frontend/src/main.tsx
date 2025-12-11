@@ -10,6 +10,7 @@ import App from "./App.tsx";
 import Home from "./pages/home";
 import CompareSwimmers from "./pages/compareSwimmers";
 import PersonalBests from "./pages/personalBests";
+import ClubRecords from "./pages/clubRecords";
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
       {
         path: "personal-bests",
         element: <PersonalBests />,
+      },
+      {
+        path: "club-records",
+        element: <ClubRecords />,
       },
     ],
   },
