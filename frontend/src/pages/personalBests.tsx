@@ -136,7 +136,7 @@ function PersonalBests() {
               title: discipline,
               render: (record: any) => {
                 const description = record[discipline];
-                return description.time !== "" ? (
+                return description?.time !== "" ? (
                   <button
                     onClick={() => {
                       setModalData({
