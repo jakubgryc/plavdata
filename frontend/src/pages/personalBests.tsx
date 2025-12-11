@@ -70,18 +70,19 @@ function PersonalBests() {
         <Title order={2} mb="md">
           Osobní rekordy
         </Title>
-        <Button
-          leftSection={<IconFileSpreadsheet size={20} stroke={1.5} />}
-          variant="outline"
-          color="rgba(60, 60, 60, 1)"
-          radius="md"
-          size="sm"
-          onClick={() => {
-            console.log(buildTableData(personalBests));
-          }}
-        >
-          Stáhnout
-        </Button>
+        {/*This can be kept commented out. Will work on it in future.*/}
+        {/*<Button*/}
+        {/*  leftSection={<IconFileSpreadsheet size={20} stroke={1.5} />}*/}
+        {/*  variant="outline"*/}
+        {/*  color="rgba(60, 60, 60, 1)"*/}
+        {/*  radius="md"*/}
+        {/*  size="sm"*/}
+        {/*  onClick={() => {*/}
+        {/*    console.log(buildTableData(personalBests));*/}
+        {/*  }}*/}
+        {/*>*/}
+        {/*  Stáhnout*/}
+        {/*</Button>*/}
       </Flex>
       <Flex
         direction={{ base: "column", md: "row" }}
@@ -117,7 +118,7 @@ function PersonalBests() {
       </Flex>
       <Flex direction="column" mah="80vh" pt="sm" style={{ overflowY: "auto" }}>
         <DataTable
-          className="shadow-xl"
+          className="shadow-xl responsive-table"
           withTableBorder
           borderRadius="lg"
           horizontalSpacing="xs"
@@ -134,9 +135,8 @@ function PersonalBests() {
               accessor: discipline,
               title: discipline,
               render: (record: any) => {
-                const descriptionKey = `${discipline}_description`;
-                const description = record[descriptionKey];
-                return description ? (
+                const description = record[discipline];
+                return description.time !== "" ? (
                   <button
                     onClick={() => {
                       setModalData({
@@ -153,10 +153,10 @@ function PersonalBests() {
                       cursor: "pointer",
                     }}
                   >
-                    {record[discipline]}
+                    {record[discipline].time}
                   </button>
                 ) : (
-                  record[discipline]
+                  record[discipline].time
                 );
               },
             })),
