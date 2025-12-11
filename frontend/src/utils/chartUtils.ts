@@ -1,5 +1,5 @@
 import type { SwimmerResults, GroupedSwimmers } from "../schema/types";
-import { DNF_TIME, DNF_THRESHOLD } from "./constants";
+import { DNF_THRESHOLD } from "./constants";
 
 export function findYoungestAndOldestYear(data: SwimmerResults[]) {
   if (data.length === 0) return { youngest: null, oldest: null };
