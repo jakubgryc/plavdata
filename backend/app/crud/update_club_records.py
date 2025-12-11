@@ -3,7 +3,7 @@ from app.crud.results import get_best_times_for_age
 from app.db import SessionLocal
 
 
-def update_club_records():
+def update_club_records(course_length: int = 25):
     db = SessionLocal()
 
     disciplines = [
@@ -14,7 +14,6 @@ def update_club_records():
         ("O", [100, 200, 400]),
     ]
 
-    course_length = 50
     try:
         ages = [ac for ac in db.query(AgeCategory).order_by(AgeCategory.max_age).all()]
 
