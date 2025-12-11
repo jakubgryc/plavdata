@@ -77,8 +77,9 @@ button {
     /* Make first column narrower on mobile */
     .responsive-table th:first-child,
     .responsive-table td:first-child {
-        width: 100px !important;
-        max-width: 100px !important;
+        width: 120px !important;
+        max-width: 120px !important;
+        min-width: 110px !important;
     }
 
     .club-records-table table {
@@ -92,10 +93,10 @@ button {
     }
     .club-records-table th:first-child,
     .club-records-table td:first-child {
-        width: 70px !important;
-        max-width: 70px !important;
+        width: 80px !important;
+        max-width: 80px !important;
         min-width: 70px !important;
-        font-size: 8px !important;
+        font-size: 9px !important;
         white-space: normal !important;
         word-wrap: break-word !important;
         line-height: 1.1 !important;
@@ -105,15 +106,15 @@ button {
         padding: 3px 3px !important;
     }
     .club-records-table tbody td:not(:first-child) {
-        font-size: 8px !important;
+        font-size: 11px !important;
         line-height: 1.2 !important;
     }
     .club-records-table tbody td:not(:first-child) * {
-        font-size: 8px !important;
+        font-size: 11px !important;
         line-height: 1.2 !important;
     }
     .club-records-table tbody td:not(:first-child) .mantine-Text-root {
-        font-size: 8px !important;
+        font-size: 10px !important;
         line-height: 1.2 !important;
     }
 }
