@@ -122,23 +122,31 @@ def get_top_swimmers_by_points(db: Session, sex: str, limit: int = 5) -> list:
     ]
 
 
-def get_recent_club_records(db: Session, limit: int = 5) -> list:
+def get_club_records(db: Session, limit: int = 5, oldest: bool = False) -> list:
     """
-    Get the most recent club records, grouped by result_id.
+    Get club records, grouped by result_id.
     Each result can have multiple age categories, which are combined.
     Returns `limit` distinct results (swims), not `limit` club_record rows.
+
+    Args:
+        db: Database session
+        limit: Number of records to return
+        oldest: If True, returns oldest records; if False, returns most recent
     """
-    # First, get the most recent distinct result_ids that have club records
-    recent_result_ids_subquery = (
+    # Get distinct result_ids ordered by date
+    order = func.max(Result.date).asc() if oldest else desc(func.max(Result.date))
+
+    result_ids_subquery = (
         db.query(ClubRecord.result_id)
         .join(Result, ClubRecord.result_id == Result.id)
         .group_by(ClubRecord.result_id)
-        .order_by(desc(func.max(Result.date)))
+        .order_by(order)
         .limit(limit)
         .subquery()
     )
 
     # Get all club records for those result_ids with full details
+    date_order = Result.date.asc() if oldest else desc(Result.date)
     records = (
         db.query(
             Result.id.label("result_id"),
@@ -153,8 +161,8 @@ def get_recent_club_records(db: Session, limit: int = 5) -> list:
         .join(Swimmer, Result.swimmer_id == Swimmer.id)
         .join(Discipline, Result.discipline_id == Discipline.id)
         .join(AgeCategory, ClubRecord.age_category_id == AgeCategory.id)
-        .filter(Result.id.in_(db.query(recent_result_ids_subquery.c.result_id)))
-        .order_by(desc(Result.date), Result.id, AgeCategory.max_age)
+        .filter(Result.id.in_(db.query(result_ids_subquery.c.result_id)))
+        .order_by(date_order, Result.id, AgeCategory.max_age)
         .all()
     )
 
@@ -172,11 +180,11 @@ def get_recent_club_records(db: Session, limit: int = 5) -> list:
             }
         grouped[row.result_id]["ageCategories"].append(row.age_category)
 
-    # Sort by date descending and return as list
+    # Sort by date and return as list
     result_list = sorted(
         grouped.values(),
         key=lambda x: x["date"] or "",
-        reverse=True,
+        reverse=not oldest,
     )
 
     return result_list
@@ -210,5 +218,6 @@ def get_dashboard_stats(db: Session) -> dict:
         },
         "topMen": get_top_swimmers_by_points(db, "male", 5),
         "topWomen": get_top_swimmers_by_points(db, "female", 5),
-        "recentRecords": get_recent_club_records(db, 5),
+        "recentRecords": get_club_records(db, limit=5, oldest=False),
+        "oldestRecords": get_club_records(db, limit=5, oldest=True),
     }
