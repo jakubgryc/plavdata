@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import personal_bests
 from app.api import swimmers
+from app.api import dashboard_stats
 from app.api.results import results_router
 
 
@@ -20,6 +21,7 @@ app.add_middleware(
 app.include_router(personal_bests.router, prefix="/api")
 app.include_router(swimmers.router, prefix="/api")
 app.include_router(results_router, prefix="/api")
+app.include_router(dashboard_stats.router, prefix="/api")
 
 
 @app.get("/")
