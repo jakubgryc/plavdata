@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { SegmentedControl, Title } from "@mantine/core";
-import { Button, Chip, Modal, Text, Stack, Flex } from "@mantine/core";
+import { Chip, Modal, Text, Stack, Flex } from "@mantine/core";
 import { DataTable } from "mantine-datatable";
-import { IconFileSpreadsheet } from "@tabler/icons-react";
 
 import { API_BASE_URL } from "../../config";
 import { GROUPS, POOLS, DISCIPLINES } from "../utils/constants";
