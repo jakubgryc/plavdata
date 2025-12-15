@@ -10,8 +10,12 @@ from app.api.results import results_router
 
 app = FastAPI()
 
-# Get allowed origins from environment variable, default to allowing all in development
-allowed_origins = os.getenv("CORS_ORIGINS", "*").split(",")
+env = os.getenv("ENV", "production").lower()
+if env == "development":
+    allowed_origins = ["*"]
+else:
+    cors_origins = os.getenv("CORS_ORIGINS", "")
+    allowed_origins = [origin.strip() for origin in cors_origins.split(",") if origin.strip()] if cors_origins else []
 
 app.add_middleware(
     CORSMiddleware,

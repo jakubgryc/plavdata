@@ -3,7 +3,7 @@
 # SSL Certificate Setup Script for Plavdata
 # Run this script on your VPS after initial deployment
 
-set -e
+set -euo pipefail
 
 # Check if .env.prod exists
 if [ ! -f .env.prod ]; then

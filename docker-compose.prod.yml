@@ -27,7 +27,7 @@ services:
       - ./certbot/www:/var/www/certbot:rw
       - ./certbot/conf:/etc/letsencrypt:rw
     # Run once to get certificate, then use cron for renewal
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    entrypoint: "/bin/sh -c 'while :; do certbot renew; sleep 12h; done'"
 
   backend:
     build: ./backend
@@ -41,20 +41,21 @@ services:
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000
     environment:
       - DATABASE_URL=${DATABASE_URL}
-      - CORS_ORIGINS=${CORS_ORIGINS:-*}
+      - ENV=production
+      - CORS_ORIGINS=${CORS_ORIGINS:-}
     restart: unless-stopped
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile.prod
+      args:
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL}
     container_name: plavdata_fe
     networks:
       - app-network
     expose:
       - "80"
-    environment:
-      - VITE_API_BASE_URL=${VITE_API_BASE_URL}
     restart: unless-stopped
 
 networks:
