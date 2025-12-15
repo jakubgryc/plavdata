@@ -6,7 +6,6 @@ import {
   SimpleGrid,
   Group,
   ThemeIcon,
-  Loader,
   Center,
 } from "@mantine/core";
 import {
@@ -21,6 +20,7 @@ import { API_BASE_URL } from "../../config";
 import StatCard from "../components/StatCard";
 import TopSwimmersCard from "../components/TopSwimmersCard";
 import ClubRecordsTable from "../components/ClubRecordsTable";
+import HomeSkeleton from "../components/HomeSkeleton";
 import type { DashboardResponse } from "../schema/types";
 
 function Home() {
@@ -53,11 +53,7 @@ function Home() {
   }, []);
 
   if (isFetching) {
-    return (
-      <Center h="50vh">
-        <Loader size="lg" />
-      </Center>
-    );
+    return <HomeSkeleton />;
   }
 
   if (error || !dashboardData) {
