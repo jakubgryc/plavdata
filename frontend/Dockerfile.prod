@@ -1,4 +1,4 @@
-# Build stage
+# Build stage - just build the React app
 FROM node:24-alpine AS builder
 
 WORKDIR /app
@@ -19,17 +19,12 @@ COPY . .
 # Build the app (VITE_API_BASE_URL is embedded here)
 RUN npm run build
 
-# Production stage - serve with nginx
-FROM nginx:alpine
+# Final stage - just the built files (will be copied to nginx volume)
+FROM alpine:latest
 
-# Copy built assets from builder
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Copy built assets to a known location
+COPY --from=builder /app/dist /app/dist
 
-# Copy nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Expose port 80
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+# Keep container running (files will be served by main nginx)
+CMD ["tail", "-f", "/dev/null"]
 

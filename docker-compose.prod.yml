@@ -9,6 +9,7 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/templates/nginx.conf.template:ro
       - ./certbot/www:/var/www/certbot:ro
       - ./certbot/conf:/etc/letsencrypt:ro
+      - frontend_dist:/usr/share/nginx/html:ro
     environment:
       - SERVER_NAME=${SERVER_NAME:-localhost}
     networks:
@@ -52,13 +53,19 @@ services:
       args:
         - VITE_API_BASE_URL=${VITE_API_BASE_URL}
     container_name: plavdata_fe
-    networks:
-      - app-network
-    expose:
-      - "80"
+    volumes:
+      - frontend_dist:/output_volume
+    entrypoint: >
+      /bin/sh -c "
+       cp -r /app/dist/. /output_volume &&
+       tail -f /dev/null
+       "
     restart: unless-stopped
 
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  frontend_dist:
 
