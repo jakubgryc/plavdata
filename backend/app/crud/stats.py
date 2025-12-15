@@ -180,7 +180,6 @@ def get_club_records(db: Session, limit: int = 5, oldest: bool = False) -> list:
             }
         grouped[row.result_id]["ageCategories"].append(row.age_category)
 
-
     return list(grouped.values())
 
 
