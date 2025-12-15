@@ -180,14 +180,8 @@ def get_club_records(db: Session, limit: int = 5, oldest: bool = False) -> list:
             }
         grouped[row.result_id]["ageCategories"].append(row.age_category)
 
-    # Sort by date and return as list
-    result_list = sorted(
-        grouped.values(),
-        key=lambda x: x["date"] or "",
-        reverse=not oldest,
-    )
 
-    return result_list
+    return list(grouped.values())
 
 
 def get_dashboard_stats(db: Session) -> dict:
