@@ -21,6 +21,14 @@ frontend/.vite/
 frontend/.env
 frontend/.env.*
 
+# ─── Root environment files ─────────────────────────
+.env
+.env.prod
+.env.local
+
+# ─── SSL Certificates (Let's Encrypt) ───────────────
+certbot/
+
 # ─── Editor / OS Crap ───────────────────────────────
 *.DS_Store
 *.swp
