@@ -44,10 +44,6 @@ export const AGE_CATEGORY_LABELS: Record<string, string> = {
   "12": "12letí",
   "13": "13letí",
   "14": "14letí",
-  "15": "15letí",
-  "16": "16letí",
-  "17": "17letí",
-  "18": "18letí",
   junior: "dorost",
   open: "open",
 };
