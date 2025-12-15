@@ -26,8 +26,8 @@ services:
     volumes:
       - ./certbot/www:/var/www/certbot:rw
       - ./certbot/conf:/etc/letsencrypt:rw
-    # Run once to get certificate, then use cron for renewal
-    entrypoint: "/bin/sh -c 'while :; do certbot renew; sleep 12h; done'"
+    depends_on:
+      - nginx
 
   backend:
     build: ./backend

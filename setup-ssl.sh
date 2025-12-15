@@ -36,7 +36,7 @@ echo "Step 2: Obtaining SSL certificate from Let's Encrypt..."
 echo "Please enter your email for Let's Encrypt notifications:"
 read -r EMAIL
 
-docker compose -f docker-compose.prod.yml run --rm certbot \
+docker compose -f docker-compose.prod.yml run --rm --entrypoint "" certbot \
     certbot certonly --webroot \
     --webroot-path=/var/www/certbot \
     --email "$EMAIL" \
@@ -57,7 +57,9 @@ if [ $? -eq 0 ]; then
     echo "5. Rebuild frontend: docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build frontend"
     echo "6. Restart nginx: docker compose -f docker-compose.prod.yml restart nginx"
     echo ""
-    echo "Certificate will auto-renew via the certbot service."
+    echo "For auto-renewal, add this cron job (run 'crontab -e'):"
+    echo "0 3 * * * cd $(pwd) && docker compose -f docker-compose.prod.yml run --rm --entrypoint '' certbot certbot renew && docker compose -f docker-compose.prod.yml restart nginx"
+    echo ""
 else
     echo "Failed to obtain certificate. Check the error above."
     exit 1
