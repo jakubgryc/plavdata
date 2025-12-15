@@ -36,6 +36,22 @@ export const DISCIPLINES = [
 export const DNF_TIME = 6039990; // magic number representing DNF in milliseconds
 export const DNF_THRESHOLD = 6000000; // 100 minutes in milliseconds
 
+// Age category display name mapping
+export const AGE_CATEGORY_LABELS: Record<string, string> = {
+  "9": "9letí",
+  "10": "10letí",
+  "11": "11letí",
+  "12": "12letí",
+  "13": "13letí",
+  "14": "14letí",
+  junior: "dorost",
+  open: "open",
+};
+
+export function getAgeCategoryLabel(code: string): string {
+  return AGE_CATEGORY_LABELS[code] ?? code;
+}
+
 const GRAPH_COLORS = [
   "#ff5733",
   "#00bc1d",

@@ -9,6 +9,48 @@ export interface GroupedSwimmers {
   swimmers: BaseSwimmer[];
 }
 
+// Dashboard Stats Types
+export interface YearlyStatValue {
+  current: number;
+  previous?: number;
+}
+
+export interface DashboardStats {
+  totalStarts: YearlyStatValue;
+  totalMeets: YearlyStatValue;
+  clubRecords: YearlyStatValue;
+  personalBests: YearlyStatValue;
+}
+
+export interface TopSwimmer {
+  rank: number;
+  swimmerId: number;
+  name: string;
+  surname: string;
+  discipline: string;
+  points: number;
+}
+
+export interface RecentClubRecord {
+  resultId: number;
+  name: string;
+  surname: string;
+  discipline: string;
+  time: number;
+  date: string;
+  ageCategories: string[];
+}
+
+export interface DashboardResponse {
+  currentYear: number;
+  previousYear: number;
+  stats: DashboardStats;
+  topMen: TopSwimmer[];
+  topWomen: TopSwimmer[];
+  recentRecords: RecentClubRecord[];
+  oldestRecords: RecentClubRecord[];
+}
+
 export interface Swimmer {
   name: string;
   surname: string;
