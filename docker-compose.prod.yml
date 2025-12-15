@@ -1,0 +1,63 @@
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: plavdata_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/templates/nginx.conf.template:ro
+      - ./certbot/www:/var/www/certbot:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+    environment:
+      - SERVER_NAME=${SERVER_NAME:-localhost}
+    networks:
+      - app-network
+    depends_on:
+      - backend
+      - frontend
+    restart: unless-stopped
+    command: >
+      /bin/sh -c "envsubst '$$SERVER_NAME' < /etc/nginx/templates/nginx.conf.template > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"
+
+  certbot:
+    image: certbot/certbot
+    container_name: plavdata_certbot
+    volumes:
+      - ./certbot/www:/var/www/certbot:rw
+      - ./certbot/conf:/etc/letsencrypt:rw
+    # Run once to get certificate, then use cron for renewal
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+  backend:
+    build: ./backend
+    container_name: plavdata_be
+    networks:
+      - app-network
+    expose:
+      - "8000"
+    volumes:
+      - "./backend/data:/app/data"
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - CORS_ORIGINS=${CORS_ORIGINS:-*}
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: plavdata_fe
+    networks:
+      - app-network
+    expose:
+      - "80"
+    environment:
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL}
+    restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge
+
