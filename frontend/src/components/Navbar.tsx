@@ -1,16 +1,35 @@
 import { NavLink } from "react-router";
 import { useState } from "react";
-import { Burger, Drawer, Flex, Text, Button, Space } from "@mantine/core";
+import {
+  Burger,
+  Drawer,
+  Flex,
+  Text,
+  Button,
+  Space,
+  ActionIcon,
+  useComputedColorScheme,
+} from "@mantine/core";
+import { IconSun, IconMoon } from "@tabler/icons-react";
+import { useTheme } from "../hooks/useTheme";
 
 type LinkState = { isActive: boolean };
 
 const Navbar = () => {
   const [opened, setOpened] = useState(false);
+  const { setColorScheme } = useTheme();
+  const computedColorScheme = useComputedColorScheme("light");
+
+  const toggleColorScheme = () => {
+    setColorScheme(computedColorScheme === "dark" ? "light" : "dark");
+  };
 
   const navLinkStyle = ({ isActive }: LinkState) => ({
     fontWeight: "bold",
     margin: "0 10px",
-    color: isActive ? "var(--color-primary)" : "black",
+    color: isActive
+      ? "var(--mantine-color-blue-5)"
+      : "var(--mantine-color-text)",
     textDecoration: "none",
   });
 
@@ -49,22 +68,19 @@ const Navbar = () => {
       align="center"
       h={48}
       px="md"
-      className="bg-white border-b"
-      pos="fixed"
-      top={0}
-      left={0}
-      right={0}
-      style={{ zIndex: 10 }}
+      bg="var(--mantine-color-body)"
+      style={{
+        borderBottom: "1px solid var(--mantine-color-default-border)",
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 10,
+      }}
     >
       <Flex align="center" gap="sm" pl="md">
         <img src="/swimmer-solid.svg" alt="logo" className="h-10 w-10" />
-        <Text
-          size="lg"
-          style={{
-            fontFamily: "var(--font-heading)",
-            color: "var(--color-text)",
-          }}
-        >
+        <Text size="lg" fw={600} c="var(--mantine-color-text)">
           Plavdata
         </Text>
 
@@ -74,11 +90,19 @@ const Navbar = () => {
       </Flex>
 
       <Flex align="center" gap="sm">
-        <Button
-          variant="transparent"
-          style={{ color: "var(--color-secondary)" }}
-          visibleFrom="md"
+        <ActionIcon
+          variant="subtle"
+          onClick={toggleColorScheme}
+          size="lg"
+          aria-label="Toggle color scheme"
         >
+          {computedColorScheme === "dark" ? (
+            <IconSun size={20} />
+          ) : (
+            <IconMoon size={20} />
+          )}
+        </ActionIcon>
+        <Button variant="subtle" visibleFrom="md">
           Přihlásit
         </Button>
         <Burger
@@ -99,12 +123,7 @@ const Navbar = () => {
         <Flex direction="column" gap="md">
           {navLinks}
           <Space h="md" />
-          <Button
-            variant="transparent"
-            style={{ color: "var(--color-secondary)" }}
-          >
-            Přihlásit
-          </Button>
+          <Button variant="subtle">Přihlásit</Button>
         </Flex>
       </Drawer>
     </Flex>
