@@ -11,6 +11,7 @@ import {
 import { format } from "date-fns";
 import { Flex, Paper, Title } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
+import { useTheme } from "../hooks/useTheme";
 
 import {
   createAbsoluteDomainTicks,
@@ -42,6 +43,7 @@ function ComparisonSwimmerChart({
 }: ComparisonSwimmerChartProps) {
   const [oldestBirthYear, setOldestBirthYear] = useState<number | null>(null);
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const { colorScheme, theme } = useTheme();
 
   useEffect(() => {
     const oldestBirthYear = findOldestBirthYear(parsedResults);
@@ -97,7 +99,13 @@ function ComparisonSwimmerChart({
           <XAxis
             dataKey="name"
             type="number"
-            tick={{ fontSize: isMobile ? 10 : 12 }}
+            tick={{
+              fontSize: isMobile ? 14 : 15,
+              fill:
+                colorScheme === "dark"
+                  ? theme.colors.gray[3]
+                  : theme.colors.gray[7],
+            }}
             tickFormatter={
               timeAxis === "absolute"
                 ? dateFormatterAbsolute
@@ -111,13 +119,29 @@ function ComparisonSwimmerChart({
             }
           />
           <YAxis
-            tick={{ fontSize: isMobile ? 10 : 12 }}
+            tick={{
+              fontSize: isMobile ? 14 : 15,
+              fill:
+                colorScheme === "dark"
+                  ? theme.colors.gray[3]
+                  : theme.colors.gray[7],
+            }}
             tickFormatter={parseTimeFromMillis}
             ticks={yAxisTicks}
             padding={{ bottom: 20 }}
           />
-          <CartesianGrid strokeDasharray="9 9" />
-          <Legend wrapperStyle={isMobile ? { fontSize: "12px" } : {}} />
+          <CartesianGrid
+            strokeDasharray={colorScheme === "dark" ? "1 3" : ""}
+          />
+          <Legend
+            wrapperStyle={{
+              fontSize: isMobile ? "12px" : "14px",
+              color:
+                colorScheme === "dark"
+                  ? theme.colors.gray[3]
+                  : theme.colors.gray[7],
+            }}
+          />
           {parsedResults.map((swimmerData, index) => {
             const color = getGraphColor(index);
             return (
@@ -154,7 +178,16 @@ function ComparisonSwimmerChart({
             );
           })}
           <Tooltip
-            contentStyle={isMobile ? { fontSize: "12px" } : {}}
+            contentStyle={{
+              fontSize: isMobile ? "12px" : "14px",
+              backgroundColor:
+                colorScheme === "dark" ? theme.colors.dark[7] : theme.white,
+              border: `1px solid ${colorScheme === "dark" ? theme.colors.gray[7] : theme.colors.gray[4]}`,
+              color:
+                colorScheme === "dark"
+                  ? theme.colors.gray[3]
+                  : theme.colors.gray[7],
+            }}
             formatter={(value, name) => [
               parseTimeFromMillis(Number(value)),
               name,

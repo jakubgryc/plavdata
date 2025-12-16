@@ -1,14 +1,20 @@
 import { Paper, Group, Stack, Title, Text, Box, Avatar } from "@mantine/core";
+import { useTheme } from "../hooks/useTheme";
 
 import type { TopSwimmer } from "../schema/types";
 
-function getRowStyles(rank: number) {
+function getRowStyles(rank: number, colorScheme: "light" | "dark" | "auto") {
+  const isDark = colorScheme === "dark";
+
   switch (rank) {
     case 1:
       return {
-        bg: "yellow.0" as const,
-        borderColor: "var(--mantine-color-yellow-3)",
-        avatarColor: "yellow",
+        bg: isDark
+          ? ("rgba(251, 191, 36, 0.1)" as const)
+          : ("#fef3c7" as const), // Very light gold background in dark
+        borderColor: isDark ? ("#fcd34d" as const) : ("#f59e0b" as const), // Bright gold border in dark
+        avatarColor: isDark ? ("yellow" as const) : ("#d97706" as const), // Use theme color in dark
+        avatarVariant: "filled",
         withBorder: true,
         size: "md" as const,
         fontWeight: 700,
@@ -16,9 +22,12 @@ function getRowStyles(rank: number) {
       };
     case 2:
       return {
-        bg: "gray.1" as const,
-        borderColor: "var(--mantine-color-gray-4)",
-        avatarColor: "gray",
+        bg: isDark
+          ? ("rgba(156, 163, 175, 0.1)" as const)
+          : ("#f3f4f6" as const), // Very light silver background in dark
+        borderColor: isDark ? ("#d1d5db" as const) : ("#9ca3af" as const), // Bright silver border in dark
+        avatarColor: isDark ? ("gray" as const) : ("#6b7280" as const), // Use theme color in dark
+        avatarVariant: "filled",
         withBorder: true,
         size: "sm" as const,
         fontWeight: 600,
@@ -26,9 +35,12 @@ function getRowStyles(rank: number) {
       };
     case 3:
       return {
-        bg: "orange.0" as const,
-        borderColor: "var(--mantine-color-orange-3)",
-        avatarColor: "orange",
+        bg: isDark
+          ? ("rgba(251, 146, 60, 0.1)" as const)
+          : ("#fed7aa" as const), // Very light bronze background in dark
+        borderColor: isDark ? ("#fdba74" as const) : ("#fb923c" as const), // Bright bronze border in dark
+        avatarColor: isDark ? ("orange" as const) : ("#ea580c" as const), // Use theme color in dark
+        avatarVariant: "filled",
         withBorder: true,
         size: "sm" as const,
         fontWeight: 600,
@@ -39,6 +51,7 @@ function getRowStyles(rank: number) {
         bg: undefined,
         borderColor: undefined,
         avatarColor: "gray",
+        avatarVariant: "light" as const,
         withBorder: false,
         size: "sm" as const,
         fontWeight: 600,
@@ -48,7 +61,8 @@ function getRowStyles(rank: number) {
 }
 
 function SwimmerRow({ rank, name, surname, discipline, points }: TopSwimmer) {
-  const styles = getRowStyles(rank);
+  const { colorScheme } = useTheme();
+  const styles = getRowStyles(rank, colorScheme);
 
   return (
     <Paper
@@ -65,7 +79,7 @@ function SwimmerRow({ rank, name, surname, discipline, points }: TopSwimmer) {
           size={styles.size}
           radius="xl"
           color={styles.avatarColor}
-          variant={rank <= 3 ? "filled" : "light"}
+          variant={styles.avatarVariant}
         >
           {rank}
         </Avatar>

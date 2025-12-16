@@ -194,7 +194,6 @@ function ClubRecords() {
           data={POOLS}
           defaultValue={POOLS[0]?.value}
           radius="xl"
-          color="var(--color-primary)"
         />
       </Flex>
 
@@ -325,34 +324,34 @@ function ClubRecords() {
           ]}
           records={buildTableData()}
         />
-
-        <Modal
-          opened={modalOpen}
-          onClose={() => setModalOpen(false)}
-          title={
-            <Text size="lg" fw={700} c="var(--color-primary)">
-              {modalData?.name} {modalData?.surname} - {modalData?.discipline}
-            </Text>
-          }
-          centered
-        >
-          {modalData && (
-            <Stack>
-              <Text>Čas: {modalData.time}</Text>
-              {modalData.location && (
-                <Text>Místo zaplavání: {modalData.location}</Text>
-              )}
-              {modalData.date && <Text>Datum: {modalData.date}</Text>}
-              {modalData.isSplit && (
-                <Text style={{ color: "orange" }}>mezičas</Text>
-              )}
-              {modalData.isRelayPart && (
-                <Text style={{ color: "purple" }}>štafeta</Text>
-              )}
-            </Stack>
-          )}
-        </Modal>
       </Flex>
+
+      <Modal
+        opened={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title={
+          <Text size="lg" fw={700} c="var(--color-primary)">
+            {modalData?.name} {modalData?.surname} - {modalData?.discipline}
+          </Text>
+        }
+        centered
+      >
+        {modalData && (
+          <Stack>
+            <Text>Čas: {modalData.time}</Text>
+            {modalData.location && (
+              <Text>Místo zaplavání: {modalData.location}</Text>
+            )}
+            {modalData.date && <Text>Datum: {modalData.date}</Text>}
+            {modalData.isSplit && (
+              <Text style={{ color: "orange" }}>mezičas</Text>
+            )}
+            {modalData.isRelayPart && (
+              <Text style={{ color: "purple" }}>štafeta</Text>
+            )}
+          </Stack>
+        )}
+      </Modal>
     </Flex>
   );
 }

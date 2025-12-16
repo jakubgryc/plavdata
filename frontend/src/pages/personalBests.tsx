@@ -88,7 +88,7 @@ function PersonalBests() {
         justify={{ md: "space-between" }}
         align={{ base: "stretch", md: "center" }}
         gap="md"
-        className="w-full mx-auto bg-gray-300 py-2"
+        className="w-full mx-auto py-2"
       >
         <Flex gap="xs" wrap="wrap" justify="flex-start">
           {GROUPS.map((group) => (
@@ -96,9 +96,7 @@ function PersonalBests() {
               key={group.value}
               checked={selectedGroup === group.value}
               onClick={() => setSelectedGroup(group.value)}
-              variant="filled"
               size="sm"
-              color="var(--color-primary)"
               style={{ flex: "1 1 auto", minWidth: 0 }}
             >
               {group.label}
@@ -112,7 +110,6 @@ function PersonalBests() {
           data={POOLS}
           defaultValue={POOLS[0]?.value}
           radius="xl"
-          color="var(--color-primary)"
         />
       </Flex>
       <Flex direction="column" mah="80vh" pt="sm" style={{ overflowY: "auto" }}>

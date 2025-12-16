@@ -1,11 +1,12 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { MantineProvider } from "@mantine/core";
+import { MantineProvider, ColorSchemeScript } from "@mantine/core";
 import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import "@mantine/core/styles.css";
 import "mantine-datatable/styles.css";
 import "./index.css";
+import { theme } from "./theme";
 import App from "./App.tsx";
 import Home from "./pages/home";
 import CompareSwimmers from "./pages/compareSwimmers";
@@ -39,7 +40,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <MantineProvider>
+    <ColorSchemeScript defaultColorScheme="auto" />
+    <MantineProvider theme={theme} defaultColorScheme="auto">
       <RouterProvider router={router} />
     </MantineProvider>
   </StrictMode>,
