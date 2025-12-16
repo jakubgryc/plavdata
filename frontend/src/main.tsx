@@ -12,6 +12,7 @@ import Home from "./pages/home";
 import CompareSwimmers from "./pages/compareSwimmers";
 import PersonalBests from "./pages/personalBests";
 import ClubRecords from "./pages/clubRecords";
+import NotFound from "./pages/notFound";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
       {
         path: "club-records",
         element: <ClubRecords />,
+      },
+      {
+        path: "*",
+        element: <NotFound />,
       },
     ],
   },
