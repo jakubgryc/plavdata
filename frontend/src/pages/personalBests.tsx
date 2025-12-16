@@ -7,10 +7,12 @@ import { API_BASE_URL } from "../../config";
 import { GROUPS, POOLS, DISCIPLINES } from "../utils/constants";
 import { buildTableData } from "../utils/tableUtils";
 import { formatDate } from "../utils/timeUtils";
+import { useTheme } from "../hooks/useTheme";
 
 import type { SwimmerPersonalBest } from "../schema/types";
 
 function PersonalBests() {
+  const { colorScheme } = useTheme();
   const [selectedGroup, setSelectedGroup] = useState<string | null>("Z1");
   const [selectedCourse, setSelectedCourse] = useState<string>("25");
   const [personalBests, setPersonalBests] = useState<
@@ -117,7 +119,8 @@ function PersonalBests() {
           className="shadow-xl responsive-table"
           withTableBorder
           borderRadius="lg"
-          horizontalSpacing="xs"
+          horizontalSpacing="0"
+          verticalSpacing="0"
           withColumnBorders
           striped
           pinFirstColumn={true}
@@ -132,6 +135,17 @@ function PersonalBests() {
               title: discipline,
               render: (record: any) => {
                 const description = record[discipline];
+                const bgColor = description?.isSplit
+                  ? colorScheme === "dark"
+                    ? "#4A5D4A"
+                    : "#D4EDDA" // dimmer green in dark
+                  : description?.isRelayPart
+                    ? colorScheme === "dark"
+                      ? "#5A4A7A"
+                      : "#E2E3F1" // dimmer purple in dark
+                    : "transparent";
+                const textColor =
+                  bgColor !== "transparent" ? "black" : "inherit";
                 return description?.time !== "" ? (
                   <button
                     onClick={() => {
@@ -143,16 +157,28 @@ function PersonalBests() {
                       setModalOpen(true);
                     }}
                     style={{
-                      background: "none",
+                      background: bgColor,
                       border: "none",
-                      color: "inherit",
+                      color: textColor,
                       cursor: "pointer",
+                      width: "100%",
+                      height: "100%",
+                      padding: "10px 10px",
+                      boxSizing: "border-box",
+                      textAlign: "left",
+                      display: "block",
                     }}
                   >
                     {record[discipline].time}
                   </button>
                 ) : (
-                  record[discipline].time
+                  <span
+                    style={{
+                      color: textColor,
+                    }}
+                  >
+                    {record[discipline].time}
+                  </span>
                 );
               },
             })),

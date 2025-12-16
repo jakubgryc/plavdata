@@ -12,6 +12,7 @@ import { DataTable } from "mantine-datatable";
 import { API_BASE_URL } from "../../config";
 import { POOLS, DISCIPLINES } from "../utils/constants";
 import { parseTimeFromMillis, formatDate } from "../utils/timeUtils";
+import { useTheme } from "../hooks/useTheme";
 
 interface ClubRecord {
   discipline: string;
@@ -56,6 +57,8 @@ function ClubRecords() {
     discipline: string;
     ageCategory: string;
   } | null>(null);
+
+  const { colorScheme } = useTheme();
 
   useEffect(() => {
     const fetchClubRecords = async (course: string) => {
@@ -202,7 +205,8 @@ function ClubRecords() {
           className="shadow-xl club-records-table"
           withTableBorder
           borderRadius="lg"
-          horizontalSpacing="sm"
+          horizontalSpacing={0}
+          verticalSpacing={0}
           withColumnBorders
           striped
           pinFirstColumn={true}
@@ -238,6 +242,7 @@ function ClubRecords() {
                       size="xs"
                       style={{
                         flex: 3,
+                        padding: "0px 10px",
                         textAlign: "left",
                       }}
                     >
@@ -246,7 +251,7 @@ function ClubRecords() {
                     <Text
                       size="xs"
                       style={{
-                        flex: 1.5,
+                        flex: 2,
                         textAlign: "left",
                       }}
                     >
@@ -261,18 +266,30 @@ function ClubRecords() {
               render: (record: any) => {
                 const data = record[category];
                 if (!data) {
-                  return (
-                    <Text size="xs" c="dimmed" ta="center">
-                      -
-                    </Text>
-                  );
+                  return <></>;
                 }
+                const bgColor = data.splitTime
+                  ? colorScheme === "dark"
+                    ? "#4A5D4A"
+                    : "#D4EDDA"
+                  : data.relayPart
+                    ? colorScheme === "dark"
+                      ? "#5A4A7A"
+                      : "#E2E3F1"
+                    : "transparent";
+                const textColor =
+                  bgColor !== "transparent" ? "black" : "inherit";
                 return (
                   <Flex
                     w="100%"
                     justify="flex-start"
                     gap={{ base: 4, sm: "xs" }}
                     align="center"
+                    style={{
+                      backgroundColor: bgColor,
+                      color: textColor,
+                      padding: "10px",
+                    }}
                   >
                     <Text
                       size="xs"
@@ -344,10 +361,22 @@ function ClubRecords() {
             )}
             {modalData.date && <Text>Datum: {modalData.date}</Text>}
             {modalData.isSplit && (
-              <Text style={{ color: "orange" }}>mezičas</Text>
+              <Text
+                style={{
+                  color: colorScheme === "dark" ? "#7A8F7A" : "#2D5A2D",
+                }}
+              >
+                mezičas
+              </Text>
             )}
             {modalData.isRelayPart && (
-              <Text style={{ color: "purple" }}>štafeta</Text>
+              <Text
+                style={{
+                  color: colorScheme === "dark" ? "#8A7A9A" : "#4B3A6B",
+                }}
+              >
+                štafeta
+              </Text>
             )}
           </Stack>
         )}

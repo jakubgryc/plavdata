@@ -41,6 +41,16 @@ button {
     font-size: 0.9rem;
 }
 
+.responsive-table th {
+    padding: 8px 4px;
+    text-align: center;
+}
+
+.responsive-table th:first-child,
+.responsive-table td:first-child {
+    padding-left: 8px;
+}
+
 .club-records-table th:not(:first-child),
 .club-records-table td:not(:first-child) {
     border-left: 2px solid #898989 !important;
@@ -52,6 +62,11 @@ button {
 .club-records-table tbody td:not(:first-child) *,
 .club-records-table tbody td:not(:first-child) .mantine-Text-root {
     font-size: 0.8rem !important;
+}
+
+.club-records-table th:first-child,
+.club-records-table td:first-child {
+    padding: 8px !important;
 }
 
 @media (max-width: 768px) {
@@ -86,10 +101,11 @@ button {
         white-space: normal !important;
         word-wrap: break-word !important;
         line-height: 1.1 !important;
+        padding: 4px !important;
     }
     .club-records-table th,
     .club-records-table td {
-        padding: 3px 3px !important;
+        padding: 0px 0px !important;
     }
     .club-records-table tbody td:not(:first-child) {
         font-size: 11px !important;
@@ -109,4 +125,3 @@ button {
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;     /* Firefox */
 }
-
