@@ -104,12 +104,15 @@ def save_data(
             db.query(Result)
             .filter_by(
                 swimmer_id=swimmer.id,
+                time=time,
                 discipline_id=discipline.id,
                 course_id=course.id,
-                date=datetime.fromisoformat(date_str),
-                time=time,
+                competition_location=competition_location,
+                improvement=improvement,
+                comparison_to_best=comparison_to_best,
                 split_time=split_time,
                 relay_part=relay_part,
+                date=datetime.fromisoformat(date_str).date(),
             )
             .first()
         )
