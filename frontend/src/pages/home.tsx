@@ -129,7 +129,7 @@ function Home() {
       <ClubRecordsTable
         records={recentRecords}
         title="Nové klubové rekordy"
-        subtitle="5 nejnovějších pokořených rekordů"
+        subtitle={`${recentRecords.length} nejnovějších pokořených rekordů`}
         variant="recent"
       />
 
@@ -137,7 +137,7 @@ function Home() {
       <ClubRecordsTable
         records={oldestRecords}
         title="Nejstarší klubové rekordy"
-        subtitle="5 nejstarších nepokořených rekordů"
+        subtitle={`${oldestRecords.length} nejstarších nepokořených rekordů`}
         variant="oldest"
       />
     </Flex>

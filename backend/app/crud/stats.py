@@ -209,8 +209,8 @@ def get_dashboard_stats(db: Session) -> dict:
                 "previous": get_personal_bests_count_by_year(db, previous_year),
             },
         },
-        "topMen": get_top_swimmers_by_points(db, "male", 5),
-        "topWomen": get_top_swimmers_by_points(db, "female", 5),
-        "recentRecords": get_club_records(db, limit=5, oldest=False),
-        "oldestRecords": get_club_records(db, limit=5, oldest=True),
+        "topMen": get_top_swimmers_by_points(db, "male", limit=5),
+        "topWomen": get_top_swimmers_by_points(db, "female", limit=5),
+        "recentRecords": get_club_records(db, limit=10, oldest=False),
+        "oldestRecords": get_club_records(db, limit=10, oldest=True),
     }
