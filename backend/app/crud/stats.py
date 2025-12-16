@@ -62,8 +62,9 @@ def get_club_records_count_by_year(db: Session, year: int) -> int:
 def get_personal_bests_count_by_year(db: Session, year: int) -> int:
     """Count personal bests achieved in a given year."""
     return (
-        db.query(func.count(PersonalBest.id))
-        .filter(extract("year", PersonalBest.date) == year)
+        db.query(func.count(Result.id))
+        .filter(extract("year", Result.date) == year)
+        .filter(Result.improvement)
         .scalar()
         or 0
     )
