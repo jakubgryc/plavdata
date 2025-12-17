@@ -6,16 +6,12 @@ import ComparisonFilterBar from "../components/ComparisonFilterBar";
 import ComparisonSwimmerChart from "../components/ComparisonSwimmerChart";
 import { API_BASE_URL } from "../../config";
 
-import {
-  shiftResults,
-  findSwimmerIds,
-  parseCurrentDiscipline,
-} from "../utils/chartUtils";
+import { shiftResults, parseCurrentDiscipline } from "../utils/chartUtils";
 
 function CompareSwimmers() {
   const [results, setResults] = useState<SwimmerResults[]>([]);
   const [groupedSwimmers, setGroupedSwimmers] = useState<GroupedSwimmers[]>([]);
-  const [selectedSwimmers, setSelectedSwimmers] = useState<string[]>([]);
+  const [selectedSwimmers, setSelectedSwimmers] = useState<number[]>([]);
 
   // Filter bar states
   const [pool, setPool] = useState<string>("25");
@@ -65,7 +61,6 @@ function CompareSwimmers() {
 
   const fetchComparisonResults = async () => {
     try {
-      const swimmerIds = findSwimmerIds(selectedSwimmers, groupedSwimmers);
       let discipline = "";
       if (selectedDiscipline) {
         // convert VZ to K for API
@@ -81,7 +76,7 @@ function CompareSwimmers() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          swimmer_ids: swimmerIds,
+          swimmer_ids: selectedSwimmers,
           discipline_code: discipline,
           course: pool,
         }),

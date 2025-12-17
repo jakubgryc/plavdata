@@ -13,8 +13,8 @@ import type { GroupedSwimmers } from "../schema/types";
 
 interface ComparisonFilterBarProps {
   groupedSwimmers: GroupedSwimmers[];
-  selectedSwimmers: string[];
-  setSelectedSwimmers: (value: string[]) => void;
+  selectedSwimmers: number[];
+  setSelectedSwimmers: (value: number[]) => void;
   selectedDiscipline: string | null;
   setSelectedDiscipline: (value: string | null) => void;
   pool: string;
@@ -65,13 +65,14 @@ function ComparisonFilterBar({
           searchable
           clearable
           maxValues={8}
-          value={selectedSwimmers}
-          onChange={setSelectedSwimmers}
+          value={selectedSwimmers.map(String)}
+          onChange={(values) => setSelectedSwimmers(values.map(Number))}
           data={groupedSwimmers.map(({ group, swimmers }) => ({
             group: group === "veteran" ? "bývalí" : group,
-            items: swimmers.map(
-              (swimmer) => `${swimmer.surname} ${swimmer.name}`,
-            ),
+            items: swimmers.map((swimmer) => ({
+              value: swimmer.id.toString(),
+              label: `${swimmer.surname} ${swimmer.name}`,
+            })),
           }))}
           w={{ base: "100%", md: "50%" }}
         />
