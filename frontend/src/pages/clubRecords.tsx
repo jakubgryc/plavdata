@@ -277,8 +277,6 @@ function ClubRecords() {
                       ? "#5A4A7A"
                       : "#E2E3F1"
                     : "transparent";
-                const textColor =
-                  bgColor !== "transparent" ? "black" : "inherit";
                 return (
                   <Flex
                     w="100%"
@@ -287,7 +285,6 @@ function ClubRecords() {
                     align="center"
                     style={{
                       backgroundColor: bgColor,
-                      color: textColor,
                       padding: "10px",
                     }}
                   >

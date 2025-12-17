@@ -144,8 +144,6 @@ function PersonalBests() {
                       ? "#5A4A7A"
                       : "#E2E3F1" // dimmer purple in dark
                     : "transparent";
-                const textColor =
-                  bgColor !== "transparent" ? "black" : "inherit";
                 return description?.time !== "" ? (
                   <button
                     onClick={() => {
@@ -159,7 +157,6 @@ function PersonalBests() {
                     style={{
                       background: bgColor,
                       border: "none",
-                      color: textColor,
                       cursor: "pointer",
                       width: "100%",
                       height: "100%",
@@ -172,13 +169,7 @@ function PersonalBests() {
                     {record[discipline].time}
                   </button>
                 ) : (
-                  <span
-                    style={{
-                      color: textColor,
-                    }}
-                  >
-                    {record[discipline].time}
-                  </span>
+                  <></>
                 );
               },
             })),
