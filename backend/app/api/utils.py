@@ -1,9 +1,10 @@
-from fastapi import APIRouter, HTTPException, Depends
-from sqlalchemy.orm import Session
-from typing import List
-from app.db import get_db
-from app.models import PersonalBest, Discipline, Course, Swimmer
 import itertools
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+
+from app.db import get_db
+from app.models import Course, Discipline, PersonalBest, Swimmer
 
 router = APIRouter(
     prefix="/utils",
@@ -42,14 +43,21 @@ async def calculate_best_relay(data: dict, db: Session = Depends(get_db)):
             raise HTTPException(status_code=400, detail="Not enough 50 free times")
 
         # Generate all combinations of 4 swimmers
+        print(swimmer_times)
         relays = []
         for combo in itertools.combinations(swimmer_times.keys(), 4):
             total = sum(swimmer_times[swimmer_id] for swimmer_id in combo)
             swimmers_list = [
                 {
                     "id": swimmer_id,
-                    "name": db.query(Swimmer).filter(Swimmer.id == swimmer_id).first().name,
-                    "surname": db.query(Swimmer).filter(Swimmer.id == swimmer_id).first().surname,
+                    "name": db.query(Swimmer)
+                    .filter(Swimmer.id == swimmer_id)
+                    .first()
+                    .name,
+                    "surname": db.query(Swimmer)
+                    .filter(Swimmer.id == swimmer_id)
+                    .first()
+                    .surname,
                     "stroke": "VZ",
                     "time": swimmer_times[swimmer_id],
                 }
@@ -66,10 +74,10 @@ async def calculate_best_relay(data: dict, db: Session = Depends(get_db)):
         strokes = ["50 Z", "50 P", "50 M", "50 K"]
         stroke_assignments = ["Z", "P", "M", "VZ"]
 
-        # Get best times for each stroke for each swimmer
-        swimmer_times = {}
+        # Get available strokes for each swimmer
+        swimmer_strokes = {}
         for swimmer_id in swimmer_ids:
-            times = {}
+            available_strokes = []
             for stroke in strokes:
                 pb = (
                     db.query(PersonalBest)
@@ -78,33 +86,46 @@ async def calculate_best_relay(data: dict, db: Session = Depends(get_db)):
                     .filter(
                         PersonalBest.swimmer_id == swimmer_id,
                         Discipline.code == stroke,
-                        Course.length == "25",
+                        Course.length == 25,
                     )
                     .order_by(PersonalBest.time)
                     .first()
                 )
                 if pb:
-                    times[stroke] = pb.time
-            if len(times) >= 4:  # Must have all strokes
-                swimmer_times[swimmer_id] = times
+                    available_strokes.append(stroke)
+            if available_strokes:  # At least one stroke
+                swimmer_strokes[swimmer_id] = available_strokes
 
-        if len(swimmer_times) < 4:
+        if len(swimmer_strokes) < 4:
             raise HTTPException(
-                status_code=400, detail="Not enough swimmers with complete stroke times"
+                status_code=400, detail="Not enough swimmers with any stroke times"
             )
 
         # Find top 10 best combinations
         top_relays = []
 
-        for combo in itertools.permutations(swimmer_times.keys(), 4):
+        for combo in itertools.permutations(swimmer_strokes.keys(), 4):
             total = 0
             team = []
             valid = True
             for i, swimmer_id in enumerate(combo):
                 stroke_code = strokes[i]
                 stroke_name = stroke_assignments[i]
-                if stroke_code in swimmer_times[swimmer_id]:
-                    time = swimmer_times[swimmer_id][stroke_code]
+                if stroke_code in swimmer_strokes[swimmer_id]:
+                    # Get the time for this stroke
+                    pb = (
+                        db.query(PersonalBest)
+                        .join(Discipline)
+                        .join(Course)
+                        .filter(
+                            PersonalBest.swimmer_id == swimmer_id,
+                            Discipline.code == stroke_code,
+                            Course.length == 25,
+                        )
+                        .order_by(PersonalBest.time)
+                        .first()
+                    )
+                    time = pb.time
                     total += time
                     team.append({"id": swimmer_id, "stroke": stroke_name, "time": time})
                 else:
@@ -113,7 +134,9 @@ async def calculate_best_relay(data: dict, db: Session = Depends(get_db)):
             if valid:
                 # Add swimmer names
                 for member in team:
-                    swimmer = db.query(Swimmer).filter(Swimmer.id == member["id"]).first()
+                    swimmer = (
+                        db.query(Swimmer).filter(Swimmer.id == member["id"]).first()
+                    )
                     member["name"] = swimmer.name
                     member["surname"] = swimmer.surname
                 top_relays.append({"totalTime": total, "swimmers": team})
