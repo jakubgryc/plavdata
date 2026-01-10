@@ -5,7 +5,10 @@ import {
   Grid,
   Skeleton,
   useMantineColorScheme,
+  Text,
+  rem,
 } from "@mantine/core";
+import { IconInfoCircle } from "@tabler/icons-react";
 import { EqualRelayTeamCard } from "./EqualRelayTeamCard.tsx";
 import { TEAM_COLORS } from "../utils/constants";
 import type { EqualRelayResult } from "../schema/types";
@@ -78,6 +81,45 @@ export function EqualRelayResults({
           );
         })}
       </Grid>
+
+      <Card
+        withBorder
+        p="md"
+        style={{
+          backgroundColor:
+            colorScheme === "dark"
+              ? "rgba(14, 165, 233, 0.1)"
+              : "rgba(14, 165, 233, 0.05)",
+          borderColor:
+            colorScheme === "dark"
+              ? "rgba(14, 165, 233, 0.3)"
+              : "rgba(14, 165, 233, 0.2)",
+        }}
+      >
+        <Group gap="sm" align="flex-start" wrap="nowrap">
+          <IconInfoCircle
+            style={{ width: rem(20), height: rem(20), flexShrink: 0 }}
+            color="var(--mantine-color-blue-6)"
+          />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <Text size="sm" fw={600} c="blue.5" style={{ lineHeight: 1.4 }}>
+              Poznámka k výpočtu
+            </Text>
+            <Text
+              size="sm"
+              c={colorScheme === "dark" ? "blue.3" : "blue.8"}
+              mt={4}
+              style={{ lineHeight: 1.5 }}
+            >
+              Časy byly použity z osobních rekordů plavců na 50m volný způsob na
+              25metrovém bazéně. Vybrání plavců do týmů bylo optimalizováno tak,
+              aby rozdíl mezi nejrychlejší a nejpomalejší štafetou byl co
+              nejmenší. V případě nevyváženého počtu plavců je nejrychlejší
+              plavec vybrán plavat dvakrát.
+            </Text>
+          </div>
+        </Group>
+      </Card>
     </>
   );
 }
