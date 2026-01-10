@@ -6,7 +6,7 @@ backend/.mypy_cache/
 backend/.pytest_cache/
 backend/.pdm-python
 backend/__pypackages__/
-backend/data/*.json
+backend/data/**
 
 # If using .env files for secrets
 backend/.env

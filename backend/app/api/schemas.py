@@ -1,8 +1,8 @@
 from datetime import datetime
+from typing import List, Optional
 
 from pydantic import BaseModel, model_validator
 from pydantic.alias_generators import to_camel
-from typing import Optional, List
 
 SPECIAL_CASES = {
     # Special cases for renaming swimmer names
@@ -222,3 +222,56 @@ class BestTimeResultOut(BaseModel):
         from_attributes = True
         alias_generator = to_camel
         validate_by_name = True
+
+
+# Relay Schemas
+class RelaySwimmerInfo(BaseModel):
+    id: int
+    name: str
+    surname: str
+    time: int
+    stroke: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+class RelayResult(BaseModel):
+    total_time: int
+    swimmers: List[RelaySwimmerInfo]
+
+    class Config:
+        from_attributes = True
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+class BestRelayResponse(BaseModel):
+    relays: List[RelayResult]
+    best_time: Optional[int] = None
+
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+class TeamResult(BaseModel):
+    swimmers: List[RelaySwimmerInfo]
+    total_time: int
+
+    class Config:
+        from_attributes = True
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+class EqualRelaysResponse(BaseModel):
+    teams: List[TeamResult]
+    delta: int
+    swimmers_per_relay: int
+
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True

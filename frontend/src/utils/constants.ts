@@ -66,3 +66,67 @@ const GRAPH_COLORS = [
 export function getGraphColor(index: number): string {
   return GRAPH_COLORS[index % GRAPH_COLORS.length];
 }
+
+// Team colors for equal relay results
+export const TEAM_COLORS = [
+  {
+    letter: "A",
+    color: "blue",
+    bgLight: "rgba(33, 150, 243, 0.1)",
+    bgDark: "rgba(33, 150, 243, 0.2)",
+  },
+  {
+    letter: "B",
+    color: "violet",
+    bgLight: "rgba(156, 39, 176, 0.1)",
+    bgDark: "rgba(156, 39, 176, 0.2)",
+  },
+  {
+    letter: "C",
+    color: "orange",
+    bgLight: "rgba(255, 152, 0, 0.2)",
+    bgDark: "rgba(255, 152, 0, 0.2)",
+  },
+  {
+    letter: "D",
+    color: "teal",
+    bgLight: "rgba(0, 150, 136, 0.2)",
+    bgDark: "rgba(0, 150, 136, 0.2)",
+  },
+  {
+    letter: "E",
+    color: "pink",
+    bgLight: "rgba(233, 30, 99, 0.1)",
+    bgDark: "rgba(233, 30, 99, 0.2)",
+  },
+  {
+    letter: "F",
+    color: "indigo",
+    bgLight: "rgba(63, 81, 181, 0.1)",
+    bgDark: "rgba(63, 81, 181, 0.2)",
+  },
+  {
+    letter: "G",
+    color: "lime",
+    bgLight: "rgba(205, 220, 57, 0.1)",
+    bgDark: "rgba(205, 220, 57, 0.2)",
+  },
+  {
+    letter: "H",
+    color: "cyan",
+    bgLight: "rgba(0, 188, 212, 0.1)",
+    bgDark: "rgba(0, 188, 212, 0.2)",
+  },
+  {
+    letter: "I",
+    color: "grape",
+    bgLight: "rgba(156, 39, 176, 0.1)",
+    bgDark: "rgba(156, 39, 176, 0.2)",
+  },
+  {
+    letter: "J",
+    color: "red",
+    bgLight: "rgba(244, 67, 54, 0.1)",
+    bgDark: "rgba(244, 67, 54, 0.2)",
+  },
+];

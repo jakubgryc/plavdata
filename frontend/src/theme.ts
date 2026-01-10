@@ -55,5 +55,46 @@ export const theme = createTheme({
         color: "blue",
       },
     },
+    Text: {
+      styles: {
+        root: {
+          fontVariantNumeric: "tabular-nums",
+          fontFeatureSettings: '"tnum"',
+          letterSpacing: "-0.01em",
+        },
+      },
+    },
+    Title: {
+      styles: {
+        root: {
+          fontVariantNumeric: "tabular-nums",
+          fontFeatureSettings: '"tnum"',
+          letterSpacing: "-0.01em",
+        },
+      },
+    },
+    TableTd: {
+      styles: {
+        td: {
+          fontVariantNumeric: "tabular-nums",
+          fontFeatureSettings: '"tnum"',
+          letterSpacing: "-0.01em",
+        },
+      },
+    },
+    TableTh: {
+      styles: {
+        th: {
+          fontVariantNumeric: "tabular-nums",
+          fontFeatureSettings: '"tnum"',
+          letterSpacing: "-0.01em",
+        },
+      },
+    },
+    Tab: {
+      defaultProps: {
+        color: "blue",
+      },
+    },
   },
 });

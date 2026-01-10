@@ -59,6 +59,13 @@ const Navbar = () => {
       >
         Klubové rekordy
       </NavLink>
+      <NavLink
+        to="/utils"
+        style={navLinkStyle}
+        onClick={() => setOpened(false)}
+      >
+        Nástroje
+      </NavLink>
     </>
   );
 

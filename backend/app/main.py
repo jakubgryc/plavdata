@@ -1,14 +1,17 @@
 import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi.errors import RateLimitExceeded
 
-from app.api import personal_bests
-from app.api import swimmers
-from app.api import dashboard_stats
+from app.api import dashboard_stats, personal_bests, swimmers, utils
+from app.api.limiter import custom_rate_limit_handler, limiter
 from app.api.results import results_router
 
-
 app = FastAPI()
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, custom_rate_limit_handler)
 
 env = os.getenv("ENV", "production").lower()
 if env == "development":
@@ -33,6 +36,7 @@ app.include_router(personal_bests.router, prefix="/api")
 app.include_router(swimmers.router, prefix="/api")
 app.include_router(results_router, prefix="/api")
 app.include_router(dashboard_stats.router, prefix="/api")
+app.include_router(utils.router, prefix="/api")
 
 
 @app.get("/")
