@@ -1,10 +1,17 @@
-import itertools
+from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
+from pydantic.alias_generators import to_camel
 from sqlalchemy.orm import Session
 
+from app.api.schemas import BestRelayResponse, EqualRelaysResponse
+from app.crud.tools.best_relay import (
+    calculate_best_freestyle_relay,
+    calculate_best_medley_relay,
+    calculate_equal_relays,
+)
 from app.db import get_db
-from app.models import Course, Discipline, PersonalBest, Swimmer
 
 router = APIRouter(
     prefix="/utils",
@@ -12,143 +19,64 @@ router = APIRouter(
 )
 
 
-@router.post("/best-relay")
-async def calculate_best_relay(data: dict, db: Session = Depends(get_db)):
-    swimmer_ids = data.get("swimmerIds", [])
-    relay_type = data.get("relayType", "freestyle")
+class BestRelayRequest(BaseModel):
+    swimmer_ids: List[int]
+    relay_type: str = "freestyle"
 
-    if len(swimmer_ids) < 4:
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+class EqualRelaysRequest(BaseModel):
+    swimmer_ids: List[int]
+    num_relays: int = 2
+
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+@router.post("/best-relay", response_model=BestRelayResponse)
+async def calculate_best_relay(data: BestRelayRequest, db: Session = Depends(get_db)):
+    if len(data.swimmer_ids) < 4:
         raise HTTPException(status_code=400, detail="At least 4 swimmers required")
 
-    if relay_type == "freestyle":
-        # Get best 50 free times for each selected swimmer
-        swimmer_times = {}
-        for swimmer_id in swimmer_ids:
-            pb = (
-                db.query(PersonalBest)
-                .join(Discipline)
-                .join(Course)
-                .filter(
-                    PersonalBest.swimmer_id == swimmer_id,
-                    Discipline.code == "50 K",
-                    Course.length == "25",
-                )
-                .order_by(PersonalBest.time)
-                .first()
-            )
-            if pb:
-                swimmer_times[swimmer_id] = pb.time
+    if data.relay_type == "freestyle":
+        relays = calculate_best_freestyle_relay(data.swimmer_ids, db)
+        if not relays:
+            raise HTTPException(status_code=400, detail="No valid combinations found")
 
-        if len(swimmer_times) < 4:
-            raise HTTPException(status_code=400, detail="Not enough 50 free times")
-
-        # Generate all combinations of 4 swimmers
-        print(swimmer_times)
-        relays = []
-        for combo in itertools.combinations(swimmer_times.keys(), 4):
-            total = sum(swimmer_times[swimmer_id] for swimmer_id in combo)
-            swimmers_list = [
-                {
-                    "id": swimmer_id,
-                    "name": db.query(Swimmer)
-                    .filter(Swimmer.id == swimmer_id)
-                    .first()
-                    .name,
-                    "surname": db.query(Swimmer)
-                    .filter(Swimmer.id == swimmer_id)
-                    .first()
-                    .surname,
-                    "stroke": "VZ",
-                    "time": swimmer_times[swimmer_id],
-                }
-                for swimmer_id in combo
-            ]
-            relays.append({"totalTime": total, "swimmers": swimmers_list})
-
-        # Sort by total time and take top 10
-        relays.sort(key=lambda x: x["totalTime"])
-        relays = relays[:10]
-
-    elif relay_type == "medley":
-        # Strokes: Z (back), P (breast), M (fly), K (free)
-        strokes = ["50 Z", "50 P", "50 M", "50 K"]
-        stroke_assignments = ["Z", "P", "M", "VZ"]
-
-        # Get available strokes for each swimmer
-        swimmer_strokes = {}
-        for swimmer_id in swimmer_ids:
-            available_strokes = []
-            for stroke in strokes:
-                pb = (
-                    db.query(PersonalBest)
-                    .join(Discipline)
-                    .join(Course)
-                    .filter(
-                        PersonalBest.swimmer_id == swimmer_id,
-                        Discipline.code == stroke,
-                        Course.length == 25,
-                    )
-                    .order_by(PersonalBest.time)
-                    .first()
-                )
-                if pb:
-                    available_strokes.append(stroke)
-            if available_strokes:  # At least one stroke
-                swimmer_strokes[swimmer_id] = available_strokes
-
-        if len(swimmer_strokes) < 4:
-            raise HTTPException(
-                status_code=400, detail="Not enough swimmers with any stroke times"
-            )
-
-        # Find top 10 best combinations
-        top_relays = []
-
-        for combo in itertools.permutations(swimmer_strokes.keys(), 4):
-            total = 0
-            team = []
-            valid = True
-            for i, swimmer_id in enumerate(combo):
-                stroke_code = strokes[i]
-                stroke_name = stroke_assignments[i]
-                if stroke_code in swimmer_strokes[swimmer_id]:
-                    # Get the time for this stroke
-                    pb = (
-                        db.query(PersonalBest)
-                        .join(Discipline)
-                        .join(Course)
-                        .filter(
-                            PersonalBest.swimmer_id == swimmer_id,
-                            Discipline.code == stroke_code,
-                            Course.length == 25,
-                        )
-                        .order_by(PersonalBest.time)
-                        .first()
-                    )
-                    time = pb.time
-                    total += time
-                    team.append({"id": swimmer_id, "stroke": stroke_name, "time": time})
-                else:
-                    valid = False
-                    break
-            if valid:
-                # Add swimmer names
-                for member in team:
-                    swimmer = (
-                        db.query(Swimmer).filter(Swimmer.id == member["id"]).first()
-                    )
-                    member["name"] = swimmer.name
-                    member["surname"] = swimmer.surname
-                top_relays.append({"totalTime": total, "swimmers": team})
-
-        # Sort by total time and take top 10
-        top_relays.sort(key=lambda x: x["totalTime"])
-        relays = top_relays[:10]
-
+    elif data.relay_type == "medley":
+        relays = calculate_best_medley_relay(data.swimmer_ids, db)
         if not relays:
             raise HTTPException(status_code=400, detail="No valid combinations found")
 
     else:
         raise HTTPException(status_code=400, detail="Invalid relay type")
 
-    return {"relays": relays}
+    # Best time is the first relay's total_time (they're sorted fastest first)
+    best_time = relays[0].total_time if relays else None
+
+    return BestRelayResponse(relays=relays, best_time=best_time)
+
+
+@router.post("/equal-relays", response_model=EqualRelaysResponse)
+async def calculate_equal_relays_endpoint(
+    data: EqualRelaysRequest, db: Session = Depends(get_db)
+):
+    """
+    Split swimmers into balanced teams for equal relays.
+
+    Request body:
+        - swimmerIds: list of swimmer IDs
+        - numRelays: number of relay teams to create
+    """
+    if len(data.swimmer_ids) < data.num_relays:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Need at least {data.num_relays} swimmers for {data.num_relays} relays",
+        )
+
+    result = calculate_equal_relays(data.swimmer_ids, data.num_relays, db)
+    return result
