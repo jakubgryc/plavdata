@@ -67,7 +67,7 @@ export function getGraphColor(index: number): string {
   return GRAPH_COLORS[index % GRAPH_COLORS.length];
 }
 
-// Team colors for equal fun relay results
+// Team colors for equal relay results
 export const TEAM_COLORS = [
   {
     letter: "A",

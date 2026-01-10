@@ -125,16 +125,16 @@ button {
         font-size: 0.625rem !important;
         padding: 0.375rem 0.5rem !important;
     }
-
+    
     .mantine-Card-root table td {
         font-size: 0.6875rem !important;
         padding: 0.375rem 0.5rem !important;
     }
-
+    
     .mantine-Card-root table td .mantine-Text-root {
         font-size: 0.6875rem !important;
     }
-
+    
     .mantine-Card-root table td .mantine-Badge-root {
         font-size: 0.5rem !important;
         padding: 0.125rem 0.25rem !important;

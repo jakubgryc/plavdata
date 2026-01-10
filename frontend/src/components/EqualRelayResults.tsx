@@ -48,26 +48,6 @@ export function EqualRelayResults({
   // Find fastest team time to calculate deltas
   const fastestTime = Math.min(...results.teams.map((t) => t.totalTime));
 
-  // Count total swimmers who swim twice
-  let totalSwimmersTwice = 0;
-  let swimmerWhoSwimsTwice: string | null = null;
-
-  results.teams.forEach((team) => {
-    const swimmerCounts = new Map<number, number>();
-    team.swimmers.forEach((swimmer) => {
-      swimmerCounts.set(swimmer.id, (swimmerCounts.get(swimmer.id) || 0) + 1);
-    });
-    swimmerCounts.forEach((count, swimmerId) => {
-      if (count > 1) {
-        totalSwimmersTwice++;
-        const swimmer = team.swimmers.find((s) => s.id === swimmerId);
-        if (swimmer && !swimmerWhoSwimsTwice) {
-          swimmerWhoSwimsTwice = `${swimmer.surname} ${swimmer.name}`;
-        }
-      }
-    });
-  });
-
   return (
     <>
       <Grid grow>

@@ -24,16 +24,14 @@ function Utils() {
   const [isLoading, setIsLoading] = useState(false);
   const [lastFetchedRelayHash, setLastFetchedRelayHash] = useState<string>("");
 
-  // Equal Fun Relays state
-  const [selectedSwimmersEqualFun, setSelectedSwimmersEqualFun] = useState<
+  // Equal Relays state
+  const [selectedEqualRelaySwimmers, setSelectedEqualRelaySwimmers] = useState<
     string[]
   >([]);
   const [numRelays, setNumRelays] = useState<number>(2);
-  const [equalFunResults, setEqualFunResults] =
+  const [equalRelayResults, setequalRelayResults] =
     useState<EqualRelayResult | null>(null);
-  const [isLoadingEqualFun, setIsLoadingEqualFun] = useState(false);
-
-  // Equal Fun timer
+  const [isLoadingEqualRelay, setIsLoadingEqualRelay] = useState(false);
 
   useEffect(() => {
     const fetchSwimmers = async () => {
@@ -84,7 +82,7 @@ function Utils() {
   };
 
   const handleCalculateEqualFun = async () => {
-    const swimmerIds = findSwimmerIds(selectedSwimmersEqualFun, swimmers);
+    const swimmerIds = findSwimmerIds(selectedEqualRelaySwimmers, swimmers);
     if (swimmerIds.length < numRelays * 2) {
       alert(`Vyberte alespoň ${numRelays * 2} plavců`);
       return;
@@ -93,7 +91,7 @@ function Utils() {
       alert("Maximální počet plavců je 50 pro výpočet vyrovnaných štafet");
       return;
     }
-    setIsLoadingEqualFun(true);
+    setIsLoadingEqualRelay(true);
     try {
       const response = await fetch(`${API_BASE_URL}/api/utils/equal-relays`, {
         method: "POST",
@@ -105,11 +103,11 @@ function Utils() {
       });
       if (!response.ok) throw new Error("Failed to calculate equal fun relays");
       const data = await response.json();
-      setEqualFunResults(data);
+      setequalRelayResults(data);
     } catch (error) {
       console.error("Error calculating equal fun relays:", error);
     } finally {
-      setIsLoadingEqualFun(false);
+      setIsLoadingEqualRelay(false);
     }
   };
 
@@ -164,22 +162,22 @@ function Utils() {
             </Stack>
           </Tabs.Panel>
 
-          {/* Equal Fun Relays Tab */}
+          {/* Equal Relays Tab */}
           <Tabs.Panel value="equal" p="lg">
             <Stack gap="lg">
               <EqualRelayFilterBar
                 groupedSwimmers={swimmers}
-                selectedSwimmers={selectedSwimmersEqualFun}
-                onSwimmersChange={setSelectedSwimmersEqualFun}
+                selectedSwimmers={selectedEqualRelaySwimmers}
+                onSwimmersChange={setSelectedEqualRelaySwimmers}
                 numRelays={numRelays}
                 onNumRelaysChange={setNumRelays}
                 onCalculate={handleCalculateEqualFun}
-                isLoading={isLoadingEqualFun}
+                isLoading={isLoadingEqualRelay}
               />
 
               <EqualRelayResults
-                results={equalFunResults}
-                isLoading={isLoadingEqualFun}
+                results={equalRelayResults}
+                isLoading={isLoadingEqualRelay}
               />
             </Stack>
           </Tabs.Panel>
