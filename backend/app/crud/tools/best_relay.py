@@ -294,7 +294,7 @@ def calculate_equal_relays(
     swimmers_data.sort(key=lambda x: x.time)
 
     num_swimmers = len(swimmers_data)
-    swimmers_per_relay = math.ceil(num_swimmers/num_relays)  # Ceiling division
+    swimmers_per_relay = math.ceil(num_swimmers / num_relays)  # Ceiling division
 
     # 3. MONTE CARLO OPTIMIZATION
     # Strategy: Split swimmers into distinct teams first, then add clones within teams if needed
