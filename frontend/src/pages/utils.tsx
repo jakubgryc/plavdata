@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Title, Flex, Paper, Stack, Tabs, Box } from "@mantine/core";
 import { IconTrophy, IconUsers } from "@tabler/icons-react";
+import { notifications } from "@mantine/notifications";
 
 import { API_BASE_URL } from "../../config";
 import type {
@@ -50,12 +51,21 @@ function Utils() {
   const handleCalculate = async () => {
     const swimmerIds = findSwimmerIds(selectedSwimmers, swimmers);
     if (swimmerIds.length < 4) {
-      alert("Vyberte alespoň 4 plavce");
+      notifications.show({
+        title: "Chyba",
+        message: "Vyberte alespoň 4 plavce",
+        color: "red",
+      });
       return;
     }
 
     if (swimmerIds.length > 30) {
-      alert("Maximální počet plavců je 30 pro výpočet nejrychlejší štafety");
+      notifications.show({
+        title: "Chyba",
+        message:
+          "Maximální počet plavců je 30 pro výpočet nejrychlejší štafety",
+        color: "red",
+      });
       return;
     }
     setIsLoading(true);
@@ -68,7 +78,22 @@ function Utils() {
           relayType,
         }),
       });
-      if (!response.ok) throw new Error("Failed to calculate relay");
+
+      if (response.status === 429) {
+        notifications.show({
+          title: "Příliš mnoho požadavků",
+          message:
+            "Překročili jste limit 20 výpočtů za minutu. Zkuste to prosím za chvíli.",
+          color: "orange",
+          autoClose: 5000,
+        });
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error("Failed to calculate relay");
+      }
+
       const data = await response.json();
       setResults(data.relays);
       // Set the hash after successful fetch
@@ -76,6 +101,11 @@ function Utils() {
       setLastFetchedRelayHash(hash);
     } catch (error) {
       console.error("Error calculating relay:", error);
+      notifications.show({
+        title: "Chyba",
+        message: "Nepodařilo se vypočítat štafetu. Zkuste to prosím znovu.",
+        color: "red",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -84,11 +114,19 @@ function Utils() {
   const handleCalculateEqualFun = async () => {
     const swimmerIds = findSwimmerIds(selectedEqualRelaySwimmers, swimmers);
     if (swimmerIds.length < numRelays * 2) {
-      alert(`Vyberte alespoň ${numRelays * 2} plavců`);
+      notifications.show({
+        title: "Chyba",
+        message: `Vyberte alespoň ${numRelays * 2} plavců`,
+        color: "red",
+      });
       return;
     }
     if (swimmerIds.length > 50) {
-      alert("Maximální počet plavců je 50 pro výpočet vyrovnaných štafet");
+      notifications.show({
+        title: "Chyba",
+        message: "Maximální počet plavců je 50 pro výpočet vyrovnaných štafet",
+        color: "red",
+      });
       return;
     }
     setIsLoadingEqualRelay(true);
@@ -101,11 +139,32 @@ function Utils() {
           numRelays,
         }),
       });
-      if (!response.ok) throw new Error("Failed to calculate equal fun relays");
+
+      if (response.status === 429) {
+        notifications.show({
+          title: "Příliš mnoho požadavků",
+          message:
+            "Překročili jste limit 20 výpočtů za minutu. Zkuste to prosím za chvíli.",
+          color: "orange",
+          autoClose: 5000,
+        });
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error("Failed to calculate equal fun relays");
+      }
+
       const data = await response.json();
       setequalRelayResults(data);
     } catch (error) {
       console.error("Error calculating equal fun relays:", error);
+      notifications.show({
+        title: "Chyba",
+        message:
+          "Nepodařilo se vypočítat vyrovnané štafety. Zkuste to prosím znovu.",
+        color: "red",
+      });
     } finally {
       setIsLoadingEqualRelay(false);
     }
