@@ -112,3 +112,28 @@ export interface SwimmerResults {
   swimmer: SwimmerWithID;
   results: Result[];
 }
+
+// Relay Types
+export interface RelaySwimmer {
+  id: number;
+  name: string;
+  surname: string;
+  stroke?: string; // Optional - only used for medley relays
+  time: number;
+}
+
+export interface RelayResult {
+  totalTime: number;
+  swimmers: RelaySwimmer[];
+}
+
+export interface EqualRelayTeam {
+  swimmers: RelaySwimmer[];
+  totalTime: number;
+}
+
+export interface EqualRelayResult {
+  teams: EqualRelayTeam[];
+  delta: number;
+  swimmersPerRelay: number;
+}

@@ -119,6 +119,26 @@ button {
         font-size: 10px !important;
         line-height: 1.2 !important;
     }
+
+    /* Relay team cards - smaller text on mobile */
+    .mantine-Card-root table th {
+        font-size: 0.625rem !important;
+        padding: 0.375rem 0.5rem !important;
+    }
+
+    .mantine-Card-root table td {
+        font-size: 0.6875rem !important;
+        padding: 0.375rem 0.5rem !important;
+    }
+
+    .mantine-Card-root table td .mantine-Text-root {
+        font-size: 0.6875rem !important;
+    }
+
+    .mantine-Card-root table td .mantine-Badge-root {
+        font-size: 0.5rem !important;
+        padding: 0.125rem 0.25rem !important;
+    }
 }
 
 .no-scrollbar {
