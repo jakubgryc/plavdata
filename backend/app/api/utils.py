@@ -1,10 +1,11 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 from pydantic.alias_generators import to_camel
 from sqlalchemy.orm import Session
 
+from app.api.limiter import limiter
 from app.api.schemas import BestRelayResponse, EqualRelaysResponse
 from app.crud.tools.best_relay import (
     calculate_best_freestyle_relay,
@@ -38,9 +39,18 @@ class EqualRelaysRequest(BaseModel):
 
 
 @router.post("/best-relay", response_model=BestRelayResponse)
-async def calculate_best_relay(data: BestRelayRequest, db: Session = Depends(get_db)):
+@limiter.limit("20/minute")
+async def calculate_best_relay(
+    data: BestRelayRequest, request: Request, db: Session = Depends(get_db)
+):
     if len(data.swimmer_ids) < 4:
         raise HTTPException(status_code=400, detail="At least 4 swimmers required")
+
+    if len(data.swimmer_ids) > 30:
+        raise HTTPException(
+            status_code=400,
+            detail="Too many swimmers (max 30) to calculate best relay",
+        )
 
     if data.relay_type == "freestyle":
         relays = calculate_best_freestyle_relay(data.swimmer_ids, db)
@@ -62,8 +72,9 @@ async def calculate_best_relay(data: BestRelayRequest, db: Session = Depends(get
 
 
 @router.post("/equal-relays", response_model=EqualRelaysResponse)
+@limiter.limit("20/minute")
 async def calculate_equal_relays_endpoint(
-    data: EqualRelaysRequest, db: Session = Depends(get_db)
+    data: EqualRelaysRequest, request: Request, db: Session = Depends(get_db)
 ):
     """
     Split swimmers into balanced teams for equal relays.
@@ -76,6 +87,12 @@ async def calculate_equal_relays_endpoint(
         raise HTTPException(
             status_code=400,
             detail=f"Need at least {data.num_relays} swimmers for {data.num_relays} relays",
+        )
+
+    if len(data.swimmer_ids) > 50:
+        raise HTTPException(
+            status_code=400,
+            detail="Too many swimmers (max 50) to calculate equal relays",
         )
 
     result = calculate_equal_relays(data.swimmer_ids, data.num_relays, db)
