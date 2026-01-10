@@ -1,40 +1,39 @@
 import { useEffect, useState } from "react";
-import {
-  Title,
-  Text,
-  Flex,
-  Select,
-  MultiSelect,
-  Button,
-  Card,
-  Stack,
-  Group,
-  Badge,
-  Grid,
-} from "@mantine/core";
+import { Title, Flex, Paper, Stack, Tabs, Box } from "@mantine/core";
+import { IconTrophy, IconUsers } from "@tabler/icons-react";
 
 import { API_BASE_URL } from "../../config";
-import { parseTimeFromMillis } from "../utils/timeUtils";
-import type { GroupedSwimmers } from "../schema/types";
-
-interface RelayResult {
-  totalTime: number;
-  swimmers: {
-    id: number;
-    name: string;
-    surname: string;
-    stroke: string;
-    time: number;
-  }[];
-}
+import type {
+  GroupedSwimmers,
+  RelayResult,
+  EqualRelayResult,
+} from "../schema/types";
+import { FastestRelayFilterBar } from "../components/FastestRelayFilterBar.tsx";
+import { EqualRelayFilterBar } from "../components/EqualRelayFilterBar.tsx";
+import { FastestRelayResults } from "../components/FastestRelayResults";
+import { EqualRelayResults } from "../components/EqualRelayResults";
+import { findSwimmerIds } from "../utils/chartUtils";
 
 function Utils() {
-  const [groupedSwimmers, setGroupedSwimmers] = useState<GroupedSwimmers[]>([]);
-  const [swimmers, setSwimmers] = useState<any[]>([]);
-  const [selectedSwimmers, setSelectedSwimmers] = useState<number[]>([]);
+  const [activeTab, setActiveTab] = useState<string | null>("fastest");
+
+  const [swimmers, setSwimmers] = useState<GroupedSwimmers[]>([]);
+  const [selectedSwimmers, setSelectedSwimmers] = useState<string[]>([]);
   const [relayType, setRelayType] = useState<string>("freestyle");
   const [results, setResults] = useState<RelayResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [lastFetchedRelayHash, setLastFetchedRelayHash] = useState<string>("");
+
+  // Equal Fun Relays state
+  const [selectedSwimmersEqualFun, setSelectedSwimmersEqualFun] = useState<
+    string[]
+  >([]);
+  const [numRelays, setNumRelays] = useState<number>(2);
+  const [equalFunResults, setEqualFunResults] =
+    useState<EqualRelayResult | null>(null);
+  const [isLoadingEqualFun, setIsLoadingEqualFun] = useState(false);
+
+  // Equal Fun timer
 
   useEffect(() => {
     const fetchSwimmers = async () => {
@@ -42,15 +41,7 @@ function Utils() {
         const response = await fetch(`${API_BASE_URL}/api/swimmers/grouped`);
         if (!response.ok) throw new Error("Failed to fetch swimmers");
         const data: GroupedSwimmers[] = await response.json();
-        setGroupedSwimmers(data);
-        const groupedOptions = data.map((groupData) => ({
-          group: groupData.group,
-          items: groupData.swimmers.map((swimmer) => ({
-            value: swimmer.id.toString(),
-            label: `${swimmer.surname} ${swimmer.name}`,
-          })),
-        }));
-        setSwimmers(groupedOptions);
+        setSwimmers(data);
       } catch (error) {
         console.error("Error fetching swimmers:", error);
       }
@@ -59,8 +50,14 @@ function Utils() {
   }, []);
 
   const handleCalculate = async () => {
-    if (selectedSwimmers.length < 4) {
+    const swimmerIds = findSwimmerIds(selectedSwimmers, swimmers);
+    if (swimmerIds.length < 4) {
       alert("Vyberte alespoň 4 plavce");
+      return;
+    }
+
+    if (swimmerIds.length > 30) {
+      alert("Maximální počet plavců je 30 pro výpočet nejrychlejší štafety");
       return;
     }
     setIsLoading(true);
@@ -69,13 +66,16 @@ function Utils() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          swimmerIds: selectedSwimmers,
+          swimmerIds: swimmerIds,
           relayType,
         }),
       });
       if (!response.ok) throw new Error("Failed to calculate relay");
       const data = await response.json();
       setResults(data.relays);
+      // Set the hash after successful fetch
+      const hash = `${selectedSwimmers.sort().join(",")}|${relayType}`;
+      setLastFetchedRelayHash(hash);
     } catch (error) {
       console.error("Error calculating relay:", error);
     } finally {
@@ -83,100 +83,108 @@ function Utils() {
     }
   };
 
+  const handleCalculateEqualFun = async () => {
+    const swimmerIds = findSwimmerIds(selectedSwimmersEqualFun, swimmers);
+    if (swimmerIds.length < numRelays * 2) {
+      alert(`Vyberte alespoň ${numRelays * 2} plavců`);
+      return;
+    }
+    if (swimmerIds.length > 50) {
+      alert("Maximální počet plavců je 50 pro výpočet vyrovnaných štafet");
+      return;
+    }
+    setIsLoadingEqualFun(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/utils/equal-relays`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          swimmerIds: swimmerIds,
+          numRelays,
+        }),
+      });
+      if (!response.ok) throw new Error("Failed to calculate equal fun relays");
+      const data = await response.json();
+      setEqualFunResults(data);
+    } catch (error) {
+      console.error("Error calculating equal fun relays:", error);
+    } finally {
+      setIsLoadingEqualFun(false);
+    }
+  };
+
   return (
     <Flex direction="column" w="100%" py="md" pb="xl">
-      <Title order={2} mb="md">
-        Nástroje
-      </Title>
+      {/* Header */}
+      <Box mb="xl">
+        <Title order={2}>Sestavování štafet</Title>
+      </Box>
 
-      <Grid>
-        <Grid.Col span={{ base: 12, md: 6 }}>
-          <Card withBorder shadow="sm" p="lg" mb="lg">
-            <Title order={3} mb="md">
-              Sestavení štafety
-            </Title>
-            <Stack>
-              <Select
-                label="Typ štafety"
-                data={[
-                  { value: "freestyle", label: "4x50 VZ (volný způsob)" },
-                  { value: "medley", label: "4x50 O (polohový závod)" },
-                ]}
-                value={relayType}
-                onChange={(value) => setRelayType(value || "freestyle")}
+      {/* Tabbed Interface */}
+      <Paper
+        withBorder
+        shadow="sm"
+        radius="lg"
+        p={0}
+        style={{ overflow: "hidden" }}
+      >
+        <Tabs value={activeTab} onChange={setActiveTab} variant="default">
+          <Tabs.List grow>
+            <Tabs.Tab value="fastest" leftSection={<IconTrophy size={16} />}>
+              Nejrychlejší štafeta
+            </Tabs.Tab>
+            <Tabs.Tab value="equal" leftSection={<IconUsers size={16} />}>
+              Vyrovnané štafety
+            </Tabs.Tab>
+          </Tabs.List>
+
+          {/* Fastest Relay Tab */}
+          <Tabs.Panel value="fastest" p="lg">
+            <Stack gap="lg">
+              <FastestRelayFilterBar
+                groupedSwimmers={swimmers}
+                selectedSwimmers={selectedSwimmers}
+                onSwimmersChange={setSelectedSwimmers}
+                relayType={relayType}
+                onRelayTypeChange={setRelayType}
+                onCalculate={handleCalculate}
+                isLoading={isLoading}
+                lastFetchedRelayHash={lastFetchedRelayHash}
               />
-              <MultiSelect
-                label="Vyberte plavce"
-                data={swimmers}
-                value={selectedSwimmers.map(String)}
-                onChange={(values) => setSelectedSwimmers(values.map(Number))}
-                placeholder="Vyberte plavce pro štafetu"
-                clearable
-                searchable
+
+              <FastestRelayResults
+                results={results}
+                relayType={
+                  lastFetchedRelayHash
+                    ? lastFetchedRelayHash.split("|")[1]
+                    : relayType
+                }
+                isLoading={isLoading}
               />
-              <Button onClick={handleCalculate} loading={isLoading}>
-                Vypočítat nejlepší štafetu
-              </Button>
             </Stack>
-          </Card>
-        </Grid.Col>
-        <Grid.Col span={{ base: 12, md: 6 }}>
-          {results.length > 0 && (
-            <Card withBorder shadow="sm" p="lg" mb="lg">
-              <Title order={4} mb="md">
-                Nejlepší {relayType === "freestyle" ? "VZ" : "O"} štafeta
-              </Title>
-              <Text size="lg" fw={700} mb="md" c="green">
-                Štafeta 1 - Celkový čas:{" "}
-                {parseTimeFromMillis(results[0].totalTime)}
-              </Text>
-              <Stack>
-                {results[0].swimmers.map((swimmer, idx) => (
-                  <Group key={swimmer.id} justify="space-between">
-                    <Text>
-                      {idx + 1}. {swimmer.surname} {swimmer.name}
-                    </Text>
-                    <Group>
-                      <Badge variant="light">
-                        {relayType === "medley" ? swimmer.stroke : "VZ"}
-                      </Badge>
-                      <Text>{parseTimeFromMillis(swimmer.time)}</Text>
-                    </Group>
-                  </Group>
-                ))}
-              </Stack>
-            </Card>
-          )}
-        </Grid.Col>
-      </Grid>
+          </Tabs.Panel>
 
-      {results.length > 1 && (
-        <Stack mt="lg">
-          {results.slice(1).map((result, index) => (
-            <Card key={index} withBorder shadow="sm" p="lg">
-              <Text size="lg" fw={700} mb="md">
-                Štafeta {index + 2} - Celkový čas:{" "}
-                {parseTimeFromMillis(result.totalTime)}
-              </Text>
-              <Stack>
-                {result.swimmers.map((swimmer, idx) => (
-                  <Group key={swimmer.id} justify="space-between">
-                    <Text>
-                      {idx + 1}. {swimmer.surname} {swimmer.name}
-                    </Text>
-                    <Group>
-                      <Badge variant="light">
-                        {relayType === "medley" ? swimmer.stroke : "VZ"}
-                      </Badge>
-                      <Text>{parseTimeFromMillis(swimmer.time)}</Text>
-                    </Group>
-                  </Group>
-                ))}
-              </Stack>
-            </Card>
-          ))}
-        </Stack>
-      )}
+          {/* Equal Fun Relays Tab */}
+          <Tabs.Panel value="equal" p="lg">
+            <Stack gap="lg">
+              <EqualRelayFilterBar
+                groupedSwimmers={swimmers}
+                selectedSwimmers={selectedSwimmersEqualFun}
+                onSwimmersChange={setSelectedSwimmersEqualFun}
+                numRelays={numRelays}
+                onNumRelaysChange={setNumRelays}
+                onCalculate={handleCalculateEqualFun}
+                isLoading={isLoadingEqualFun}
+              />
+
+              <EqualRelayResults
+                results={equalFunResults}
+                isLoading={isLoadingEqualFun}
+              />
+            </Stack>
+          </Tabs.Panel>
+        </Tabs>
+      </Paper>
     </Flex>
   );
 }
