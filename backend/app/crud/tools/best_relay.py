@@ -7,7 +7,6 @@ from typing import Optional
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from app.db import SessionLocal
 from app.models import Course, Discipline, PersonalBest, Swimmer
 
 
