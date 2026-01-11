@@ -9,6 +9,7 @@ import {
   Center,
   SegmentedControl,
 } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import {
   IconSwimming,
   IconCalendarEvent,
@@ -31,6 +32,14 @@ function Home() {
   const [isFetching, setIsFetching] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [periodType, setPeriodType] = useState<string>("season");
+
+  // State for top swimmers expansion
+  const [showAllMen, setShowAllMen] = useState(false);
+  const [showAllWomen, setShowAllWomen] = useState(false);
+  const [showAllCombined, setShowAllCombined] = useState(false);
+
+  // Check if cards are side by side (lg breakpoint and up)
+  const isSideBySide = useMediaQuery("(min-width: 75em)"); // lg breakpoint
 
   useEffect(() => {
     const fetchDashboardStats = async () => {
@@ -167,8 +176,30 @@ function Home() {
       </Group>
 
       <SimpleGrid cols={{ base: 1, lg: 2 }} mb="xl">
-        <TopSwimmersCard title="Muži - Top 5" swimmers={topMen} />
-        <TopSwimmersCard title="Ženy - Top 5" swimmers={topWomen} />
+        <TopSwimmersCard
+          title="Muži - Top 5"
+          swimmers={topMen}
+          showAll={isSideBySide ? showAllCombined : showAllMen}
+          onToggle={() => {
+            if (isSideBySide) {
+              setShowAllCombined(!showAllCombined);
+            } else {
+              setShowAllMen(!showAllMen);
+            }
+          }}
+        />
+        <TopSwimmersCard
+          title="Ženy - Top 5"
+          swimmers={topWomen}
+          showAll={isSideBySide ? showAllCombined : showAllWomen}
+          onToggle={() => {
+            if (isSideBySide) {
+              setShowAllCombined(!showAllCombined);
+            } else {
+              setShowAllWomen(!showAllWomen);
+            }
+          }}
+        />
       </SimpleGrid>
 
       {/* Recent Records Table */}
