@@ -1,31 +1,64 @@
-from sqlalchemy import func, extract, desc
-from sqlalchemy.orm import Session
 from datetime import date
+from enum import Enum
 
+from sqlalchemy import and_, desc, extract, func
+from sqlalchemy.orm import Session
+
+from app.constants import EXCLUDED_COMPETITION_LOCATIONS
 from app.models import (
-    Result,
-    ClubRecord,
-    PersonalBest,
-    Swimmer,
-    Discipline,
     AgeCategory,
+    ClubRecord,
+    Discipline,
+    PersonalBest,
+    Result,
+    Swimmer,
 )
 
 
-def get_results_count_by_year(db: Session, year: int) -> int:
-    """Count total number of results (starts) in a given year."""
+class PeriodType(str, Enum):
+    YEAR = "year"
+    SEASON = "season"
+
+
+def get_date_filter(period_value: int, period_type: PeriodType = PeriodType.YEAR):
+    """
+    Build a date filter for SQLAlchemy queries.
+
+    Args:
+        period_value: Year (e.g., 2025) or season start year (e.g., 2025 for 2025/2026 season)
+        period_type: Either "year" or "season"
+
+    Returns:
+        SQLAlchemy filter condition for Result.date
+    """
+    if period_type == PeriodType.YEAR:
+        return extract("year", Result.date) == period_value
+    else:  # SEASON
+        # Season runs from September 1st of period_value to August 31st of period_value+1
+        season_start = date(period_value, 9, 1)
+        season_end = date(period_value + 1, 8, 31)
+        return and_(Result.date >= season_start, Result.date <= season_end)
+
+
+def get_results_count(
+    db: Session, period_value: int, period_type: PeriodType = PeriodType.YEAR
+) -> int:
+    """Count total number of results (starts) in a given period."""
     return (
         db.query(func.count(Result.id))
-        .filter(extract("year", Result.date) == year)
+        .filter(get_date_filter(period_value, period_type))
         .filter(Result.split_time == 0)
+        .filter(Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS))
         .scalar()
         or 0
     )
 
 
-def get_meets_count_by_year(db: Session, year: int) -> int:
+def get_meets_count(
+    db: Session, period_value: int, period_type: PeriodType = PeriodType.YEAR
+) -> int:
     """
-    Count unique meets in a given year.
+    Count unique meets in a given period.
     A meet is defined by unique location + week combination.
     """
     return (
@@ -38,33 +71,40 @@ def get_meets_count_by_year(db: Session, year: int) -> int:
                 )
             )
         )
-        .filter(extract("year", Result.date) == year)
+        .filter(get_date_filter(period_value, period_type))
+        .filter(Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS))
         .scalar()
         or 0
     )
 
 
-def get_club_records_count_by_year(db: Session, year: int) -> int:
-    """Count club records set/broken in a given year."""
-    if year == date.today().year:
-        # For the current year, count records with date in the current year
-        return (
-            db.query(func.count(ClubRecord.id))
-            .join(Result, ClubRecord.result_id == Result.id)
-            .filter(extract("year", Result.date) == year)
-            .scalar()
-            or 0
-        )
+def get_club_records_count(
+    db: Session, period_value: int, period_type: PeriodType = PeriodType.YEAR
+) -> int:
+    """Count club records set/broken in a given period."""
+    if period_type == PeriodType.YEAR and period_value != date.today().year:
+        return 0
 
-    return 0
+    # For seasons or current year, count records with date in the period
+    return (
+        db.query(func.count(ClubRecord.id))
+        .join(Result, ClubRecord.result_id == Result.id)
+        .filter(get_date_filter(period_value, period_type))
+        .filter(Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS))
+        .scalar()
+        or 0
+    )
 
 
-def get_personal_bests_count_by_year(db: Session, year: int) -> int:
-    """Count personal bests achieved in a given year."""
+def get_personal_bests_count(
+    db: Session, period_value: int, period_type: PeriodType = PeriodType.YEAR
+) -> int:
+    """Count personal bests achieved in a given period."""
     return (
         db.query(func.count(Result.id))
-        .filter(extract("year", Result.date) == year)
+        .filter(get_date_filter(period_value, period_type))
         .filter(Result.improvement)
+        .filter(Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS))
         .scalar()
         or 0
     )
@@ -140,6 +180,7 @@ def get_club_records(db: Session, limit: int = 5, oldest: bool = False) -> list:
     result_ids_subquery = (
         db.query(ClubRecord.result_id)
         .join(Result, ClubRecord.result_id == Result.id)
+        .filter(Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS))
         .group_by(ClubRecord.result_id)
         .order_by(order)
         .limit(limit)
@@ -184,30 +225,49 @@ def get_club_records(db: Session, limit: int = 5, oldest: bool = False) -> list:
     return list(grouped.values())
 
 
-def get_dashboard_stats(db: Session) -> dict:
-    """Get all dashboard statistics for current and previous year."""
-    current_year = date.today().year
-    previous_year = current_year - 1
+def get_dashboard_stats(db: Session, period_type: PeriodType = PeriodType.YEAR) -> dict:
+    """
+    Get all dashboard statistics for current and previous period.
+
+    Args:
+        db: Database session
+        period_type: Either "year" or "season" to determine the period type
+    """
+    if period_type == PeriodType.YEAR:
+        current_period = date.today().year
+        previous_period = current_period - 1
+        current_label = str(current_period)
+        previous_label = str(previous_period)
+    else:  # SEASON
+        # Determine current season based on current date
+        today = date.today()
+        if today.month >= 9:  # September or later
+            current_period = today.year
+        else:  # Before September
+            current_period = today.year - 1
+        previous_period = current_period - 1
+        current_label = f"{current_period}/{current_period + 1}"
+        previous_label = f"{previous_period}/{previous_period + 1}"
 
     return {
-        "currentYear": current_year,
-        "previousYear": previous_year,
+        "periodType": period_type.value,
+        "currentPeriod": current_label,
+        "previousPeriod": previous_label,
         "stats": {
             "totalStarts": {
-                "current": get_results_count_by_year(db, current_year),
-                "previous": get_results_count_by_year(db, previous_year),
+                "current": get_results_count(db, current_period, period_type),
+                "previous": get_results_count(db, previous_period, period_type),
             },
             "totalMeets": {
-                "current": get_meets_count_by_year(db, current_year),
-                "previous": get_meets_count_by_year(db, previous_year),
+                "current": get_meets_count(db, current_period, period_type),
+                "previous": get_meets_count(db, previous_period, period_type),
             },
             "clubRecords": {
-                "current": get_club_records_count_by_year(db, current_year),
-                # "previous": get_club_records_count_by_year(db, previous_year),
+                "current": get_club_records_count(db, current_period, period_type),
             },
             "personalBests": {
-                "current": get_personal_bests_count_by_year(db, current_year),
-                "previous": get_personal_bests_count_by_year(db, previous_year),
+                "current": get_personal_bests_count(db, current_period, period_type),
+                "previous": get_personal_bests_count(db, previous_period, period_type),
             },
         },
         "topMen": get_top_swimmers_by_points(db, "male", limit=5),
