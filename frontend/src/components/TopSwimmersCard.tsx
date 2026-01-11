@@ -1,5 +1,6 @@
 import { Paper, Group, Stack, Title, Text, Box, Avatar } from "@mantine/core";
 import { useTheme } from "../hooks/useTheme";
+import { parseTimeFromMillis } from "../utils/timeUtils";
 
 import type { TopSwimmer } from "../schema/types";
 
@@ -60,7 +61,14 @@ function getRowStyles(rank: number, colorScheme: "light" | "dark" | "auto") {
   }
 }
 
-function SwimmerRow({ rank, name, surname, discipline, points }: TopSwimmer) {
+function SwimmerRow({
+  rank,
+  name,
+  surname,
+  discipline,
+  points,
+  time,
+}: TopSwimmer) {
   const { colorScheme } = useTheme();
   const styles = getRowStyles(rank, colorScheme);
 
@@ -90,10 +98,16 @@ function SwimmerRow({ rank, name, surname, discipline, points }: TopSwimmer) {
           <Text size="xs" c="dimmed" truncate>
             {discipline}
           </Text>
+          <Text size="xs" c="dimmed" fw={500}>
+            {parseTimeFromMillis(time)}
+          </Text>
         </Box>
         <Box ta="right">
           <Text size={rank === 1 ? "lg" : "sm"} fw={700} c={styles.pointsColor}>
             {points}
+          </Text>
+          <Text size="xs" c="dimmed">
+            bodů
           </Text>
         </Box>
       </Group>

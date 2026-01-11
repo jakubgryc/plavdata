@@ -29,6 +29,7 @@ export interface TopSwimmer {
   surname: string;
   discipline: string;
   points: number;
+  time: number;
 }
 
 export interface RecentClubRecord {

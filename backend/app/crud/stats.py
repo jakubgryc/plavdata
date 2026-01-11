@@ -136,6 +136,7 @@ def get_top_swimmers_by_points(db: Session, sex: str, limit: int = 5) -> list:
             Swimmer.id.label("swimmer_id"),
             Discipline.title.label("discipline"),
             PersonalBest.points,
+            PersonalBest.time,
         )
         .join(PersonalBest, PersonalBest.swimmer_id == Swimmer.id)
         .join(Discipline, PersonalBest.discipline_id == Discipline.id)
@@ -158,6 +159,7 @@ def get_top_swimmers_by_points(db: Session, sex: str, limit: int = 5) -> list:
             "surname": row.surname,
             "discipline": row.discipline,
             "points": row.points,
+            "time": row.time,
         }
         for idx, row in enumerate(results)
     ]
