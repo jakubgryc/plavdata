@@ -45,11 +45,14 @@ function CompareSwimmers() {
   useEffect(() => {
     const fetchGroupedSwimmers = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/swimmers/grouped`, {
-          method: "GET",
-        });
+        const response = await fetch(
+          `${API_BASE_URL}/api/swimmers/grouped?include_former=true`,
+          {
+            method: "GET",
+          },
+        );
         if (!response.ok) throw new Error("Failed to fetch grouped swimmers");
-        const data = await response.json();
+        const data: GroupedSwimmers[] = await response.json();
         setGroupedSwimmers(data);
       } catch (error) {
         console.error("Error fetching grouped swimmers:", error);
