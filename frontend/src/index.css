@@ -70,6 +70,12 @@ button {
 }
 
 @media (max-width: 768px) {
+    /* Make h2 titles (Mantine Title with order 2) smaller on mobile */
+    h2,
+    .mantine-Title-root[data-order="2"] {
+        font-size: 1.25rem !important;
+    }
+
     .responsive-table th,
     .responsive-table td {
         font-size: 0.7rem;

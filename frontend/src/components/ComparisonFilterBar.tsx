@@ -9,6 +9,7 @@ import {
 import { Button } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { DISCIPLINES } from "../utils/constants";
+import { swimmersFilter } from "../utils/filterUtils";
 import type { GroupedSwimmers } from "../schema/types";
 
 interface ComparisonFilterBarProps {
@@ -64,6 +65,7 @@ function ComparisonFilterBar({
           placeholder="Vyber až 8 plavců"
           searchable
           clearable
+          filter={swimmersFilter}
           maxValues={8}
           value={selectedSwimmers.map(String)}
           onChange={(values) => setSelectedSwimmers(values.map(Number))}

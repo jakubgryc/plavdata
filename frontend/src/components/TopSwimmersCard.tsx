@@ -1,5 +1,17 @@
-import { Paper, Group, Stack, Title, Text, Box, Avatar } from "@mantine/core";
+import {
+  Paper,
+  Group,
+  Stack,
+  Title,
+  Text,
+  Box,
+  Avatar,
+  Button,
+  Collapse,
+} from "@mantine/core";
+import { IconChevronDown } from "@tabler/icons-react";
 import { useTheme } from "../hooks/useTheme";
+import { parseTimeFromMillis } from "../utils/timeUtils";
 
 import type { TopSwimmer } from "../schema/types";
 
@@ -49,10 +61,12 @@ function getRowStyles(rank: number, colorScheme: "light" | "dark" | "auto") {
     default:
       return {
         bg: undefined,
-        borderColor: undefined,
+        borderColor: isDark
+          ? "rgba(55, 65, 81, 0.5)"
+          : "rgba(229, 231, 235, 0.8)",
         avatarColor: "gray",
         avatarVariant: "light" as const,
-        withBorder: false,
+        withBorder: true,
         size: "sm" as const,
         fontWeight: 600,
         pointsColor: undefined,
@@ -60,7 +74,14 @@ function getRowStyles(rank: number, colorScheme: "light" | "dark" | "auto") {
   }
 }
 
-function SwimmerRow({ rank, name, surname, discipline, points }: TopSwimmer) {
+function SwimmerRow({
+  rank,
+  name,
+  surname,
+  discipline,
+  points,
+  time,
+}: TopSwimmer) {
   const { colorScheme } = useTheme();
   const styles = getRowStyles(rank, colorScheme);
 
@@ -90,10 +111,16 @@ function SwimmerRow({ rank, name, surname, discipline, points }: TopSwimmer) {
           <Text size="xs" c="dimmed" truncate>
             {discipline}
           </Text>
+          <Text size="xs" c="dimmed" fw={500}>
+            {parseTimeFromMillis(time)}
+          </Text>
         </Box>
         <Box ta="right">
           <Text size={rank === 1 ? "lg" : "sm"} fw={700} c={styles.pointsColor}>
             {points}
+          </Text>
+          <Text size="xs" c="dimmed">
+            bodů
           </Text>
         </Box>
       </Group>
@@ -104,18 +131,61 @@ function SwimmerRow({ rank, name, surname, discipline, points }: TopSwimmer) {
 interface TopSwimmersCardProps {
   title: string;
   swimmers: TopSwimmer[];
+  showAll: boolean;
+  onToggle: () => void;
 }
 
-function TopSwimmersCard({ title, swimmers }: TopSwimmersCardProps) {
+function TopSwimmersCard({
+  title,
+  swimmers,
+  showAll,
+  onToggle,
+}: TopSwimmersCardProps) {
+  const topSwimmers = swimmers.slice(0, 5);
+  const additionalSwimmers = swimmers.slice(5);
+  const hasAdditionalSwimmers = additionalSwimmers.length > 0;
+
   return (
     <Paper p="lg" radius="md" withBorder shadow="sm">
       <Group justify="space-between" mb="lg">
         <Title order={4}>{title}</Title>
       </Group>
       <Stack gap="xs">
-        {swimmers.map((swimmer) => (
+        {topSwimmers.map((swimmer) => (
           <SwimmerRow key={swimmer.rank} {...swimmer} />
         ))}
+
+        {hasAdditionalSwimmers && (
+          <>
+            <Collapse in={showAll}>
+              <Stack gap="xs" mt="xs">
+                {additionalSwimmers.map((swimmer) => (
+                  <SwimmerRow key={swimmer.rank} {...swimmer} />
+                ))}
+              </Stack>
+            </Collapse>
+
+            <Button
+              variant="subtle"
+              size="xs"
+              fullWidth
+              onClick={onToggle}
+              rightSection={
+                <IconChevronDown
+                  size={16}
+                  style={{
+                    transform: showAll ? "rotate(180deg)" : "rotate(0deg)",
+                    transition: "transform 200ms",
+                  }}
+                />
+              }
+            >
+              {showAll
+                ? "Skrýt"
+                : `Zobrazit dalších ${additionalSwimmers.length}`}
+            </Button>
+          </>
+        )}
       </Stack>
     </Paper>
   );

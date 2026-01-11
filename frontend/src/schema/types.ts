@@ -29,6 +29,7 @@ export interface TopSwimmer {
   surname: string;
   discipline: string;
   points: number;
+  time: number;
 }
 
 export interface RecentClubRecord {
@@ -44,6 +45,8 @@ export interface RecentClubRecord {
 export interface DashboardResponse {
   currentYear: number;
   previousYear: number;
+  currentPeriod: string;
+  previousPeriod: string;
   stats: DashboardStats;
   topMen: TopSwimmer[];
   topWomen: TopSwimmer[];

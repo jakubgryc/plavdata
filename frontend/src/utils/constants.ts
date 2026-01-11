@@ -52,6 +52,47 @@ export function getAgeCategoryLabel(code: string): string {
   return AGE_CATEGORY_LABELS[code] ?? code;
 }
 
+// Remove Czech diacritics for search/filter purposes
+export function removeDiacritics(text: string): string {
+  const diacriticsMap: Record<string, string> = {
+    á: "a",
+    Á: "A",
+    č: "c",
+    Č: "C",
+    ď: "d",
+    Ď: "D",
+    é: "e",
+    É: "E",
+    ě: "e",
+    Ě: "E",
+    í: "i",
+    Í: "I",
+    ň: "n",
+    Ň: "N",
+    ó: "o",
+    Ó: "O",
+    ř: "r",
+    Ř: "R",
+    š: "s",
+    Š: "S",
+    ť: "t",
+    Ť: "T",
+    ú: "u",
+    Ú: "U",
+    ů: "u",
+    Ů: "U",
+    ý: "y",
+    Ý: "Y",
+    ž: "z",
+    Ž: "Z",
+  };
+
+  return text.replace(
+    /[áčďéěíňóřšťúůýžÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]/g,
+    (char) => diacriticsMap[char] || char,
+  );
+}
+
 const GRAPH_COLORS = [
   "#ff5733",
   "#00bc1d",

@@ -7,7 +7,9 @@ import {
   Group,
   ThemeIcon,
   Center,
+  SegmentedControl,
 } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import {
   IconSwimming,
   IconCalendarEvent,
@@ -29,17 +31,42 @@ function Home() {
   );
   const [isFetching, setIsFetching] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [periodType, setPeriodType] = useState<string>("season");
+
+  // Cache for storing dashboard data by period type
+  const [cache, setCache] = useState<Record<string, DashboardResponse>>({});
+
+  // State for top swimmers expansion
+  const [showAllMen, setShowAllMen] = useState(false);
+  const [showAllWomen, setShowAllWomen] = useState(false);
+  const [showAllCombined, setShowAllCombined] = useState(false);
+
+  // Check if cards are side by side (lg breakpoint and up)
+  const isSideBySide = useMediaQuery("(min-width: 75em)"); // lg breakpoint
 
   useEffect(() => {
     const fetchDashboardStats = async () => {
+      // Check if data is already in cache
+      if (cache[periodType]) {
+        setDashboardData(cache[periodType]);
+        setIsFetching(false);
+        return;
+      }
+
       setIsFetching(true);
       setError(null);
       try {
-        const response = await fetch(`${API_BASE_URL}/api/stats/dashboard`, {
-          method: "GET",
-        });
+        const response = await fetch(
+          `${API_BASE_URL}/api/stats/dashboard?period_type=${periodType}`,
+          {
+            method: "GET",
+          },
+        );
         if (!response.ok) throw new Error("Failed to fetch dashboard stats");
         const data: DashboardResponse = await response.json();
+
+        // Store in cache
+        setCache((prevCache) => ({ ...prevCache, [periodType]: data }));
         setDashboardData(data);
       } catch (err) {
         console.error("Error fetching dashboard stats:", err);
@@ -49,11 +76,19 @@ function Home() {
       }
     };
 
+    setShowAllMen(false);
+    setShowAllWomen(false);
+    setShowAllCombined(false);
     fetchDashboardStats();
-  }, []);
+  }, [periodType, cache]);
 
   if (isFetching) {
-    return <HomeSkeleton />;
+    return (
+      <HomeSkeleton
+        periodType={periodType}
+        onPeriodTypeChange={setPeriodType}
+      />
+    );
   }
 
   if (error || !dashboardData) {
@@ -64,8 +99,24 @@ function Home() {
     );
   }
 
-  const { stats, topMen, topWomen, recentRecords, oldestRecords } =
-    dashboardData;
+  const {
+    stats,
+    topMen,
+    topWomen,
+    recentRecords,
+    oldestRecords,
+    currentPeriod,
+    previousPeriod,
+  } = dashboardData;
+
+  const currentPeriodLabel =
+    periodType === "season"
+      ? `za sezónu ${currentPeriod}`
+      : `za rok ${currentPeriod}`;
+  const previousPeriodLabel =
+    periodType === "season"
+      ? `za sezónu ${previousPeriod}`
+      : `za rok ${previousPeriod}`;
 
   const statCards = [
     {
@@ -74,6 +125,9 @@ function Home() {
       previousValue: stats.totalStarts.previous,
       icon: IconSwimming,
       color: "blue",
+      periodType: periodType as "year" | "season",
+      currentPeriodLabel,
+      previousPeriodLabel,
     },
     {
       title: "Počet závodů",
@@ -81,6 +135,9 @@ function Home() {
       previousValue: stats.totalMeets.previous,
       icon: IconCalendarEvent,
       color: "teal",
+      periodType: periodType as "year" | "season",
+      currentPeriodLabel,
+      previousPeriodLabel,
     },
     {
       title: "Nové klubové rekordy",
@@ -88,6 +145,9 @@ function Home() {
       previousValue: stats.clubRecords.previous,
       icon: IconTrophy,
       color: "yellow",
+      periodType: periodType as "year" | "season",
+      currentPeriodLabel,
+      previousPeriodLabel,
     },
     {
       title: "Počet osobních rekordů",
@@ -95,15 +155,26 @@ function Home() {
       previousValue: stats.personalBests.previous,
       icon: IconFlame,
       color: "violet",
+      periodType: periodType as "year" | "season",
+      currentPeriodLabel,
+      previousPeriodLabel,
     },
   ];
 
   return (
     <Flex direction="column" w="100%" py="md" pb="xl">
       {/* Header */}
-      <Title order={2} mb="md">
-        Statistiky PKBoh
-      </Title>
+      <Group justify="space-between" align="center" mb="md" wrap="wrap">
+        <Title order={2}>Statistiky PKBoh</Title>
+        <SegmentedControl
+          value={periodType}
+          onChange={setPeriodType}
+          data={[
+            { label: "Sezónní", value: "season" },
+            { label: "Roční", value: "year" },
+          ]}
+        />
+      </Group>
 
       {/* Stats Grid */}
       <SimpleGrid cols={{ base: 1, xs: 2, lg: 4 }} mb="xl">
@@ -121,8 +192,30 @@ function Home() {
       </Group>
 
       <SimpleGrid cols={{ base: 1, lg: 2 }} mb="xl">
-        <TopSwimmersCard title="Muži - Top 5" swimmers={topMen} />
-        <TopSwimmersCard title="Ženy - Top 5" swimmers={topWomen} />
+        <TopSwimmersCard
+          title={`Muži - Top ${topMen.length}`}
+          swimmers={topMen}
+          showAll={isSideBySide ? showAllCombined : showAllMen}
+          onToggle={() => {
+            if (isSideBySide) {
+              setShowAllCombined(!showAllCombined);
+            } else {
+              setShowAllMen(!showAllMen);
+            }
+          }}
+        />
+        <TopSwimmersCard
+          title={`Ženy - Top ${topWomen.length}`}
+          swimmers={topWomen}
+          showAll={isSideBySide ? showAllCombined : showAllWomen}
+          onToggle={() => {
+            if (isSideBySide) {
+              setShowAllCombined(!showAllCombined);
+            } else {
+              setShowAllWomen(!showAllWomen);
+            }
+          }}
+        />
       </SimpleGrid>
 
       {/* Recent Records Table */}
