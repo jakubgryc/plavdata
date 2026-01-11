@@ -63,6 +63,9 @@ function Home() {
       }
     };
 
+    setShowAllMen(false);
+    setShowAllWomen(false);
+    setShowAllCombined(false);
     fetchDashboardStats();
   }, [periodType]);
 
@@ -177,7 +180,7 @@ function Home() {
 
       <SimpleGrid cols={{ base: 1, lg: 2 }} mb="xl">
         <TopSwimmersCard
-          title="Muži - Top 5"
+          title={`Muži - Top ${topMen.length}`}
           swimmers={topMen}
           showAll={isSideBySide ? showAllCombined : showAllMen}
           onToggle={() => {
@@ -189,7 +192,7 @@ function Home() {
           }}
         />
         <TopSwimmersCard
-          title="Ženy - Top 5"
+          title={`Ženy - Top ${topWomen.length}`}
           swimmers={topWomen}
           showAll={isSideBySide ? showAllCombined : showAllWomen}
           onToggle={() => {
