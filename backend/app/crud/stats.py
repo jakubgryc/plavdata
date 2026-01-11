@@ -272,8 +272,8 @@ def get_dashboard_stats(db: Session, period_type: PeriodType = PeriodType.YEAR) 
                 "previous": get_personal_bests_count(db, previous_period, period_type),
             },
         },
-        "topMen": get_top_swimmers_by_points(db, "male", limit=5),
-        "topWomen": get_top_swimmers_by_points(db, "female", limit=5),
+        "topMen": get_top_swimmers_by_points(db, "male", limit=10),
+        "topWomen": get_top_swimmers_by_points(db, "female", limit=10),
         "recentRecords": get_club_records(db, limit=10, oldest=False),
         "oldestRecords": get_club_records(db, limit=10, oldest=True),
     }
