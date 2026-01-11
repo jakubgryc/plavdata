@@ -33,6 +33,9 @@ function Home() {
   const [error, setError] = useState<string | null>(null);
   const [periodType, setPeriodType] = useState<string>("season");
 
+  // Cache for storing dashboard data by period type
+  const [cache, setCache] = useState<Record<string, DashboardResponse>>({});
+
   // State for top swimmers expansion
   const [showAllMen, setShowAllMen] = useState(false);
   const [showAllWomen, setShowAllWomen] = useState(false);
@@ -43,6 +46,13 @@ function Home() {
 
   useEffect(() => {
     const fetchDashboardStats = async () => {
+      // Check if data is already in cache
+      if (cache[periodType]) {
+        setDashboardData(cache[periodType]);
+        setIsFetching(false);
+        return;
+      }
+
       setIsFetching(true);
       setError(null);
       try {
@@ -54,6 +64,9 @@ function Home() {
         );
         if (!response.ok) throw new Error("Failed to fetch dashboard stats");
         const data: DashboardResponse = await response.json();
+
+        // Store in cache
+        setCache((prevCache) => ({ ...prevCache, [periodType]: data }));
         setDashboardData(data);
       } catch (err) {
         console.error("Error fetching dashboard stats:", err);
@@ -67,7 +80,7 @@ function Home() {
     setShowAllWomen(false);
     setShowAllCombined(false);
     fetchDashboardStats();
-  }, [periodType]);
+  }, [periodType, cache]);
 
   if (isFetching) {
     return (
