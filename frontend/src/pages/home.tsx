@@ -7,6 +7,7 @@ import {
   Group,
   ThemeIcon,
   Center,
+  SegmentedControl,
 } from "@mantine/core";
 import {
   IconSwimming,
@@ -29,15 +30,19 @@ function Home() {
   );
   const [isFetching, setIsFetching] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [periodType, setPeriodType] = useState<string>("season");
 
   useEffect(() => {
     const fetchDashboardStats = async () => {
       setIsFetching(true);
       setError(null);
       try {
-        const response = await fetch(`${API_BASE_URL}/api/stats/dashboard`, {
-          method: "GET",
-        });
+        const response = await fetch(
+          `${API_BASE_URL}/api/stats/dashboard?period_type=${periodType}`,
+          {
+            method: "GET",
+          },
+        );
         if (!response.ok) throw new Error("Failed to fetch dashboard stats");
         const data: DashboardResponse = await response.json();
         setDashboardData(data);
@@ -50,10 +55,15 @@ function Home() {
     };
 
     fetchDashboardStats();
-  }, []);
+  }, [periodType]);
 
   if (isFetching) {
-    return <HomeSkeleton />;
+    return (
+      <HomeSkeleton
+        periodType={periodType}
+        onPeriodTypeChange={setPeriodType}
+      />
+    );
   }
 
   if (error || !dashboardData) {
@@ -64,8 +74,24 @@ function Home() {
     );
   }
 
-  const { stats, topMen, topWomen, recentRecords, oldestRecords } =
-    dashboardData;
+  const {
+    stats,
+    topMen,
+    topWomen,
+    recentRecords,
+    oldestRecords,
+    currentPeriod,
+    previousPeriod,
+  } = dashboardData;
+
+  const currentPeriodLabel =
+    periodType === "season"
+      ? `za sezónu ${currentPeriod}`
+      : `za rok ${currentPeriod}`;
+  const previousPeriodLabel =
+    periodType === "season"
+      ? `za sezónu ${previousPeriod}`
+      : `za rok ${previousPeriod}`;
 
   const statCards = [
     {
@@ -74,6 +100,9 @@ function Home() {
       previousValue: stats.totalStarts.previous,
       icon: IconSwimming,
       color: "blue",
+      periodType: periodType as "year" | "season",
+      currentPeriodLabel,
+      previousPeriodLabel,
     },
     {
       title: "Počet závodů",
@@ -81,6 +110,9 @@ function Home() {
       previousValue: stats.totalMeets.previous,
       icon: IconCalendarEvent,
       color: "teal",
+      periodType: periodType as "year" | "season",
+      currentPeriodLabel,
+      previousPeriodLabel,
     },
     {
       title: "Nové klubové rekordy",
@@ -88,6 +120,9 @@ function Home() {
       previousValue: stats.clubRecords.previous,
       icon: IconTrophy,
       color: "yellow",
+      periodType: periodType as "year" | "season",
+      currentPeriodLabel,
+      previousPeriodLabel,
     },
     {
       title: "Počet osobních rekordů",
@@ -95,15 +130,26 @@ function Home() {
       previousValue: stats.personalBests.previous,
       icon: IconFlame,
       color: "violet",
+      periodType: periodType as "year" | "season",
+      currentPeriodLabel,
+      previousPeriodLabel,
     },
   ];
 
   return (
     <Flex direction="column" w="100%" py="md" pb="xl">
       {/* Header */}
-      <Title order={2} mb="md">
-        Statistiky PKBoh
-      </Title>
+      <Group justify="space-between" align="center" mb="md" wrap="wrap">
+        <Title order={2}>Statistiky PKBoh</Title>
+        <SegmentedControl
+          value={periodType}
+          onChange={setPeriodType}
+          data={[
+            { label: "Sezónní", value: "season" },
+            { label: "Roční", value: "year" },
+          ]}
+        />
+      </Group>
 
       {/* Stats Grid */}
       <SimpleGrid cols={{ base: 1, xs: 2, lg: 4 }} mb="xl">

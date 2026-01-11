@@ -12,6 +12,9 @@ interface StatCardProps {
   previousValue?: number;
   icon: Icon;
   color: string;
+  periodType?: "year" | "season";
+  currentPeriodLabel?: string;
+  previousPeriodLabel?: string;
 }
 
 function getTrend(current: number, previous?: number) {
@@ -37,9 +40,20 @@ function StatCard({
   previousValue,
   icon: Icon,
   color,
+  periodType = "year",
+  currentPeriodLabel,
+  previousPeriodLabel,
 }: StatCardProps) {
   const trend = getTrend(value, previousValue);
   const TrendIcon = trend.icon;
+
+  // Generate labels based on period type
+  const currentLabel =
+    currentPeriodLabel ||
+    (periodType === "season" ? "tuto sezónu" : "tento rok");
+  const previousLabel =
+    previousPeriodLabel ||
+    (periodType === "season" ? "minulou sezónu" : "předešlý rok");
 
   return (
     <Paper p="lg" radius="md" withBorder shadow="sm">
@@ -67,12 +81,12 @@ function StatCard({
           {value.toLocaleString("cs-CZ")}
         </Title>
         <Text size="xs" c="dimmed">
-          tento rok
+          {currentLabel}
         </Text>
       </Group>
       {previousValue !== undefined && (
         <Text size="xs" c="dimmed" mt={4}>
-          {previousValue.toLocaleString("cs-CZ")} předešlý rok
+          {previousValue.toLocaleString("cs-CZ")} {previousLabel}
         </Text>
       )}
     </Paper>
