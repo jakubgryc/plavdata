@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session, joinedload
 
-from app.models import Swimmer
 from app.api.schemas import BaseSwimmerOut, GroupedSwimmersOut
-from app.db import get_db
 from app.constants import GROUPS_TO_LOOKUP
+from app.db import get_db
+from app.models import Swimmer
 
 router = APIRouter(
     prefix="/swimmers",
@@ -25,12 +25,25 @@ async def get_swimmers(db: Session = Depends(get_db)):
 
 
 @router.get("/grouped", response_model=list[GroupedSwimmersOut])
-async def get_swimmers_grouped(db: Session = Depends(get_db)):
-    """Get swimmers grouped by their group."""
-    swimmers = db.query(Swimmer).filter(Swimmer.group.in_(GROUPS_TO_LOOKUP)).all()
+async def get_swimmers_grouped(
+    include_former: bool = False, db: Session = Depends(get_db)
+):
+    """Get swimmers grouped by their group. Optionally include former swimmers who left the club."""
+    groups_to_include = GROUPS_TO_LOOKUP.copy()
+    if include_former:
+        groups_to_include.append("runaway")
+
+    swimmers = (
+        db.query(Swimmer)
+        .filter(Swimmer.group.in_(groups_to_include))
+        .order_by(Swimmer.surname, Swimmer.name)
+        .all()
+    )
 
     grouped = {}
     for swimmer in swimmers:
+        if swimmer.group == "runaway":
+            swimmer.group = "veteran"
         grouped.setdefault(swimmer.group, []).append(swimmer)
 
     result = [
