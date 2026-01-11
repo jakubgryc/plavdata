@@ -1,5 +1,6 @@
 import { MultiSelect, Stack, Group, Text } from "@mantine/core";
 import type { GroupedSwimmers } from "../schema/types";
+import { swimmersFilter } from "../utils/filterUtils";
 
 interface SwimmerSelectionProps {
   groupedSwimmers: GroupedSwimmers[];
@@ -35,6 +36,7 @@ export function SwimmerSelection({
         placeholder="Vyhledat plavce..."
         clearable
         searchable
+        filter={swimmersFilter}
       />
       <Group justify="space-between" wrap="wrap">
         <Text size="xs" c="dimmed">
