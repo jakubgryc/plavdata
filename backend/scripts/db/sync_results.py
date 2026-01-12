@@ -36,10 +36,10 @@ class ResultEntry(NamedTuple):
 def save_fetched_results(
     db: Session,
     results: list[dict],
-    swimmers: list[Swimmer],
     disciplines: list[Discipline],
     courses: list[Course],
 ) -> None:
+    swimmers = db.query(Swimmer).all()
     for entry in results:
         swimmer_csps_id = entry.get("userId")
         discipline_code = entry.get("disciplineName")
@@ -54,25 +54,29 @@ def save_fetched_results(
         if not swimmer:
             swimmer_profile = get_swimmer_profile(swimmer_csps_id)
             swimmer_data = parse_swimmer_data(None, swimmer_profile, "unknown")
-            db.add(
-                Swimmer(
-                    csps_id=swimmer_data.csps_id,
-                    name=swimmer_data.name,
-                    surname=swimmer_data.surname,
-                    birth_year=swimmer_data.birth_year,
-                    group=swimmer_data.group,
-                    sex=swimmer.sex,
-                    membership_start=datetime.fromisoformat(
-                        swimmer_data.membership_start
-                    ).date(),
-                    membership_end=datetime.fromisoformat(
-                        swimmer_data.membership_end
-                    ).date()
-                    if swimmer_data.membership_end
-                    else None,
-                )
+            print(f"Adding new swimmer: {swimmer_data.name} {swimmer_data.surname}")
+            new_swimmer = Swimmer(
+                csps_id=swimmer_data.csps_id,
+                name=swimmer_data.name,
+                surname=swimmer_data.surname,
+                birth_year=swimmer_data.birth_year,
+                group=swimmer_data.group,
+                sex=swimmer_data.sex,
+                membership_start=datetime.fromisoformat(
+                    swimmer_data.membership_start
+                ).date()
+                if swimmer_data.membership_start
+                else None,
+                membership_end=datetime.fromisoformat(
+                    swimmer_data.membership_end
+                ).date()
+                if swimmer_data.membership_end
+                else None,
             )
+            db.add(new_swimmer)
             db.commit()
+            swimmers.append(new_swimmer)
+            swimmer = new_swimmer
 
         exists = (
             db.query(Result)
@@ -83,8 +87,6 @@ def save_fetched_results(
                 course_id=course.id,
                 competition_location=entry.get("location"),
                 csps_result_id=entry.get("outputId", None),
-                improvement=entry.get("improvement"),
-                comparison_to_best=entry.get("comparisonToBest"),
                 split_time=entry.get("splitTime"),
                 relay_part=entry.get("relayPart"),
                 date=datetime.fromisoformat(entry.get("date")).date(),
@@ -148,11 +150,11 @@ def fetch_results_by_discipline(
                 fetched_results.extend(results)
 
             if page * page_limit >= total:
-                wait_random(0.1, 0.3)
+                wait_random(0.3, 0.6)
                 return fetched_results
 
             page += 1
-            wait_random(0.2, 0.35)
+            wait_random(0.4, 0.6)
         except Exception as e:
             print(f"Failed to fetch for {discipline_code}: {e}")
             return []
@@ -166,7 +168,6 @@ def fetch_results_by_disciplines(
 ) -> None:
     fetched_results = []
 
-    swimmers_db = db.query(Swimmer).all()
     disciplines_db = db.query(Discipline).all()
     courses_db = db.query(Course).all()
 
@@ -177,9 +178,7 @@ def fetch_results_by_disciplines(
             )
             fetched_results.extend(fetched_results_by_discipline)
 
-        save_fetched_results(
-            db, fetched_results, swimmers_db, disciplines_db, courses_db
-        )
+        save_fetched_results(db, fetched_results, disciplines_db, courses_db)
         fetched_results.clear()
 
 
@@ -213,7 +212,7 @@ def sync_results(
     for disciplines in grouped_disciplines.values():
         print(f"Fetching results for disciplines: {', '.join(disciplines)}")
         fetch_results_by_disciplines(db, disciplines, after_date, before_date)
-        wait_random(1.0, 2.0)
+        wait_random(1.2, 2.2)
 
     db.commit()
     db.close()
@@ -244,7 +243,18 @@ def parse_args():
     return parser.parse_args()
 
 
+def check_date_format(date_str: str) -> bool:
+    try:
+        datetime.strptime(date_str, "%Y-%m-%d")
+        return True
+    except ValueError:
+        return False
+
+
 if __name__ == "__main__":
     args = parse_args()
+
+    if not check_date_format(args.after) or not check_date_format(args.before):
+        raise ValueError("Invalid date format. Use YYYY-MM-DD.")
 
     sync_results(args.create_tables, args.after, args.before)
