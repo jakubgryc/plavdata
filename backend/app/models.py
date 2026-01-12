@@ -1,13 +1,15 @@
 from datetime import datetime
+
 from sqlalchemy import (
-    Column,
     BigInteger,
-    Integer,
-    String,
+    Boolean,
+    Column,
     Date,
     DateTime,
     ForeignKey,
-    Boolean,
+    Integer,
+    String,
+    Table,
     UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
@@ -54,6 +56,8 @@ class Result(Base):
     swimmer_id = Column(Integer, ForeignKey("swimmers.id"))
     discipline_id = Column(Integer, ForeignKey("disciplines.id"))
     course_id = Column(Integer, ForeignKey("courses.id"))
+    competition_id = Column(Integer, ForeignKey("competitions.id"), nullable=True)
+    csps_result_id = Column(String, nullable=True)
     time = Column(Integer, nullable=False)
     comparison_to_best = Column(Integer)
     split_time = Column(Boolean)
@@ -61,6 +65,7 @@ class Result(Base):
     improvement = Column(Boolean)
     competition_location = Column(String, nullable=True)  # nullable just in case
     date = Column(Date, nullable=False)
+    points = Column(Integer, nullable=True)
 
     discipline = relationship("Discipline")
     course = relationship("Course")
@@ -131,6 +136,57 @@ class ApiSync(Base):
     id = Column(Integer, primary_key=True, index=True)
     personal_bests_last_fetch = Column(DateTime, nullable=False, default=EPOCH)
     results_last_fetch = Column(DateTime, nullable=False, default=EPOCH)
+
+
+class CompetitionTag(Base):
+    __tablename__ = "competition_tags"
+
+    id = Column(Integer, primary_key=True, index=True)
+    csps_competition_tag_id = Column(
+        Integer, unique=True, nullable=False
+    )  # competitionTagId from API
+    title = Column(String, nullable=False)
+    key = Column(String, nullable=False)
+
+
+# Association table for many-to-many relationship
+competition_tag_association = Table(
+    "competition_tag_association",
+    Base.metadata,
+    Column("competition_id", Integer, ForeignKey("competitions.id"), primary_key=True),
+    Column("tag_id", Integer, ForeignKey("competition_tags.id"), primary_key=True),
+)
+
+
+class Competition(Base):
+    __tablename__ = "competitions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    csps_competition_id = Column(
+        Integer, unique=True, nullable=False
+    )  # competitionId from API
+    title = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+    sport = Column(Integer, nullable=True)
+    start_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=False)
+    location = Column(String, nullable=True)
+    location_region = Column(String, nullable=True)
+    club_id = Column(Integer, nullable=True)
+    competition_state = Column(String, nullable=True)  # ACTIVE, etc.
+    pool_length = Column(Integer, nullable=True)
+    has_plan = Column(Boolean, default=False)
+    has_results = Column(Boolean, default=False)
+    plan_file_name = Column(String, nullable=True)
+    results_file_name = Column(String, nullable=True)
+    stopwatch_type = Column(String, nullable=True)  # MANUAL, SEMIMANUAL, etc.
+    elapsed = Column(Boolean, default=False)
+    irregular_pool = Column(Boolean, default=False)
+
+    # Relationship to tags
+    tags = relationship(
+        "CompetitionTag", secondary=competition_tag_association, backref="competitions"
+    )
 
 
 Swimmer.personal_bests = relationship(
