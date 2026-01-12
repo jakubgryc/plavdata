@@ -110,6 +110,7 @@ def store_competition(db: Session, comp_data: dict):
     competition.stopwatch_type = comp_data.get("stopwatchType")
     competition.elapsed = comp_data.get("elapsed", False)
     competition.irregular_pool = comp_data.get("irregularPool", False)
+    competition.masters = comp_data.get("masters", False)
 
     # Handle tags (many-to-many relationship)
     tags = []
@@ -142,7 +143,6 @@ def sync_competitions(year: int = None, create_tables: bool = False):
     db: Session = SessionLocal()
 
     try:
-        # Determine which years to sync
         if year is None:
             current_year = datetime.now().year
             years_to_sync = list(range(EARLIEST_COMPETITION_YEAR, current_year + 1))
@@ -156,23 +156,21 @@ def sync_competitions(year: int = None, create_tables: bool = False):
         total_competitions = 0
 
         for year_to_sync in years_to_sync:
-            # Fetch competitions from API
             competitions_data = fetch_competitions(year_to_sync)
 
             if not competitions_data:
                 print(f"No competitions found for {year_to_sync}")
                 continue
 
-            # Store each competition
             for comp_data in competitions_data:
                 store_competition(db, comp_data)
 
             total_competitions += len(competitions_data)
-            db.commit()  # Commit after each year
+            db.commit()
             print(
                 f"✓ Synced {len(competitions_data)} competitions for {year_to_sync}\n"
             )
-            wait_random(0.4, 0.8)  # Be nice to the API
+            wait_random(0.4, 0.8)
 
         print(f"\n✓ Successfully synced {total_competitions} total competitions")
 

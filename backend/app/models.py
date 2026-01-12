@@ -182,6 +182,7 @@ class Competition(Base):
     stopwatch_type = Column(String, nullable=True)  # MANUAL, SEMIMANUAL, etc.
     elapsed = Column(Boolean, default=False)
     irregular_pool = Column(Boolean, default=False)
+    masters = Column(Boolean, default=False)
 
     # Relationship to tags
     tags = relationship(
