@@ -1,7 +1,6 @@
 import argparse
 from collections import defaultdict
 from datetime import date, datetime
-from typing import NamedTuple, Literal
 
 import requests
 from sqlalchemy.orm import Session
@@ -13,8 +12,6 @@ from app.models import Course, Discipline, Result, Swimmer
 from scripts.config import HEADERS
 from scripts.parse.utils import parse_swimmer_data, get_swimmer_profile
 from scripts.utils import wait_random
-
-
 
 
 def save_fetched_results(
