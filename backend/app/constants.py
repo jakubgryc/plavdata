@@ -4,6 +4,9 @@ DISTANCES = [50, 100, 200, 400, 800, 1500]
 GROUPS_TO_LOOKUP = ["Z1", "Z2", "P1", "veteran"]
 DNF_THRESHOLD = 3600000
 EXCLUDED_COMPETITION_LOCATIONS = ["Bohumín"]
+DEFAULT_AFTER_DATE = "2000-01-01"
+REFERER_RESULTS_URL = "https://vysledky.czechswimming.cz/statistiky"
+GENDERS = ["MALE", "FEMALE"]
 
 DISCIPLINE_ORDER = [
     "50 Z",

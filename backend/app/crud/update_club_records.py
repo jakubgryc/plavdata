@@ -3,7 +3,7 @@ from app.crud.results import get_best_times_for_age
 from app.db import SessionLocal
 
 
-def update_club_records(course_length: int = 25):
+def update_club_records():
     db = SessionLocal()
 
     disciplines = [
@@ -17,63 +17,77 @@ def update_club_records(course_length: int = 25):
     try:
         ages = [ac for ac in db.query(AgeCategory).order_by(AgeCategory.max_age).all()]
 
-        for stroke_code, distances in disciplines:
-            for distance in distances:
-                if stroke_code == "O" and distance == 100 and course_length == 50:
-                    continue
-                discipline_code = f"{distance} {stroke_code}"
-                for sex in ["male", "female"]:
-                    for age in ages:
-                        print(
-                            f"Processing {discipline_code}, age {age.code}, sex {sex}..."
-                        )
-                        found_record = get_best_times_for_age(
-                            db=db,
-                            discipline_code=discipline_code,
-                            course_length=course_length,
-                            sex=sex,
-                            max_age=age.max_age,
-                            limit=1,
-                        )
-                        if found_record:
-                            curr_record = (
-                                db.query(ClubRecord)
-                                .join(ClubRecord.result)
-                                .join(ClubRecord.age_category)
-                                .join(Result.discipline)
-                                .join(Result.swimmer)
-                                .join(Result.course)
-                                .filter(
-                                    Discipline.code == discipline_code,
-                                    AgeCategory.id == age.id,
-                                    Swimmer.sex == sex,
-                                    Course.length == course_length,
-                                )
-                                .first()
+        for course_length in [25, 50]:
+            for stroke_code, distances in disciplines:
+                for distance in distances:
+                    if stroke_code == "O" and distance == 100 and course_length == 50:
+                        continue
+                    discipline_code = f"{distance} {stroke_code}"
+                    for sex in ["male", "female"]:
+                        for age in ages:
+                            print(
+                                f"Processing {discipline_code}, age {age.code}, sex {sex}..."
                             )
-                            if curr_record:
-                                if curr_record.result.time > found_record[0].time:
-                                    curr_record.result_id = found_record[0].id
-                                    print(
-                                        f"Updated record for {discipline_code}, age {age.code}, sex {sex}."
+                            found_record = get_best_times_for_age(
+                                db=db,
+                                discipline_code=discipline_code,
+                                course_length=course_length,
+                                sex=sex,
+                                max_age=age.max_age,
+                                limit=1,
+                            )
+                            if found_record:
+                                curr_record = (
+                                    db.query(ClubRecord)
+                                    .join(ClubRecord.result)
+                                    .join(ClubRecord.age_category)
+                                    .join(Result.discipline)
+                                    .join(Result.swimmer)
+                                    .join(Result.course)
+                                    .filter(
+                                        Discipline.code == discipline_code,
+                                        AgeCategory.id == age.id,
+                                        Swimmer.sex == sex,
+                                        Course.length == course_length,
                                     )
+                                    .first()
+                                )
+
+                                if curr_record:
+                                    already_exists = (
+                                        db.query(ClubRecord)
+                                        .filter(
+                                            ClubRecord.result_id == found_record[0].id,
+                                            ClubRecord.age_category_id == age.id,
+                                        )
+                                        .first()
+                                    )
+
+                                    if already_exists:
+                                        if curr_record.id != already_exists.id:
+                                            print(
+                                                f"Duplicate found. Deleting old record ID {curr_record.id}..."
+                                            )
+                                            db.delete(curr_record)
+
+                                    elif curr_record.result.time > found_record[0].time:
+                                        curr_record.result_id = found_record[0].id
+                                        print(
+                                            f"Updated record for {discipline_code}..."
+                                        )
                                 else:
+                                    new_record = ClubRecord(
+                                        result_id=found_record[0].id,
+                                        age_category_id=age.id,
+                                    )
+                                    db.add(new_record)
                                     print(
-                                        f"No update needed for {discipline_code}, age {age.code}, sex {sex}."
+                                        f"Added new record for {discipline_code}, age {age.code}, sex {sex}."
                                     )
                             else:
-                                new_record = ClubRecord(
-                                    result_id=found_record[0].id,
-                                    age_category_id=age.id,
-                                )
-                                db.add(new_record)
                                 print(
-                                    f"Added new record for {discipline_code}, age {age.code}, sex {sex}."
+                                    f"No record found for {discipline_code}, age {age.code}, sex {sex}."
                                 )
-                        else:
-                            print(
-                                f"No record found for {discipline_code}, age {age.code}, sex {sex}."
-                            )
 
         db.commit()
     except Exception as e:
