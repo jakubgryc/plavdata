@@ -15,22 +15,6 @@ from scripts.parse.utils import parse_swimmer_data, get_swimmer_profile
 from scripts.utils import wait_random
 
 
-class ResultEntry(NamedTuple):
-    # Because of the need of storing competition locaition, the db
-    # will not be completely normalized. This is needed to then connect the results to
-    # the competition.
-    output_id: str
-    swimmer_id: int
-    discipline_id: int
-    course_id: int
-    time: int
-    split_time: bool
-    relay_part: bool
-    competition_location: str
-    date: date
-    points: int
-    improvement: int | None = None
-    comparison_to_best: bool | None = None
 
 
 def save_fetched_results(
@@ -123,7 +107,7 @@ def fetch_results_by_discipline(
     after_date: str,
     before_date: str,
     gender: Literal["MALE", "FEMALE"],
-) -> list[ResultEntry]:
+) -> list[dict]:
     page = 1
     page_limit = 100
     fetched_results = []

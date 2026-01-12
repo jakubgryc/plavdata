@@ -75,6 +75,7 @@ class Result(Base):
         back_populates="result",
         cascade="all, delete-orphan",
     )
+    competition = relationship("Competition")
 
 
 class PersonalBest(Base):
