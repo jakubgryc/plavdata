@@ -61,7 +61,7 @@ def _get_membership_dates(
 
 
 def parse_swimmer_data(
-    swimmer: dict,
+    swimmer: dict | None,
     swimmer_profile_data: dict,
     group: str,
 ) -> SwimmerData:
@@ -83,8 +83,10 @@ def parse_swimmer_data(
     group = "runaway" if runaway else group
     return SwimmerData(
         csps_id=swimmer_profile_data.get("userId"),
-        name=swimmer["name"],
-        surname=swimmer["surname"],
+        name=swimmer["name"] if swimmer else swimmer_profile_data.get("firstName"),
+        surname=swimmer["surname"]
+        if swimmer
+        else swimmer_profile_data.get("lastName").capitalize(),
         group=group,
         sex=swimmer_profile_data.get("sex").lower(),
         birth_year=swimmer_profile_data.get("birthYear"),
