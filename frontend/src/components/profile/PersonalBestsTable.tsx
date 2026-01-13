@@ -149,8 +149,8 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
               {getDisplayCode(code)}
             </Table.Td>
             <Table.Td
-              ta="right"
-              w={30}
+              ta="center"
+              w={40}
               style={{
                 backgroundColor: isDark
                   ? "rgba(14, 165, 233, 0.05)"
@@ -213,8 +213,8 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
               {pb25?.date ? formatDate(pb25.date) : "-"}
             </Table.Td>
             <Table.Td
-              ta="right"
-              w={30}
+              ta="center"
+              w={40}
               style={{
                 backgroundColor: isDark
                   ? "rgba(6, 182, 212, 0.05)"
