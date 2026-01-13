@@ -13,6 +13,8 @@ from app.crud.swimmer_profile import (
     get_swimmer_basic_info,
     get_swimmer_competitions,
     get_swimmer_personal_bests,
+    get_swimmer_quarterly_improvements,
+    get_swimmer_starts_by_stroke,
     get_swimmer_starts_by_year,
     get_swimmer_stats,
     get_swimmer_top_results,
@@ -80,6 +82,8 @@ async def get_swimmer_profile(swimmer_id: int, db: Session = Depends(get_db)):
     starts_by_year = get_swimmer_starts_by_year(db, swimmer_id)
     competitions = get_swimmer_competitions(db, swimmer_id)
     personal_bests = get_swimmer_personal_bests(db, swimmer_id)
+    starts_by_stroke = get_swimmer_starts_by_stroke(db, swimmer_id)
+    quarterly_improvements = get_swimmer_quarterly_improvements(db, swimmer_id)
 
     return SwimmerProfileResponse(
         basic_info=basic_info,
@@ -88,6 +92,8 @@ async def get_swimmer_profile(swimmer_id: int, db: Session = Depends(get_db)):
         starts_by_year=starts_by_year,
         competitions=competitions,
         personal_bests=personal_bests,
+        starts_by_stroke=starts_by_stroke,
+        quarterly_improvements=quarterly_improvements,
     )
 
 

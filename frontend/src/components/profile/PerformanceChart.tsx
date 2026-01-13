@@ -57,7 +57,9 @@ function PerformanceChart({ data }: PerformanceChartProps) {
               fontWeight: 600,
             }}
             cursor={{
-              fill: isDark ? "rgba(14, 165, 233, 0.1)" : "rgba(8,138,198,0.1)",
+              fill: isDark
+                ? "rgba(14, 165, 233, 0.1)"
+                : "rgba(8, 138, 198, 0.1)",
               radius: 8,
             }}
           />

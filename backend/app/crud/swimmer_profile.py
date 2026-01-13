@@ -1,6 +1,7 @@
 from datetime import date
+from collections import defaultdict
 
-from sqlalchemy import extract, func
+from sqlalchemy import extract, func, Integer
 from sqlalchemy.orm import Session
 
 from app.constants import EXCLUDED_COMPETITION_LOCATIONS
@@ -271,3 +272,73 @@ def get_swimmer_personal_bests(db: Session, swimmer_id: int) -> dict:
                 for row in pbs]
 
     return {"pb25m": format_pbs(pbs_25m), "pb50m": format_pbs(pbs_50m)}
+
+
+def get_swimmer_starts_by_stroke(db: Session, swimmer_id: int) -> dict:
+    """Get total number of starts by stroke type for a swimmer."""
+    results = (
+        db.query(Discipline.code, func.count(Result.id).label("starts"))
+        .join(Discipline, Result.discipline_id == Discipline.id)
+        .filter(Result.swimmer_id == swimmer_id)
+        .filter(Result.split_time == 0)
+        .filter(Result.relay_part == 0)
+        .filter(Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS))
+        .group_by(Discipline.code)
+        .all()
+    )
+
+    stroke_counts = defaultdict(int)
+
+    for row in results:
+        code = row.code.upper().split()[1]
+        stroke_counts[code] += row.starts
+
+    # Ensure all stroke types are present in the result
+    return {
+        "Z": stroke_counts.get("Z", 0),
+        "P": stroke_counts.get("P", 0),
+        "M": stroke_counts.get("M", 0),
+        "K": stroke_counts.get("K", 0),
+        "O": stroke_counts.get("O", 0),
+    }
+
+
+def get_swimmer_quarterly_improvements(db: Session, swimmer_id: int) -> list:
+    """Get quarterly improvement statistics for a swimmer."""
+    # Calculate quarter as (month - 1) / 3 + 1
+    # Month 1-3 -> Q1, 4-6 -> Q2, 7-9 -> Q3, 10-12 -> Q4
+    quarter_calc = ((extract("month", Result.date) - 1) / 3) + 1
+
+    results = (
+        db.query(
+            extract("year", Result.date).label("year"),
+            func.cast(quarter_calc, Integer).label("quarter"),
+            func.count(Result.id).label("total_starts"),
+            func.sum(func.cast(Result.improvement, Integer)).label("improvements"),
+        )
+        .filter(Result.swimmer_id == swimmer_id)
+        .filter(Result.split_time == 0)
+        .filter(Result.relay_part == 0)
+        .filter(Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS))
+        .group_by(extract("year", Result.date), func.cast(quarter_calc, Integer))
+        .order_by(extract("year", Result.date), func.cast(quarter_calc, Integer))
+        .all()
+    )
+
+    quarterly_data = []
+    for row in results:
+        improvements = row.improvements or 0
+        total_starts = row.total_starts or 0
+        improvement_rate = round((improvements / total_starts * 100), 2) if total_starts > 0 else 0.0
+
+        quarterly_data.append({
+            "quarter": f"Q{int(row.quarter)} {int(row.year)}",
+            "year": int(row.year),
+            "quarterNum": int(row.quarter),
+            "totalStarts": total_starts,
+            "improvements": improvements,
+            "improvementRate": improvement_rate,
+        })
+
+    return quarterly_data
+

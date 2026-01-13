@@ -215,6 +215,23 @@ export interface SwimmerPersonalBests {
   pb50M: SwimmerPersonalBestRecord[];
 }
 
+export interface StartsByStroke {
+  z: number;
+  p: number;
+  m: number;
+  k: number;
+  o: number;
+}
+
+export interface QuarterlyImprovement {
+  quarter: string;
+  year: number;
+  quarterNum: number;
+  totalStarts: number;
+  improvements: number;
+  improvementRate: number;
+}
+
 export interface SwimmerProfileResponse {
   basicInfo: SwimmerBasicInfo;
   stats: SwimmerStats;
@@ -222,4 +239,6 @@ export interface SwimmerProfileResponse {
   startsByYear: SwimmerStartsByYear[];
   competitions: SwimmerCompetition[];
   personalBests: SwimmerPersonalBests;
+  startsByStroke: StartsByStroke;
+  quarterlyImprovements: QuarterlyImprovement[];
 }

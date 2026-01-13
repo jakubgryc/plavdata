@@ -374,6 +374,31 @@ class PersonalBestsByCourse(BaseModel):
         populate_by_name = True
 
 
+class StartsByStroke(BaseModel):
+    K: int
+    Z: int
+    P: int
+    M: int
+    O: int
+
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+class QuarterlyImprovement(BaseModel):
+    quarter: str
+    year: int
+    quarter_num: int
+    total_starts: int
+    improvements: int
+    improvement_rate: float
+
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True
+
+
 class SwimmerProfileResponse(BaseModel):
     basic_info: SwimmerBasicInfo
     stats: SwimmerStats
@@ -381,6 +406,8 @@ class SwimmerProfileResponse(BaseModel):
     starts_by_year: List[StartsByYear]
     competitions: List[CompetitionDetail]
     personal_bests: PersonalBestsByCourse
+    starts_by_stroke: StartsByStroke
+    quarterly_improvements: List[QuarterlyImprovement]
 
     class Config:
         alias_generator = to_camel

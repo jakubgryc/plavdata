@@ -8,6 +8,8 @@ import PerformanceChart from "../components/profile/PerformanceChart";
 import TopResultsCard from "../components/profile/TopResultsCard";
 import CompetitionsTable from "../components/profile/CompetitionsTable";
 import PersonalBestsTable from "../components/profile/PersonalBestsTable";
+import StrokeRadarChart from "../components/profile/StrokeRadarChart";
+import QuarterlyImprovementChart from "../components/profile/QuarterlyImprovementChart";
 
 function SwimmerProfile() {
   const params = useParams();
@@ -73,6 +75,8 @@ function SwimmerProfile() {
     startsByYear,
     competitions,
     personalBests,
+    startsByStroke,
+    quarterlyImprovements,
   } = profileData;
 
   return (
@@ -93,15 +97,15 @@ function SwimmerProfile() {
               gap="md"
               align="stretch"
             >
-              <div style={{ flex: 2 }}>
+              <div style={{ flex: 4 }}>
                 <PerformanceChart data={startsByYear} />
               </div>
-              <div style={{ flex: 1 }}>
-                <TopResultsCard results={topResults} />
+              <div style={{ flex: 3 }}>
+                <StrokeRadarChart startsByStroke={startsByStroke} />
               </div>
             </Flex>
-
-            <CompetitionsTable competitions={competitions} />
+            <QuarterlyImprovementChart data={quarterlyImprovements} />
+            <TopResultsCard results={topResults} />
           </Flex>
         </Tabs.Panel>
 
