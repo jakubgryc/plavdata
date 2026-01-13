@@ -14,6 +14,7 @@ dependencies = [
     "slowapi>=0.1.9",
     "sqlalchemy>=2.0.40",
     "sqlmodel>=0.0.24",
+    "unidecode>=1.4.0",
     "uvicorn>=0.34.0",
 ]
 
