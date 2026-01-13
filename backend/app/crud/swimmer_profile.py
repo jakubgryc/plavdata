@@ -4,6 +4,7 @@ from sqlalchemy import extract, func
 from sqlalchemy.orm import Session
 
 from app.constants import EXCLUDED_COMPETITION_LOCATIONS
+from app.api.schemas import PersonalBestDetail
 from app.models import (
     ClubRecord,
     Competition,
@@ -230,6 +231,8 @@ def get_swimmer_personal_bests(db: Session, swimmer_id: int) -> dict:
                 PersonalBest.points,
                 PersonalBest.date,
                 PersonalBest.competition_location,
+                PersonalBest.split_time,
+                PersonalBest.relay_part,
             )
             .join(Discipline, PersonalBest.discipline_id == Discipline.id)
             .filter(PersonalBest.swimmer_id == swimmer_id)
@@ -241,16 +244,14 @@ def get_swimmer_personal_bests(db: Session, swimmer_id: int) -> dict:
     pbs_50m = get_pbs_for_course(2)  # 50m course
 
     def format_pbs(pbs):
-        return [
-            {
-                "discipline": row.discipline,
-                "code": row.code,
-                "time": row.time,
-                "points": row.points,
-                "date": row.date.isoformat() if row.date else None,
-                "location": row.competition_location,
-            }
-            for row in pbs
-        ]
+        return [PersonalBestDetail(discipline=row.discipline,
+                                   code=row.code,
+                                   time=row.time,
+                                   split_time=row.split_time,
+                                   relay_part=row.relay_part,
+                                   points=row.points,
+                                   date=row.date.isoformat() if row.date else None,
+                                   location=row.competition_location)
+                for row in pbs]
 
     return {"pb25m": format_pbs(pbs_25m), "pb50m": format_pbs(pbs_50m)}

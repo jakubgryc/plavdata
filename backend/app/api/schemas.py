@@ -341,6 +341,8 @@ class PersonalBestDetail(BaseModel):
     discipline: str
     code: str
     time: int
+    split_time: bool
+    relay_part: bool
     points: Optional[int]
     date: Optional[str]
     location: Optional[str]

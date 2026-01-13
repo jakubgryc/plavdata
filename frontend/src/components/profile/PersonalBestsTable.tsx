@@ -8,7 +8,7 @@ import {
   useMantineColorScheme,
 } from "@mantine/core";
 import { IconClock } from "@tabler/icons-react";
-import { parseTimeFromMillis } from "../../utils/timeUtils";
+import { parseTimeFromMillis, formatDate } from "../../utils/timeUtils";
 import type { SwimmerPersonalBests } from "../../schema/types";
 import type { ReactElement } from "react";
 
@@ -33,10 +33,10 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
   // Group personal bests by stroke type
   const groupByStroke = (records: any[]) => {
     const groups: Record<string, any[]> = {
-      "Volný způsob": [],
       Znak: [],
       Prsa: [],
       Motýlek: [],
+      "Volný způsob": [],
       "Polohový závod": [],
     };
 
@@ -101,7 +101,7 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
           }}
         >
           <Table.Td
-            colSpan={5}
+            colSpan={11}
             py={6}
             style={{
               position: "sticky",
@@ -149,21 +149,41 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
               {getDisplayCode(code)}
             </Table.Td>
             <Table.Td
-              ta="center"
+              ta="right"
+              w={30}
+              style={{
+                backgroundColor: isDark
+                  ? "rgba(14, 165, 233, 0.05)"
+                  : "rgba(14, 165, 233, 0.03)",
+                paddingRight: 4,
+              }}
+            >
+              {pb25?.splitTime && (
+                <Badge size="xs" color="orange" variant="light">
+                  M
+                </Badge>
+              )}
+              {pb25?.relayPart && (
+                <Badge size="xs" color="grape" variant="light">
+                  Š
+                </Badge>
+              )}
+            </Table.Td>
+            <Table.Td
+              ta="left"
               ff="monospace"
               style={{
                 backgroundColor: isDark
                   ? "rgba(14, 165, 233, 0.05)"
                   : "rgba(14, 165, 233, 0.03)",
+                paddingLeft: 4,
               }}
             >
               {pb25 ? parseTimeFromMillis(pb25.time) : "-"}
             </Table.Td>
             <Table.Td
               ta="center"
-              c="dimmed"
               style={{
-                borderRight: `1px solid ${isDark ? "#373A40" : "#dee2e6"}`,
                 backgroundColor: isDark
                   ? "rgba(14, 165, 233, 0.05)"
                   : "rgba(14, 165, 233, 0.03)",
@@ -173,25 +193,87 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
             </Table.Td>
             <Table.Td
               ta="center"
-              ff="monospace"
               style={{
                 backgroundColor: isDark
                   ? "rgba(14, 165, 233, 0.05)"
                   : "rgba(14, 165, 233, 0.03)",
+              }}
+            >
+              {pb25?.location || "-"}
+            </Table.Td>
+            <Table.Td
+              ta="center"
+              style={{
+                borderRight: `1px solid ${isDark ? "#373A40" : "#dee2e6"}`,
+                backgroundColor: isDark
+                  ? "rgba(14, 165, 233, 0.05)"
+                  : "rgba(14, 165, 233, 0.03)",
+              }}
+            >
+              {pb25?.date ? formatDate(pb25.date) : "-"}
+            </Table.Td>
+            <Table.Td
+              ta="right"
+              w={30}
+              style={{
+                backgroundColor: isDark
+                  ? "rgba(6, 182, 212, 0.05)"
+                  : "rgba(6, 182, 212, 0.03)",
+                paddingRight: 4,
+              }}
+            >
+              {pb50?.splitTime && (
+                <Badge size="xs" color="orange" variant="light">
+                  M
+                </Badge>
+              )}
+              {pb50?.relayPart && (
+                <Badge size="xs" color="grape" variant="light">
+                  Š
+                </Badge>
+              )}
+            </Table.Td>
+            <Table.Td
+              ta="left"
+              ff="monospace"
+              style={{
+                backgroundColor: isDark
+                  ? "rgba(6, 182, 212, 0.05)"
+                  : "rgba(6, 182, 212, 0.03)",
+                paddingLeft: 4,
               }}
             >
               {pb50 ? parseTimeFromMillis(pb50.time) : "-"}
             </Table.Td>
             <Table.Td
               ta="center"
-              c="dimmed"
               style={{
                 backgroundColor: isDark
-                  ? "rgba(14, 165, 233, 0.05)"
-                  : "rgba(14, 165, 233, 0.03)",
+                  ? "rgba(6, 182, 212, 0.05)"
+                  : "rgba(6, 182, 212, 0.03)",
               }}
             >
               {pb50?.points || "-"}
+            </Table.Td>
+            <Table.Td
+              ta="center"
+              style={{
+                backgroundColor: isDark
+                  ? "rgba(6, 182, 212, 0.05)"
+                  : "rgba(6, 182, 212, 0.03)",
+              }}
+            >
+              {pb50?.location || "-"}
+            </Table.Td>
+            <Table.Td
+              ta="center"
+              style={{
+                backgroundColor: isDark
+                  ? "rgba(6, 182, 212, 0.05)"
+                  : "rgba(6, 182, 212, 0.03)",
+              }}
+            >
+              {pb50?.date ? formatDate(pb50.date) : "-"}
             </Table.Td>
           </Table.Tr>,
         );
@@ -211,35 +293,15 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
       >
         <div>
           <Group gap="xs" mb={4}>
-            <ThemeIcon
-              size={{ base: "sm", sm: "md" }}
-              variant="transparent"
-              color="blue"
-            >
-              <IconClock size={{ base: 16, sm: 20 }} />
+            <ThemeIcon variant="transparent" color="blue">
+              <IconClock />
             </ThemeIcon>
-            <Title order={3} size={{ base: "h4", sm: "h3" }}>
-              Osobní rekordy
-            </Title>
+            <Title order={3}>Osobní rekordy</Title>
           </Group>
-          <span
-            style={{ fontSize: "0.75rem", color: "#868e96" }}
-            className="hidden sm:inline"
-          >
-            Kompletní přehled nejlepších časů
-          </span>
         </div>
-        <Group gap="xs">
-          <Badge color="blue" variant="light" size="xs">
-            25m
-          </Badge>
-          <Badge color="cyan" variant="light" size="xs">
-            50m
-          </Badge>
-        </Group>
       </Group>
 
-      <Table.ScrollContainer minWidth={700}>
+      <Table.ScrollContainer minWidth={900}>
         <Table
           highlightOnHover
           stickyHeader
@@ -251,7 +313,7 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
           <Table.Thead>
             <Table.Tr>
               <Table.Th
-                w="15%"
+                w={100}
                 style={{
                   position: "sticky",
                   left: 0,
@@ -263,7 +325,7 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
                 Disciplína
               </Table.Th>
               <Table.Th
-                colSpan={2}
+                colSpan={5}
                 ta="center"
                 style={{
                   backgroundColor: isDark
@@ -276,7 +338,7 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
                 25m Bazén
               </Table.Th>
               <Table.Th
-                colSpan={2}
+                colSpan={5}
                 ta="center"
                 style={{
                   backgroundColor: isDark
@@ -304,47 +366,23 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
                   backgroundColor: isDark ? "#25262b" : "#f1f3f5",
                 }}
               ></Table.Th>
+              <Table.Th w={30}></Table.Th>
+              <Table.Th ta="center">Čas</Table.Th>
+              <Table.Th ta="center">Body</Table.Th>
+              <Table.Th ta="center">Místo</Table.Th>
               <Table.Th
                 ta="center"
                 style={{
-                  backgroundColor: isDark
-                    ? "rgba(14, 165, 233, 0.02)"
-                    : "rgba(14, 165, 233, 0.02)",
-                }}
-              >
-                Čas
-              </Table.Th>
-              <Table.Th
-                ta="center"
-                style={{
-                  backgroundColor: isDark
-                    ? "rgba(14, 165, 233, 0.02)"
-                    : "rgba(14, 165, 233, 0.02)",
                   borderRight: `1px solid ${isDark ? "#373A40" : "#dee2e6"}`,
                 }}
               >
-                Body
+                Datum
               </Table.Th>
-              <Table.Th
-                ta="center"
-                style={{
-                  backgroundColor: isDark
-                    ? "rgba(6, 182, 212, 0.02)"
-                    : "rgba(6, 182, 212, 0.02)",
-                }}
-              >
-                Čas
-              </Table.Th>
-              <Table.Th
-                ta="center"
-                style={{
-                  backgroundColor: isDark
-                    ? "rgba(6, 182, 212, 0.02)"
-                    : "rgba(6, 182, 212, 0.02)",
-                }}
-              >
-                Body
-              </Table.Th>
+              <Table.Th w={30}></Table.Th>
+              <Table.Th ta="center">Čas</Table.Th>
+              <Table.Th ta="center">Body</Table.Th>
+              <Table.Th ta="center">Místo</Table.Th>
+              <Table.Th ta="center">Datum</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>{renderRows()}</Table.Tbody>

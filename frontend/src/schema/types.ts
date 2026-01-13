@@ -197,6 +197,8 @@ export interface SwimmerPersonalBestRecord {
   points: number;
   date: string;
   location: string;
+  splitTime: boolean;
+  relayPart: boolean;
 }
 
 export interface SwimmerPersonalBests {
