@@ -51,7 +51,9 @@ def update_personal_bests(db: Session):
                 pb.split_time = best_result.split_time
                 pb.relay_part = best_result.relay_part
                 updated += 1
-                print(f"Updated PB for Swimmer ID {r.swimmer_id}, Discipline ID {r.discipline_id}, Course ID {r.course_id}")
+                print(
+                    f"Updated PB for Swimmer ID {r.swimmer_id}, Discipline ID {r.discipline_id}, Course ID {r.course_id}"
+                )
         else:
             new_pb = PersonalBest(
                 swimmer_id=r.swimmer_id,
@@ -70,8 +72,8 @@ def update_personal_bests(db: Session):
     db.commit()
     print(f"Updated: {updated}, Created: {created}")
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     db = SessionLocal()
     update_personal_bests(db)
     db.close()

@@ -122,13 +122,8 @@ function ProfileHeader({ basicInfo, stats }: ProfileHeaderProps) {
         >
           <Grid grow>
             {statCards.map((stat) => (
-              <Grid.Col span="auto">
-                <Stack
-                  key={stat.label}
-                  gap={4}
-                  align="center"
-                  style={{ minWidth: 120 }}
-                >
+              <Grid.Col span="auto" key={stat.label}>
+                <Stack gap={4} align="center" style={{ minWidth: 120 }}>
                   <Group gap="xs">
                     <ThemeIcon size="sm" variant="light" color={stat.color}>
                       <stat.icon size={16} />

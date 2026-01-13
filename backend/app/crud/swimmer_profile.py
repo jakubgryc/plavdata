@@ -222,14 +222,16 @@ def get_swimmer_competitions(db: Session, swimmer_id: int) -> list:
 
         previous_best_time = row.time + abs(row.comparison_to_best)
         calculated_performance = round(row.comparison_to_best / previous_best_time, 4)
-        competitions_dict[comp_id]["results"].append({
-            "discipline": row.discipline,
-            "code": row.code,
-            "time": row.time,
-            "points": row.points,
-            "improvement": row.improvement,
-            "performance": calculated_performance,
-        })
+        competitions_dict[comp_id]["results"].append(
+            {
+                "discipline": row.discipline,
+                "code": row.code,
+                "time": row.time,
+                "points": row.points,
+                "improvement": row.improvement,
+                "performance": calculated_performance,
+            }
+        )
 
     result = list(competitions_dict.values())
 
@@ -261,15 +263,19 @@ def get_swimmer_personal_bests(db: Session, swimmer_id: int) -> dict:
     pbs_50m = get_pbs_for_course(2)  # 50m course
 
     def format_pbs(pbs):
-        return [PersonalBestDetail(discipline=row.discipline,
-                                   code=row.code,
-                                   time=row.time,
-                                   split_time=row.split_time,
-                                   relay_part=row.relay_part,
-                                   points=row.points,
-                                   date=row.date.isoformat() if row.date else None,
-                                   location=row.competition_location)
-                for row in pbs]
+        return [
+            PersonalBestDetail(
+                discipline=row.discipline,
+                code=row.code,
+                time=row.time,
+                split_time=row.split_time,
+                relay_part=row.relay_part,
+                points=row.points,
+                date=row.date.isoformat() if row.date else None,
+                location=row.competition_location,
+            )
+            for row in pbs
+        ]
 
     return {"pb25m": format_pbs(pbs_25m), "pb50m": format_pbs(pbs_50m)}
 
@@ -329,16 +335,19 @@ def get_swimmer_quarterly_improvements(db: Session, swimmer_id: int) -> list:
     for row in results:
         improvements = row.improvements or 0
         total_starts = row.total_starts or 0
-        improvement_rate = round((improvements / total_starts * 100), 2) if total_starts > 0 else 0.0
+        improvement_rate = (
+            round((improvements / total_starts * 100), 2) if total_starts > 0 else 0.0
+        )
 
-        quarterly_data.append({
-            "quarter": f"Q{int(row.quarter)} {int(row.year)}",
-            "year": int(row.year),
-            "quarterNum": int(row.quarter),
-            "totalStarts": total_starts,
-            "improvements": improvements,
-            "improvementRate": improvement_rate,
-        })
+        quarterly_data.append(
+            {
+                "quarter": f"Q{int(row.quarter)} {int(row.year)}",
+                "year": int(row.year),
+                "quarterNum": int(row.quarter),
+                "totalStarts": total_starts,
+                "improvements": improvements,
+                "improvementRate": improvement_rate,
+            }
+        )
 
     return quarterly_data
-

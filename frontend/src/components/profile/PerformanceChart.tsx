@@ -72,7 +72,6 @@ function PerformanceChart({ data }: PerformanceChartProps) {
               strokeWidth: 2,
             }}
           />
-          {/*  <Bar dataKey="starts" fill="#00a5e9" radius={[8, 8, 0, 0]} />*/}
         </BarChart>
       </ResponsiveContainer>
     </Paper>

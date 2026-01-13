@@ -149,7 +149,7 @@ export interface SwimmerBasicInfo {
   birthYear: number;
   group: string;
   sex: string;
-  cspsId?: number;
+  cspsId: number;
 }
 
 export interface SwimmerSearchResult {
