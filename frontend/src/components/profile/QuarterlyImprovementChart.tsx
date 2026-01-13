@@ -38,7 +38,7 @@ function QuarterlyImprovementChart({ data }: QuarterlyImprovementChartProps) {
         </Group>
       </Group>
 
-      <ResponsiveContainer width="100%" height={250}>
+      <ResponsiveContainer width="100%" height={350}>
         <ComposedChart data={data}>
           <CartesianGrid
             strokeDasharray="3 3"
