@@ -136,6 +136,10 @@ button {
         font-size: 1.25rem !important;
     }
 
+    .profile-stat-label {
+        font-size: 0.625rem !important;
+    }
+
     .profile-info-text {
         font-size: 0.75rem !important;
     }

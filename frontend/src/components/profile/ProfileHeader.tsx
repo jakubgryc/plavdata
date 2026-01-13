@@ -3,10 +3,9 @@ import {
   Group,
   Stack,
   Title,
-  Badge,
   Button,
   Text,
-  SimpleGrid,
+  Grid,
   ThemeIcon,
   useMantineColorScheme,
 } from "@mantine/core";
@@ -37,109 +36,134 @@ function ProfileHeader({ basicInfo, stats }: ProfileHeaderProps) {
     {
       icon: IconSwimming,
       color: "blue",
+      label: "Starty",
       value: stats.totalStarts,
-      label: "Startů",
+      subtitle: `${stats.yearStarts} tento rok`,
+      secondaryLabel: "celkem",
     },
     {
       icon: IconCalendarEvent,
       color: "teal",
+      label: "Závody",
       value: stats.totalCompetitions,
-      label: "Závodů",
+      subtitle: `${stats.yearCompetitions} tento rok`,
+      secondaryLabel: "celkem",
     },
     {
       icon: IconFlame,
       color: "violet",
+      label: "Osobní rekordy",
       value: stats.yearPersonalBests,
-      label: "OR",
+      secondaryLabel: "tento rok",
     },
-    {
-      icon: IconTrophy,
-      color: "yellow",
-      value: stats.clubRecords,
-      label: "Klubových rekordů",
-    },
+    ...(stats.clubRecords > 0
+      ? [
+          {
+            icon: IconTrophy,
+            color: "yellow" as const,
+            label: "Klubové rekordy",
+            value: stats.clubRecords,
+          },
+        ]
+      : []),
   ];
 
   return (
     <Paper p={{ base: "sm", sm: "lg" }} radius="lg" withBorder>
-      <Group align="flex-start" wrap="nowrap" mb={{ base: "sm", sm: "lg" }}>
-        <Stack gap="xs" style={{ flex: 1 }}>
-          <Group justify="space-between" align="flex-start" wrap="wrap">
-            <Group gap="sm">
-              <Title
-                order={1}
-                className="profile-header-title"
-              >{`${basicInfo.name} ${basicInfo.surname}`}</Title>
-              <Badge color="blue" size="lg" variant="light">
-                Aktivní plavec
-              </Badge>
-            </Group>
-            {basicInfo.cspsId && (
-              <Button
-                component="a"
-                href={`https://vysledky.czechswimming.cz/lide/${basicInfo.cspsId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                leftSection={<IconExternalLink size={16} />}
-                variant="default"
-                size="sm"
-              >
-                ČSPS Profil
-              </Button>
-            )}
+      <Stack gap="md">
+        <Group justify="space-between" align="flex-start" wrap="wrap">
+          <Group gap="sm">
+            <Title
+              order={1}
+              className="profile-header-title"
+            >{`${basicInfo.name} ${basicInfo.surname}`}</Title>
           </Group>
+          {basicInfo.cspsId && (
+            <Button
+              component="a"
+              href={`https://vysledky.czechswimming.cz/lide/${basicInfo.cspsId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              leftSection={<IconExternalLink size={16} />}
+              variant="default"
+              size="sm"
+            >
+              ČSPS Profil
+            </Button>
+          )}
+        </Group>
 
-          <Group gap="xl" wrap="wrap">
+        <Group gap="xl" wrap="wrap">
+          <Group gap="xs">
+            <IconCalendar size={16} stroke={1.5} />
+            <Text size="sm" c="dimmed" className="profile-info-text">
+              Ročník: <strong>{basicInfo.birthYear}</strong> ({age} let)
+            </Text>
+          </Group>
+          {ACTIVE_GROUPS.includes(basicInfo.group) && (
             <Group gap="xs">
-              <IconCalendar size={16} stroke={1.5} />
+              <IconUsers size={16} stroke={1.5} />
               <Text size="sm" c="dimmed" className="profile-info-text">
-                Ročník: <strong>{basicInfo.birthYear}</strong> ({age} let)
+                Skupina: <strong>{getGroupLabel(basicInfo.group)}</strong>
               </Text>
             </Group>
-            {ACTIVE_GROUPS.includes(basicInfo.group) && (
-              <Group gap="xs">
-                <IconUsers size={16} stroke={1.5} />
-                <Text size="sm" c="dimmed" className="profile-info-text">
-                  Skupina: <strong>{getGroupLabel(basicInfo.group)}</strong>
-                </Text>
-              </Group>
-            )}
-          </Group>
+          )}
+        </Group>
 
-          <SimpleGrid
-            cols={{ base: 2, sm: 4 }}
-            spacing={{ base: "xs", sm: "md" }}
-            mt={{ base: "xs", sm: "md" }}
-            pt={{ base: "xs", sm: "md" }}
-            style={{
-              borderTop: `1px solid ${
-                colorScheme === "dark" ? "#373A40" : "#dee2e6"
-              }`,
-            }}
-          >
+        <Stack
+          gap="md"
+          mt="xs"
+          pt="md"
+          style={{
+            borderTop: `1px solid ${
+              colorScheme === "dark" ? "#373A40" : "#dee2e6"
+            }`,
+          }}
+        >
+          <Grid grow>
             {statCards.map((stat) => (
-              <Group key={stat.label} gap="xs" wrap="nowrap">
-                <ThemeIcon size="lg" variant="light" color={stat.color}>
-                  <stat.icon size={20} />
-                </ThemeIcon>
-                <div>
-                  <Text
-                    size="xl"
-                    fw={700}
-                    lh={1}
-                    className="profile-stat-value"
-                  >
-                    {stat.value}
-                  </Text>
-                  <Text size="xs" c="dimmed" mt={4}>
-                    {stat.label}
-                  </Text>
-                </div>
-              </Group>
+              <Grid.Col span="auto">
+                <Stack
+                  key={stat.label}
+                  gap={4}
+                  align="center"
+                  style={{ minWidth: 120 }}
+                >
+                  <Group gap="xs">
+                    <ThemeIcon size="sm" variant="light" color={stat.color}>
+                      <stat.icon size={16} />
+                    </ThemeIcon>
+                    <Text
+                      size="xs"
+                      c="dimmed"
+                      tt="uppercase"
+                      fw={600}
+                      className="profile-stat-label"
+                    >
+                      {stat.label}
+                    </Text>
+                  </Group>
+                  <Group gap="xs" align="baseline">
+                    <Text size="xl" fw={700} className="profile-stat-value">
+                      {stat.value}
+                    </Text>
+                    {stat.secondaryLabel && (
+                      <Text size="sm" c="dimmed">
+                        {stat.secondaryLabel}
+                      </Text>
+                    )}
+                  </Group>
+                  {stat.subtitle && (
+                    <Text size="xs" c="dimmed">
+                      {stat.subtitle}
+                    </Text>
+                  )}
+                </Stack>
+              </Grid.Col>
             ))}
-          </SimpleGrid>
+          </Grid>
         </Stack>
-      </Group>
+      </Stack>
     </Paper>
   );
 }
