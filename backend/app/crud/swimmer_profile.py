@@ -178,43 +178,59 @@ def get_swimmer_starts_by_year(db: Session, swimmer_id: int) -> list:
 
 
 def get_swimmer_competitions(db: Session, swimmer_id: int) -> list:
-    """Get detailed information about competitions the swimmer attended."""
-    competitions_data = (
+    """Get detailed information about competitions the swimmer attended with individual results."""
+    # Single query to get all results with competition and discipline info
+    results_data = (
         db.query(
+            Competition.csps_competition_id,
+            Competition.title.label("comp_name"),
+            Competition.start_date,
+            Competition.location,
+            Competition.pool_length,
+            Discipline.title.label("discipline"),
+            Discipline.code.label("code"),
+            Result.time,
+            Result.improvement,
+            Result.comparison_to_best,
+            Result.points,
             Result.competition_id,
-            func.count(Result.id).label("starts"),
         )
+        .join(Competition, Result.competition_id == Competition.id)
+        .join(Discipline, Result.discipline_id == Discipline.id)
         .filter(Result.swimmer_id == swimmer_id)
         .filter(Result.split_time == 0)
         .filter(Result.competition_id.isnot(None))
         .filter(Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS))
-        .group_by(Result.competition_id)
+        .order_by(Competition.start_date.desc())
         .all()
     )
 
-    result = []
-    for comp_data in competitions_data:
-        competition = (
-            db.query(Competition)
-            .filter(Competition.id == comp_data.competition_id)
-            .first()
-        )
-
-        if competition:
-            comp_info = {
-                "competitionId": competition.csps_competition_id,
-                "name": competition.title,
-                "date": competition.start_date.isoformat()
-                if competition.start_date
-                else None,
-                "location": competition.location,
-                "poolLength": competition.pool_length,
-                "starts": comp_data.starts,
+    # Group results by competition
+    competitions_dict = {}
+    for row in results_data:
+        comp_id = row.competition_id
+        if comp_id not in competitions_dict:
+            competitions_dict[comp_id] = {
+                "competitionId": row.csps_competition_id,
+                "name": row.comp_name,
+                "date": row.start_date.isoformat() if row.start_date else None,
+                "location": row.location,
+                "poolLength": row.pool_length,
+                "results": [],
             }
-            result.append(comp_info)
 
-    # Sort by date descending
-    result.sort(key=lambda x: x["date"] or "", reverse=True)
+        previous_best_time = row.time + abs(row.comparison_to_best)
+        calculated_performance = round(row.comparison_to_best / previous_best_time, 4)
+        competitions_dict[comp_id]["results"].append({
+            "discipline": row.discipline,
+            "code": row.code,
+            "time": row.time,
+            "points": row.points,
+            "improvement": row.improvement,
+            "performance": calculated_performance,
+        })
+
+    result = list(competitions_dict.values())
 
     return result
 

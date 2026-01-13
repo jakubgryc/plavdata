@@ -210,6 +210,28 @@ button {
         font-size: 0.5rem !important;
         padding: 0.125rem 0.25rem !important;
     }
+
+    /* Competitions table - smaller text on mobile */
+    .competitions-table th,
+    .competitions-table td {
+        font-size: 0.7rem !important;
+        padding: 0.5rem 0.375rem !important;
+    }
+
+    .competitions-table td .mantine-Text-root {
+        font-size: 0.7rem !important;
+    }
+
+    .competitions-table .mantine-Table-table {
+        font-size: 0.7rem !important;
+    }
+
+    /* Nested table in expanded rows */
+    .competitions-table .mantine-Table-table .mantine-Table-table th,
+    .competitions-table .mantine-Table-table .mantine-Table-table td {
+        font-size: 0.65rem !important;
+        padding: 0.375rem 0.25rem !important;
+    }
 }
 
 .no-scrollbar {
