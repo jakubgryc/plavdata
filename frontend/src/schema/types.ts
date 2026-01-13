@@ -156,7 +156,7 @@ export interface SwimmerSearchResult {
   id: number;
   name: string;
   surname: string;
-  group: string;
+  group?: string;
   birthYear: number;
 }
 

@@ -125,6 +125,8 @@ async def search_swimmers(
             normalized_query in normalized_name
             or normalized_query in normalized_surname
         ):
+            if swimmer.group not in GROUPS_TO_LOOKUP or swimmer.group == "veteran":
+                swimmer.group = None
             matching_swimmers.append(swimmer)
 
             # Limit results to 20

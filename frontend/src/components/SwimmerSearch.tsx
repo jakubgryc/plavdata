@@ -79,7 +79,7 @@ function SwimmerSearch() {
   const showDropdown = isFocused && (results.length > 0 || isLoading);
 
   return (
-    <Box ref={searchRef} pos="relative" w="100%" maw={{ base: 200, md: 300 }}>
+    <Box ref={searchRef} pos="relative" w="100%" maw={{ base: 100, md: 300 }}>
       <TextInput
         placeholder="Hledat plavce..."
         value={searchQuery}
@@ -96,8 +96,9 @@ function SwimmerSearch() {
           p="xs"
           pos="absolute"
           top="calc(100% + 4px)"
-          left={0}
-          right={0}
+          left={{ base: -150, md: 0 }}
+          right={{ base: "auto", md: 0 }}
+          w={{ base: "min(350px, 90vw)", md: "auto" }}
           style={{
             zIndex: 1000,
             maxHeight: "400px",
@@ -134,7 +135,8 @@ function SwimmerSearch() {
                         {swimmer.surname} {swimmer.name}
                       </Text>
                       <Text size="xs" c="dimmed">
-                        {swimmer.birthYear} • {swimmer.group}
+                        {swimmer.birthYear}
+                        {swimmer.group ? ` • ${swimmer.group}` : ""}
                       </Text>
                     </Box>
                   </Group>
