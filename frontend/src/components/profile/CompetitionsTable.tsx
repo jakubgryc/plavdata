@@ -23,7 +23,7 @@ interface CompetitionsTableProps {
   competitions: SwimmerCompetition[];
 }
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 8;
 
 function CompetitionsTable({ competitions }: CompetitionsTableProps) {
   const [activePage, setActivePage] = useState(1);
