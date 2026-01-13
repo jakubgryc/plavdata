@@ -12,6 +12,7 @@ import {
 } from "@mantine/core";
 import { IconSun, IconMoon } from "@tabler/icons-react";
 import { useTheme } from "../hooks/useTheme";
+import SwimmerSearch from "./SwimmerSearch";
 
 type LinkState = { isActive: boolean };
 
@@ -97,6 +98,7 @@ const Navbar = () => {
       </Flex>
 
       <Flex align="center" gap="sm">
+        <SwimmerSearch />
         <ActionIcon
           variant="subtle"
           onClick={toggleColorScheme}

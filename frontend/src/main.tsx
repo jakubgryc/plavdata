@@ -16,6 +16,7 @@ import PersonalBests from "./pages/personalBests";
 import ClubRecords from "./pages/clubRecords";
 import NotFound from "./pages/notFound";
 import Utils from "./pages/utils";
+import SwimmerProfile from "./pages/swimmerProfile";
 
 const router = createBrowserRouter([
   {
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
       {
         path: "utils",
         element: <Utils />,
+      },
+      {
+        path: "swimmer/:id",
+        element: <SwimmerProfile />,
       },
       {
         path: "*",

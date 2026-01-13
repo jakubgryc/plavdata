@@ -140,3 +140,75 @@ export interface EqualRelayResult {
   delta: number;
   swimmersPerRelay: number;
 }
+
+// Swimmer Profile Types
+export interface SwimmerBasicInfo {
+  id: number;
+  name: string;
+  surname: string;
+  birthYear: number;
+  group: string;
+  sex: string;
+  cspsId?: number;
+}
+
+export interface SwimmerSearchResult {
+  id: number;
+  name: string;
+  surname: string;
+  group: string;
+  birthYear: number;
+}
+
+export interface SwimmerStats {
+  totalStarts: number;
+  yearStarts: number;
+  totalCompetitions: number;
+  yearCompetitions: number;
+  yearPersonalBests: number;
+  clubRecords: number;
+}
+
+export interface SwimmerTopResult {
+  discipline: string;
+  time: number;
+  points: number;
+  date: string;
+}
+
+export interface SwimmerStartsByYear {
+  year: number;
+  starts: number;
+}
+
+export interface SwimmerCompetition {
+  competitionId: number;
+  name: string;
+  date: string;
+  location: string;
+  poolLength: number;
+  starts: number;
+}
+
+export interface SwimmerPersonalBestRecord {
+  discipline: string;
+  code: string;
+  time: number;
+  points: number;
+  date: string;
+  location: string;
+}
+
+export interface SwimmerPersonalBests {
+  pb25M: SwimmerPersonalBestRecord[];
+  pb50M: SwimmerPersonalBestRecord[];
+}
+
+export interface SwimmerProfileResponse {
+  basicInfo: SwimmerBasicInfo;
+  stats: SwimmerStats;
+  topResults: SwimmerTopResult[];
+  startsByYear: SwimmerStartsByYear[];
+  competitions: SwimmerCompetition[];
+  personalBests: SwimmerPersonalBests;
+}
