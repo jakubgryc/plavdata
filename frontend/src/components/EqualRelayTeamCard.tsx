@@ -8,7 +8,9 @@ import {
   Avatar,
   useMantineTheme,
   useMantineColorScheme,
+  Anchor,
 } from "@mantine/core";
+import { useNavigate } from "react-router";
 import { parseTimeFromMillis } from "../utils/timeUtils";
 import type { RelaySwimmer } from "../schema/types";
 
@@ -37,11 +39,15 @@ export function EqualRelayTeamCard({
 }: EqualRelayTeamCardProps) {
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
+  const navigate = useNavigate();
 
   // Count swimmer occurrences
   const swimmerCounts = new Map<number, number>();
   swimmers.forEach((swimmer) => {
-    swimmerCounts.set(swimmer.id, (swimmerCounts.get(swimmer.id) || 0) + 1);
+    swimmerCounts.set(
+      swimmer.swimmerId,
+      (swimmerCounts.get(swimmer.swimmerId) || 0) + 1,
+    );
   });
 
   return (
@@ -162,14 +168,16 @@ export function EqualRelayTeamCard({
           </Table.Thead>
           <Table.Tbody>
             {swimmers.map((swimmer, idx) => {
-              const swimsTwice = (swimmerCounts.get(swimmer.id) || 0) > 1;
+              const swimsTwice =
+                (swimmerCounts.get(swimmer.swimmerId) || 0) > 1;
               const isFirstOccurrence =
                 swimsTwice &&
-                swimmers.findIndex((s) => s.id === swimmer.id) === idx;
+                swimmers.findIndex((s) => s.swimmerId === swimmer.swimmerId) ===
+                  idx;
 
               return (
                 <Table.Tr
-                  key={`${swimmer.id}-${idx}`}
+                  key={`${swimmer.swimmerId}-${idx}`}
                   style={{
                     backgroundColor:
                       swimsTwice && !isFirstOccurrence
@@ -189,16 +197,22 @@ export function EqualRelayTeamCard({
                   </Table.Td>
                   <Table.Td>
                     <Group gap="xs" wrap="wrap">
-                      <Text
+                      <Anchor
+                        component="button"
                         fw={500}
+                        underline="never"
                         c={
                           swimsTwice && !isFirstOccurrence
                             ? "orange"
-                            : undefined
+                            : "inherit"
                         }
+                        onClick={() =>
+                          navigate(`/swimmer/${swimmer.swimmerId}`)
+                        }
+                        style={{ cursor: "pointer" }}
                       >
                         {swimmer.surname} {swimmer.name}
-                      </Text>
+                      </Anchor>
                       {swimsTwice && !isFirstOccurrence && (
                         <Badge
                           size="xs"

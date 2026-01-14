@@ -226,7 +226,7 @@ class BestTimeResultOut(BaseModel):
 
 # Relay Schemas
 class RelaySwimmerInfo(BaseModel):
-    id: int
+    swimmer_id: int
     name: str
     surname: str
     time: int

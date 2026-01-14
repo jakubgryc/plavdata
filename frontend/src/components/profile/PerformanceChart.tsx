@@ -62,6 +62,8 @@ function PerformanceChart({ data }: PerformanceChartProps) {
                 : "rgba(8, 138, 198, 0.1)",
               radius: 8,
             }}
+            formatter={(value: number) => [value, "Počet startů"]}
+            labelFormatter={(label) => `Rok: ${label}`}
           />
           <Bar
             dataKey="starts"

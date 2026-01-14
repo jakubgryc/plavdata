@@ -119,7 +119,7 @@ export interface SwimmerResults {
 
 // Relay Types
 export interface RelaySwimmer {
-  id: number;
+  swimmerId: number;
   name: string;
   surname: string;
   stroke?: string; // Optional - only used for medley relays

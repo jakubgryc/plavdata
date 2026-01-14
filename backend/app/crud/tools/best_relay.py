@@ -15,7 +15,7 @@ from app.models import Course, Discipline, PersonalBest, Swimmer
 class SwimmerInfo:
     """Represents a swimmer's basic information and time for a specific stroke."""
 
-    id: int
+    swimmer_id: int
     name: str
     surname: str
     time: int
@@ -95,7 +95,7 @@ def calculate_best_freestyle_relay(
         sid = pb.swimmer_id
         if sid not in swimmer_lookup:
             swimmer_lookup[sid] = SwimmerInfo(
-                id=sid, name=name, surname=surname, time=pb.time, stroke="VZ"
+                swimmer_id=sid, name=name, surname=surname, time=pb.time, stroke="VZ"
             )
         else:
             # Keep the best (minimum) time for this swimmer
@@ -172,7 +172,7 @@ def calculate_best_medley_relay(
         sid = pb.swimmer_id
         if sid not in swimmer_lookup:
             swimmer_lookup[sid] = {
-                "id": sid,
+                "swimmer_id": sid,
                 "name": name,
                 "surname": surname,
                 "times": {},
@@ -205,7 +205,7 @@ def calculate_best_medley_relay(
             total_time += time
             relay_swimmers.append(
                 SwimmerInfo(
-                    id=swimmer_id,
+                    swimmer_id=swimmer_id,
                     name=swimmer_lookup[swimmer_id]["name"],
                     surname=swimmer_lookup[swimmer_id]["surname"],
                     stroke=stroke_names[i],
@@ -286,7 +286,7 @@ def calculate_equal_relays(
     for pb, swimmer_id, name, surname in pbs:
         swimmers_data.append(
             SwimmerInfo(
-                id=swimmer_id, name=name, surname=surname, time=pb.time, stroke="VZ"
+                swimmer_id=swimmer_id, name=name, surname=surname, time=pb.time, stroke="VZ"
             )
         )
 
@@ -326,7 +326,7 @@ def calculate_equal_relays(
                     # Clone the swimmer info (create new instance)
                     original = team_sorted[j % len(team_sorted)]
                     clone = SwimmerInfo(
-                        id=original.id,
+                        swimmer_id=original.swimmer_id,
                         name=original.name,
                         surname=original.surname,
                         time=original.time,

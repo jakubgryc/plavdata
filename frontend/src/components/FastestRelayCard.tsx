@@ -8,8 +8,10 @@ import {
   rem,
   useMantineTheme,
   useMantineColorScheme,
+  Anchor,
 } from "@mantine/core";
 import { IconSwimming } from "@tabler/icons-react";
+import { useNavigate } from "react-router";
 import { parseTimeFromMillis } from "../utils/timeUtils";
 import type { RelaySwimmer } from "../schema/types";
 
@@ -46,6 +48,7 @@ export function FastestRelayCard({
 }: FastestRelayCard) {
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
+  const navigate = useNavigate();
 
   return (
     <Card
@@ -161,7 +164,7 @@ export function FastestRelayCard({
               .reduce((sum, s) => sum + s.time, 0);
 
             return (
-              <Table.Tr key={`${swimmer.id}-${idx}`}>
+              <Table.Tr key={`${swimmer.swimmerId}-${idx}`}>
                 <Table.Td>
                   {relayType === "medley" ? (
                     <Badge
@@ -186,9 +189,16 @@ export function FastestRelayCard({
                   )}
                 </Table.Td>
                 <Table.Td>
-                  <Text fw={500}>
+                  <Anchor
+                    component="button"
+                    fw={500}
+                    underline="never"
+                    c="inherit"
+                    onClick={() => navigate(`/swimmer/${swimmer.swimmerId}`)}
+                    style={{ cursor: "pointer" }}
+                  >
                     {swimmer.surname} {swimmer.name}
-                  </Text>
+                  </Anchor>
                 </Table.Td>
                 <Table.Td ta="right">
                   <Text
