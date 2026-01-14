@@ -11,7 +11,7 @@ type DisciplineDescription = {
   points: number | undefined;
 };
 
-type TableRow = Record<string, string | DisciplineDescription>;
+type TableRow = Record<string, string | number | DisciplineDescription>;
 
 export function buildTableData(data: SwimmerPersonalBest[]): TableRow[] {
   const emptyDescription: DisciplineDescription = {
@@ -25,6 +25,7 @@ export function buildTableData(data: SwimmerPersonalBest[]): TableRow[] {
   return data.map((swimmerBests) => {
     const row: TableRow = {
       name: `${swimmerBests.swimmer.surname} ${swimmerBests.swimmer.name}`,
+      swimmerId: swimmerBests.swimmer.id,
     };
     for (const discipline of DISCIPLINES) {
       const pb = swimmerBests.personal_bests.find(

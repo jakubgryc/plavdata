@@ -36,6 +36,7 @@ export interface RecentClubRecord {
   resultId: number;
   name: string;
   surname: string;
+  swimmerId: number;
   discipline: string;
   time: number;
   date: string;
