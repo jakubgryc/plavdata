@@ -275,3 +275,153 @@ class EqualRelaysResponse(BaseModel):
     class Config:
         alias_generator = to_camel
         populate_by_name = True
+
+
+class SwimmerBasicInfo(BaseModel):
+    id: int
+    csps_id: int
+    name: str
+    surname: str
+    birth_year: int
+    group: Optional[str]
+    sex: str
+
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+class SwimmerStats(BaseModel):
+    total_starts: int
+    year_starts: int
+    total_competitions: int
+    year_competitions: int
+    year_personal_bests: int
+    club_records: int
+
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+class TopResult(BaseModel):
+    discipline: str
+    time: int
+    points: int
+    date: Optional[str]
+
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+class StartsByYear(BaseModel):
+    year: int
+    starts: int
+
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+class CompetitionResult(BaseModel):
+    discipline: str
+    code: str
+    time: int
+    improvement: bool
+    performance: float
+    points: Optional[int]
+
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+class CompetitionDetail(BaseModel):
+    competition_id: int
+    name: str
+    date: Optional[str]
+    location: str
+    pool_length: Optional[int] = None
+    results: List[CompetitionResult]
+
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+class PersonalBestDetail(BaseModel):
+    discipline: str
+    code: str
+    time: int
+    split_time: bool
+    relay_part: bool
+    points: Optional[int]
+    date: Optional[str]
+    location: Optional[str]
+
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+class PersonalBestsByCourse(BaseModel):
+    pb25m: List[PersonalBestDetail]
+    pb50m: List[PersonalBestDetail]
+
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+class StartsByStroke(BaseModel):
+    K: int
+    Z: int
+    P: int
+    M: int
+    O: int
+
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+class QuarterlyImprovement(BaseModel):
+    quarter: str
+    year: int
+    quarter_num: int
+    total_starts: int
+    improvements: int
+    improvement_rate: float
+
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+class SwimmerProfileResponse(BaseModel):
+    basic_info: SwimmerBasicInfo
+    stats: SwimmerStats
+    top_results: List[TopResult]
+    starts_by_year: List[StartsByYear]
+    competitions: List[CompetitionDetail]
+    personal_bests: PersonalBestsByCourse
+    starts_by_stroke: StartsByStroke
+    quarterly_improvements: List[QuarterlyImprovement]
+
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+class SwimmerSearchResult(BaseModel):
+    id: int
+    name: str
+    surname: str
+    group: Optional[str]
+    birth_year: int
+
+    class Config:
+        from_attributes = True
+        alias_generator = to_camel
+        populate_by_name = True

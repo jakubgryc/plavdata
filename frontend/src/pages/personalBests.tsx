@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { SegmentedControl, Title } from "@mantine/core";
 import { Chip, Modal, Text, Stack, Flex } from "@mantine/core";
 import { DataTable } from "mantine-datatable";
@@ -13,6 +14,7 @@ import type { SwimmerPersonalBest } from "../schema/types";
 
 function PersonalBests() {
   const { colorScheme } = useTheme();
+  const navigate = useNavigate();
   const [selectedGroup, setSelectedGroup] = useState<string | null>("Z1");
   const [selectedCourse, setSelectedCourse] = useState<string>("25");
   const [personalBests, setPersonalBests] = useState<
@@ -127,7 +129,31 @@ function PersonalBests() {
           highlightOnHover
           fetching={isFetching}
           columns={[
-            { accessor: "name", width: 145, noWrap: true, title: "" },
+            {
+              accessor: "name",
+              width: 145,
+              noWrap: true,
+              title: "",
+              render: (record: any) => (
+                <button
+                  onClick={() => navigate(`/swimmer/${record.swimmerId}`)}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    width: "100%",
+                    height: "100%",
+                    boxSizing: "border-box",
+                    textAlign: "left",
+                    display: "block",
+                    color: "inherit",
+                    fontWeight: 500,
+                  }}
+                >
+                  {record.name}
+                </button>
+              ),
+            },
             ...DISCIPLINES.filter((discipline) => {
               return !(selectedCourse === "50" && discipline === "100 O");
             }).map((discipline) => ({

@@ -7,6 +7,8 @@ export const GROUPS = [
   { label: "bývalí", value: "veteran" },
 ];
 
+export const ACTIVE_GROUPS = ["Z1", "Z2", "P1"];
+
 export const POOLS: SegmentedControlItem[] = [
   { label: "25 m", value: "25" },
   { label: "50 m", value: "50" },

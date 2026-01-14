@@ -10,6 +10,7 @@ import {
   Collapse,
 } from "@mantine/core";
 import { IconChevronDown } from "@tabler/icons-react";
+import { useNavigate } from "react-router";
 import { useTheme } from "../hooks/useTheme";
 import { parseTimeFromMillis } from "../utils/timeUtils";
 
@@ -81,8 +82,10 @@ function SwimmerRow({
   discipline,
   points,
   time,
+  swimmerId,
 }: TopSwimmer) {
   const { colorScheme } = useTheme();
+  const navigate = useNavigate();
   const styles = getRowStyles(rank, colorScheme);
 
   return (
@@ -91,9 +94,11 @@ function SwimmerRow({
       radius="md"
       bg={styles.bg}
       withBorder={styles.withBorder}
-      style={
-        styles.borderColor ? { borderColor: styles.borderColor } : undefined
-      }
+      style={{
+        ...(styles.borderColor ? { borderColor: styles.borderColor } : {}),
+        cursor: "pointer",
+      }}
+      onClick={() => navigate(`/swimmer/${swimmerId}`)}
     >
       <Group gap="sm" wrap="nowrap">
         <Avatar

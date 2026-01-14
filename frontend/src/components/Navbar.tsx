@@ -5,13 +5,12 @@ import {
   Drawer,
   Flex,
   Text,
-  Button,
-  Space,
   ActionIcon,
   useComputedColorScheme,
 } from "@mantine/core";
 import { IconSun, IconMoon } from "@tabler/icons-react";
 import { useTheme } from "../hooks/useTheme";
+import SwimmerSearch from "./SwimmerSearch";
 
 type LinkState = { isActive: boolean };
 
@@ -91,12 +90,13 @@ const Navbar = () => {
           Plavdata
         </Text>
 
-        <Flex align="center" gap="sm" visibleFrom="md" ml="xl">
+        <Flex align="center" gap="sm" visibleFrom="sm" ml="xl">
           {navLinks}
         </Flex>
       </Flex>
 
       <Flex align="center" gap="sm">
+        <SwimmerSearch />
         <ActionIcon
           variant="subtle"
           onClick={toggleColorScheme}
@@ -109,13 +109,10 @@ const Navbar = () => {
             <IconMoon size={20} />
           )}
         </ActionIcon>
-        <Button variant="subtle" visibleFrom="md">
-          Přihlásit
-        </Button>
         <Burger
           opened={opened}
           onClick={() => setOpened(!opened)}
-          hiddenFrom="md"
+          hiddenFrom="sm"
         />
       </Flex>
 
@@ -125,12 +122,10 @@ const Navbar = () => {
         title="Menu"
         padding="md"
         size="sm"
-        hiddenFrom="md"
+        hiddenFrom="sm"
       >
         <Flex direction="column" gap="md">
           {navLinks}
-          <Space h="md" />
-          <Button variant="subtle">Přihlásit</Button>
         </Flex>
       </Drawer>
     </Flex>

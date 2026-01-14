@@ -1,6 +1,7 @@
 import argparse
 from collections import defaultdict
 from datetime import date, datetime
+from typing import Literal
 
 import requests
 from sqlalchemy.orm import Session

@@ -196,6 +196,7 @@ def get_club_records(db: Session, limit: int = 5, oldest: bool = False) -> list:
             Result.id.label("result_id"),
             Swimmer.name,
             Swimmer.surname,
+            Swimmer.id.label("swimmer_id"),
             Discipline.title.label("discipline"),
             Result.time,
             Result.date,
@@ -217,6 +218,7 @@ def get_club_records(db: Session, limit: int = 5, oldest: bool = False) -> list:
             grouped[row.result_id] = {
                 "name": row.name,
                 "surname": row.surname,
+                "swimmerId": row.swimmer_id,
                 "discipline": row.discipline,
                 "time": row.time,
                 "date": row.date.isoformat() if row.date else None,

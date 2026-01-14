@@ -10,6 +10,7 @@ import {
   Badge,
 } from "@mantine/core";
 import { IconMedal, IconArrowRight } from "@tabler/icons-react";
+import { useNavigate } from "react-router";
 
 import { parseTimeFromMillis, formatDate } from "../utils/timeUtils";
 import { getAgeCategoryLabel } from "../utils/constants";
@@ -28,6 +29,7 @@ function ClubRecordsTable({
   subtitle,
   variant,
 }: ClubRecordsTableProps) {
+  const navigate = useNavigate();
   const color = variant === "recent" ? "green" : "orange";
   const iconColor = variant === "recent" ? "yellow" : "orange";
 
@@ -68,8 +70,13 @@ function ClubRecordsTable({
             {records.map((record, idx) => (
               <Table.Tr key={idx}>
                 <Table.Td fw={500}>{record.discipline}</Table.Td>
-                <Table.Td>
-                  {record.surname} {record.name}
+                <Table.Td
+                  style={{ cursor: "pointer" }}
+                  onClick={() => navigate(`/swimmer/${record.swimmerId}`)}
+                >
+                  <Text fw={500}>
+                    {record.surname} {record.name}
+                  </Text>
                 </Table.Td>
                 <Table.Td>
                   <Group gap={4}>

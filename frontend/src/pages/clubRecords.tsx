@@ -8,6 +8,7 @@ import {
   Flex,
 } from "@mantine/core";
 import { DataTable } from "mantine-datatable";
+import { useNavigate } from "react-router";
 
 import { API_BASE_URL } from "../../config";
 import { POOLS, DISCIPLINES } from "../utils/constants";
@@ -38,6 +39,7 @@ interface ClubRecordsData {
 }
 
 function ClubRecords() {
+  const navigate = useNavigate();
   const [selectedCourse, setSelectedCourse] = useState<string>("25");
   const [clubRecords, setClubRecords] = useState<ClubRecordsData>({});
   const [isFetching, setIsFetching] = useState<boolean>(false);
@@ -297,6 +299,17 @@ function ClubRecords() {
                         whiteSpace: "nowrap",
                         overflow: "hidden",
                       }}
+                      onClick={() => navigate(`/swimmer/${data.swimmerId}`)}
+                    >
+                      {data.surname} {data.name}
+                    </Text>
+                    <Text
+                      size="xs"
+                      style={{
+                        flex: 1.5,
+                        textAlign: "left",
+                        cursor: "pointer",
+                      }}
                       onClick={() => {
                         setModalData({
                           time: parseTimeFromMillis(data.time),
@@ -311,15 +324,6 @@ function ClubRecords() {
                           ageCategory: category,
                         });
                         setModalOpen(true);
-                      }}
-                    >
-                      {data.surname} {data.name}
-                    </Text>
-                    <Text
-                      size="xs"
-                      style={{
-                        flex: 1.5,
-                        textAlign: "left",
                       }}
                     >
                       {parseTimeFromMillis(data.time)}
