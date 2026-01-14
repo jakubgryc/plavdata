@@ -2,7 +2,7 @@ from sqlalchemy import func, cast, select, Integer, case
 from sqlalchemy.orm import Session
 
 from app.models import Swimmer, Discipline, Course, Result, ClubRecord, AgeCategory
-from app.constants import DNF_THRESHOLD
+from app.constants import DNF_THRESHOLD, EXCLUDED_COMPETITION_LOCATIONS
 
 
 def get_best_times_for_age(
@@ -52,6 +52,7 @@ def get_best_times_for_age(
             if not only_current_age
             else age_at_result == max_age,
             Result.time < DNF_THRESHOLD,
+            Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS),
         )
     ).subquery()
 

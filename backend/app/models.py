@@ -11,6 +11,7 @@ from sqlalchemy import (
     String,
     Table,
     UniqueConstraint,
+    Index,
 )
 from sqlalchemy.orm import relationship
 
@@ -76,6 +77,12 @@ class Result(Base):
         cascade="all, delete-orphan",
     )
     competition = relationship("Competition")
+
+    __table_args__ = (
+        Index(
+            "idx_swimmer_pb_lookup", "swimmer_id", "discipline_id", "course_id", "time"
+        ),
+    )
 
 
 class PersonalBest(Base):
