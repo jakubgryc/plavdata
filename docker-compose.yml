@@ -1,7 +1,12 @@
 services:
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
     container_name: plavdata_be
+    user: "${UID:-1000}:${GID:-1000}"
     networks:
       - app-network
     ports:
