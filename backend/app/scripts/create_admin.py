@@ -9,8 +9,8 @@ from getpass import getpass
 from sqlalchemy.orm import Session
 
 from app.auth import get_password_hash
-from app.db import SessionLocal, engine
-from app.models import Base, User
+from app.db import SessionLocal
+from app.models import User
 
 
 def create_admin_user(username: str, password: str) -> None:

@@ -286,7 +286,11 @@ def calculate_equal_relays(
     for pb, swimmer_id, name, surname in pbs:
         swimmers_data.append(
             SwimmerInfo(
-                swimmer_id=swimmer_id, name=name, surname=surname, time=pb.time, stroke="VZ"
+                swimmer_id=swimmer_id,
+                name=name,
+                surname=surname,
+                time=pb.time,
+                stroke="VZ",
             )
         )
 
