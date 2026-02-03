@@ -17,6 +17,7 @@ import ClubRecords from "./pages/clubRecords";
 import NotFound from "./pages/notFound";
 import Utils from "./pages/utils";
 import SwimmerProfile from "./pages/swimmerProfile";
+import Login from "./pages/login";
 
 const router = createBrowserRouter([
   {
@@ -46,6 +47,10 @@ const router = createBrowserRouter([
       {
         path: "swimmer/:id",
         element: <SwimmerProfile />,
+      },
+      {
+        path: "admin",
+        element: <Login />,
       },
       {
         path: "*",
