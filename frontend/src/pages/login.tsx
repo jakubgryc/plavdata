@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { FormEvent } from "react";
 import { useNavigate } from "react-router";
 import {
   Container,
@@ -21,7 +22,7 @@ function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
@@ -29,9 +30,8 @@ function Login() {
     try {
       const response = await authApi.login({ username, password });
       authApi.saveToken(response.access_token, response.username);
-      // TODO: Navigate to admin dashboard once created
-      console.log("Login successful:", response);
-      navigate("/"); // For now, redirect to home
+      window.dispatchEvent(new Event("storage"));
+      navigate("/admin/swimmers");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Přihlášení se nezdařilo");
     } finally {

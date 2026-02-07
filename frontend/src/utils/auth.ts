@@ -17,9 +17,52 @@ export interface User {
   is_active: boolean;
 }
 
+interface DecodedToken {
+  sub: string;
+  exp: number;
+}
+
 class AuthApi {
   private readonly TOKEN_KEY = "auth_token";
   private readonly USERNAME_KEY = "auth_username";
+
+  private decodeToken(token: string): DecodedToken | null {
+    try {
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join(""),
+      );
+      return JSON.parse(jsonPayload);
+    } catch {
+      return null;
+    }
+  }
+
+  getTokenExpiration(): number | null {
+    const token = this.getToken();
+    if (!token) return null;
+
+    const decoded = this.decodeToken(token);
+    return decoded?.exp || null;
+  }
+
+  getTimeUntilExpiration(): number | null {
+    const exp = this.getTokenExpiration();
+    if (!exp) return null;
+
+    const now = Math.floor(Date.now() / 1000);
+    const remaining = exp - now;
+    return remaining > 0 ? remaining : 0;
+  }
+
+  isTokenExpired(): boolean {
+    const timeRemaining = this.getTimeUntilExpiration();
+    return timeRemaining === null || timeRemaining <= 0;
+  }
 
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
@@ -78,7 +121,13 @@ class AuthApi {
   }
 
   isAuthenticated(): boolean {
-    return !!this.getToken();
+    const token = this.getToken();
+    if (!token) return false;
+    return !this.isTokenExpired();
+  }
+
+  logout(): void {
+    this.removeToken();
   }
 }
 

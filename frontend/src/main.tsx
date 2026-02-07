@@ -18,6 +18,7 @@ import NotFound from "./pages/notFound";
 import Utils from "./pages/utils";
 import SwimmerProfile from "./pages/swimmerProfile";
 import Login from "./pages/login";
+import AdminSwimmers from "./pages/adminSwimmers";
 
 const router = createBrowserRouter([
   {
@@ -51,6 +52,10 @@ const router = createBrowserRouter([
       {
         path: "admin",
         element: <Login />,
+      },
+      {
+        path: "admin/swimmers",
+        element: <AdminSwimmers />,
       },
       {
         path: "*",
