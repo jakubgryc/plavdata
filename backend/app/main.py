@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi.errors import RateLimitExceeded
 
-from app.api import dashboard_stats, personal_bests, swimmers, utils, auth
+from app.api import dashboard_stats, personal_bests, swimmers, utils, auth, admin
 from app.api.limiter import custom_rate_limit_handler, limiter
 from app.api.results import results_router
 
@@ -28,16 +28,16 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
     allow_headers=["*"],
 )
-
+app.include_router(auth.router, prefix="/api")
+app.include_router(admin.router, prefix="/api")
 app.include_router(personal_bests.router, prefix="/api")
 app.include_router(swimmers.router, prefix="/api")
 app.include_router(results_router, prefix="/api")
 app.include_router(dashboard_stats.router, prefix="/api")
 app.include_router(utils.router, prefix="/api")
-app.include_router(auth.router, prefix="/api")
 
 
 @app.get("/")
