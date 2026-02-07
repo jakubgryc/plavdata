@@ -239,8 +239,8 @@ function AdminSwimmers() {
               <Table striped highlightOnHover withTableBorder withColumnBorders>
                 <Table.Thead>
                   <Table.Tr>
-                    <Table.Th>Jméno</Table.Th>
                     <Table.Th>Příjmení</Table.Th>
+                    <Table.Th>Jméno</Table.Th>
                     <Table.Th>Ročník</Table.Th>
                     <Table.Th>Skupina</Table.Th>
                     <Table.Th>Status</Table.Th>
@@ -259,8 +259,8 @@ function AdminSwimmers() {
 
                     return (
                       <Table.Tr key={swimmer.id}>
-                        <Table.Td>{swimmer.name}</Table.Td>
                         <Table.Td fw={500}>{swimmer.surname}</Table.Td>
+                        <Table.Td>{swimmer.name}</Table.Td>
                         <Table.Td>{swimmer.birth_year}</Table.Td>
                         <Table.Td>
                           <CreatableGroupSelect

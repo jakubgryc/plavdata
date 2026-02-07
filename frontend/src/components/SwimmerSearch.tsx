@@ -96,9 +96,9 @@ function SwimmerSearch() {
           p="xs"
           pos="absolute"
           top="calc(100% + 4px)"
-          left={{ base: -150, md: 0 }}
+          left={{ base: "auto", md: 0 }}
           right={{ base: "auto", md: 0 }}
-          w={{ base: "min(350px, 90vw)", md: "auto" }}
+          w={{ base: "min(200px, 90vw)", md: "auto" }}
           style={{
             zIndex: 1000,
             maxHeight: "400px",
