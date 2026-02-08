@@ -16,7 +16,15 @@ from app.db import get_db
 from app.models import User
 
 # Configuration
-SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-this-in-production")
+ENV = os.getenv("ENV", "development")
+
+if ENV == "development":
+    SECRET_KEY = os.getenv("SECRET_KEY", "dev_secret_key")
+else:
+    SECRET_KEY = os.getenv("SECRET_KEY")
+
+    if not SECRET_KEY:
+        raise RuntimeError("SECRET_KEY environment variable must be set in production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
