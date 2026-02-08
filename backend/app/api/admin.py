@@ -129,7 +129,7 @@ async def get_all_swimmers_admin(
 async def update_swimmer_group(
     swimmer_id: int,
     update_data: UpdateSwimmerGroupRequest,
-    current_user: Annotated[User, Depends(get_current_user)] = None,
+    _current_user: Annotated[User, Depends(get_current_user)],
     db: Session = Depends(get_db),
 ):
     """
