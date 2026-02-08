@@ -1,6 +1,7 @@
 """
 Admin API endpoints for managing swimmers.
 """
+
 from datetime import date
 from typing import Annotated, Optional
 
@@ -33,7 +34,9 @@ class SwimmerAdminOut(BaseModel):
     @classmethod
     def from_swimmer(cls, swimmer: Swimmer):
         """Create SwimmerAdminOut with is_active calculated."""
-        is_active = swimmer.membership_end is None or swimmer.membership_end >= date.today()
+        is_active = (
+            swimmer.membership_end is None or swimmer.membership_end >= date.today()
+        )
         return cls(
             id=swimmer.id,
             name=swimmer.name,
@@ -142,4 +145,3 @@ async def update_swimmer_group(
     db.refresh(swimmer)
 
     return SwimmerAdminOut.from_swimmer(swimmer)
-
