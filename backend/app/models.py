@@ -36,6 +36,16 @@ class Discipline(Base):
     code = Column(String, nullable=False)
 
 
+class Group(Base):
+    __tablename__ = "groups"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, nullable=False)
+    display_name_cs = Column(String, nullable=False)
+
+    swimmers = relationship("Swimmer", back_populates="group_rel")
+
+
 class Swimmer(Base):
     __tablename__ = "swimmers"
 
@@ -45,9 +55,15 @@ class Swimmer(Base):
     surname = Column(String, nullable=False)
     birth_year = Column(Integer, nullable=False)
     group = Column(String, nullable=True)
+    group_id = Column(Integer, ForeignKey("groups.id"), nullable=True)
     sex = Column(String)
     membership_start = Column(Date, nullable=True)
     membership_end = Column(Date, nullable=True)
+    show_in_comparison = Column(Boolean, default=False)
+    show_in_personal_bests = Column(Boolean, default=False)
+    show_in_relay_builder = Column(Boolean, default=False)
+
+    group_rel = relationship("Group", back_populates="swimmers")
 
 
 class Result(Base):
