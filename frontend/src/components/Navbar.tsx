@@ -151,6 +151,14 @@ const Navbar = () => {
                 >
                   Správa plavců
                 </Menu.Item>
+                <Menu.Item
+                  component={NavLink}
+                  to="/admin/groups"
+                  leftSection={<IconUser size={14} />}
+                  onClick={() => setOpened(false)}
+                >
+                  Správa skupin
+                </Menu.Item>
                 <Menu.Divider />
                 <Menu.Item
                   color="red"
@@ -230,6 +238,14 @@ const Navbar = () => {
                     onClick={() => setOpened(false)}
                   >
                     Správa plavců
+                  </Menu.Item>
+                  <Menu.Item
+                    component={NavLink}
+                    to="/admin/groups"
+                    leftSection={<IconUser size={14} />}
+                    onClick={() => setOpened(false)}
+                  >
+                    Správa skupiny
                   </Menu.Item>
                   <Menu.Divider />
                   <Menu.Item

@@ -232,6 +232,32 @@ button {
         font-size: 0.65rem !important;
         padding: 0.375rem 0.25rem !important;
     }
+
+    /* Admin tables - smaller text on mobile */
+    .responsive-table table th,
+    .responsive-table table td {
+        font-size: 0.7rem !important;
+        padding: 0.5rem 0.375rem !important;
+    }
+
+    .responsive-table table td .mantine-Select-input {
+        font-size: 0.7rem !important;
+        min-height: 28px !important;
+        padding: 0.25rem 0.5rem !important;
+    }
+
+    .responsive-table table td .mantine-Checkbox-label {
+        font-size: 0.7rem !important;
+    }
+
+    .responsive-table table td .mantine-Badge-root {
+        font-size: 0.625rem !important;
+        padding: 0.125rem 0.375rem !important;
+    }
+
+    .responsive-table table td .mantine-Text-root {
+        font-size: 0.7rem !important;
+    }
 }
 
 .no-scrollbar {
