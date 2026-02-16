@@ -5,6 +5,7 @@ services:
       args:
         UID: ${UID:-1000}
         GID: ${GID:-1000}
+      network: host
     container_name: plavdata_be
     networks:
       - app-network
@@ -19,7 +20,9 @@ services:
       - ENV=development
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      network: host
     container_name: plavdata_fe
     networks:
       - app-network
