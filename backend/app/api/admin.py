@@ -144,11 +144,13 @@ async def get_all_swimmers_admin(
     swimmers_out = []
     for swimmer in swimmers:
         # Get group display name if swimmer has a group_id
-        group_display_name = None
-        if swimmer.group_id:
-            group = db.query(Group).filter(Group.id == swimmer.group_id).first()
-            if group:
-                group_display_name = group.display_name_cs
+
+        group_rel = getattr(swimmer, "group_rel", None)
+        group_display_name = (
+            getattr(group_rel, "display_name_cs", None)
+            if group_rel is not None
+            else None
+        )
 
         swimmers_out.append(SwimmerAdminOut.from_swimmer(swimmer, group_display_name))
 
