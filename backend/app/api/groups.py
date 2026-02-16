@@ -46,6 +46,18 @@ class UpdateGroupRequest(BaseModel):
     display_name_cs: Optional[str] = None
 
 
+class SwimmerInGroup(BaseModel):
+    id: int
+    name: str
+    surname: str
+    birth_year: int
+    sex: str
+    membership_end: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
 @router.get("", response_model=list[GroupOut])
 async def get_all_groups(
     _current_user: Annotated[User, Depends(get_current_user)],
@@ -59,8 +71,8 @@ async def get_all_groups(
 
     result = []
     for group in groups:
-        # Count swimmers in this group using the old group column
-        swimmer_count = db.query(Swimmer).filter(Swimmer.group == group.name).count()
+        # Count swimmers in this group using group_id foreign key
+        swimmer_count = db.query(Swimmer).filter(Swimmer.group_id == group.id).count()
 
         result.append(
             GroupOut(
@@ -88,8 +100,8 @@ async def get_group_detail(
     if not group:
         raise HTTPException(status_code=404, detail="Group not found")
 
-    # Count all swimmers
-    swimmer_count = db.query(Swimmer).filter(Swimmer.group == group.name).count()
+    # Count all swimmers using group_id foreign key
+    swimmer_count = db.query(Swimmer).filter(Swimmer.group_id == group.id).count()
 
     # Count active swimmers
     from datetime import date
@@ -97,7 +109,7 @@ async def get_group_detail(
     today = date.today()
     active_swimmer_count = (
         db.query(Swimmer)
-        .filter(Swimmer.group == group.name)
+        .filter(Swimmer.group_id == group.id)
         .filter((Swimmer.membership_end.is_(None)) | (Swimmer.membership_end >= today))
         .count()
     )
@@ -109,6 +121,42 @@ async def get_group_detail(
         swimmer_count=swimmer_count,
         active_swimmer_count=active_swimmer_count,
     )
+
+
+@router.get("/{group_id}/swimmers", response_model=list[SwimmerInGroup])
+async def get_group_swimmers(
+    group_id: int,
+    _current_user: Annotated[User, Depends(get_current_user)],
+    db: Session = Depends(get_db),
+):
+    """
+    Get all swimmers in a group.
+    Requires authentication.
+    """
+    group = db.query(Group).filter(Group.id == group_id).first()
+    if not group:
+        raise HTTPException(status_code=404, detail="Group not found")
+
+    swimmers = (
+        db.query(Swimmer)
+        .filter(Swimmer.group_id == group.id)
+        .order_by(Swimmer.surname, Swimmer.name)
+        .all()
+    )
+
+    return [
+        SwimmerInGroup(
+            id=swimmer.id,
+            name=swimmer.name,
+            surname=swimmer.surname,
+            birth_year=swimmer.birth_year,
+            sex=swimmer.sex,
+            membership_end=swimmer.membership_end.isoformat()
+            if swimmer.membership_end
+            else None,
+        )
+        for swimmer in swimmers
+    ]
 
 
 @router.post("", response_model=GroupOut)
@@ -167,14 +215,7 @@ async def update_group(
             raise HTTPException(
                 status_code=400, detail="Group with this name already exists"
             )
-
-        # Update all swimmers with old group name to new group name
-        old_name = group.name
         group.name = update_data.name
-
-        db.query(Swimmer).filter(Swimmer.group == old_name).update(
-            {Swimmer.group: update_data.name}
-        )
 
     if update_data.display_name_cs:
         group.display_name_cs = update_data.display_name_cs
@@ -182,7 +223,7 @@ async def update_group(
     db.commit()
     db.refresh(group)
 
-    swimmer_count = db.query(Swimmer).filter(Swimmer.group == group.name).count()
+    swimmer_count = db.query(Swimmer).filter(Swimmer.group_id == group.id).count()
 
     return GroupOut(
         id=group.id,
@@ -207,8 +248,8 @@ async def delete_group(
     if not group:
         raise HTTPException(status_code=404, detail="Group not found")
 
-    # Check if group has swimmers
-    swimmer_count = db.query(Swimmer).filter(Swimmer.group == group.name).count()
+    # Check if group has swimmers using group_id foreign key
+    swimmer_count = db.query(Swimmer).filter(Swimmer.group_id == group.id).count()
     if swimmer_count > 0:
         raise HTTPException(
             status_code=400,
@@ -219,3 +260,40 @@ async def delete_group(
     db.commit()
 
     return {"message": "Group deleted successfully"}
+
+
+@router.delete("/{group_id}/swimmers/{swimmer_id}")
+async def remove_swimmer_from_group(
+    group_id: int,
+    swimmer_id: int,
+    _current_user: Annotated[User, Depends(get_current_user)],
+    db: Session = Depends(get_db),
+):
+    """
+    Remove a swimmer from a group.
+    Sets group_id to NULL and visibility flags to False.
+    Requires authentication.
+    """
+    group = db.query(Group).filter(Group.id == group_id).first()
+    if not group:
+        raise HTTPException(status_code=404, detail="Group not found")
+
+    swimmer = db.query(Swimmer).filter(Swimmer.id == swimmer_id).first()
+    if not swimmer:
+        raise HTTPException(status_code=404, detail="Swimmer not found")
+
+    if swimmer.group_id != group_id:
+        raise HTTPException(
+            status_code=400, detail="Swimmer is not in this group"
+        )
+
+    # Remove from group and set visibility flags to False
+    swimmer.group_id = None
+    swimmer.show_in_personal_bests = False
+    swimmer.show_in_relay_builder = False
+    swimmer.show_in_comparison = False
+
+    db.commit()
+
+    return {"message": "Swimmer removed from group successfully"}
+
