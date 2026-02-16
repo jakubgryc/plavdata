@@ -18,3 +18,12 @@ export interface UpdateGroupRequest {
   name?: string;
   display_name_cs?: string;
 }
+
+export interface SwimmerInGroup {
+  id: number;
+  name: string;
+  surname: string;
+  birth_year: number;
+  sex: string;
+  membership_end: string | null;
+}

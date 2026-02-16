@@ -1,5 +1,5 @@
-import { authenticatedFetch } from "./authenticatedFetch";
 import { API_BASE_URL } from "../../config";
+import { apiGet, apiPatch } from "./apiHelpers";
 import type {
   PaginatedSwimmersResponse,
   UpdateSwimmerRequest,
@@ -39,15 +39,7 @@ export const swimmersApi = {
       page_size: pageSize.toString(),
     });
 
-    const response = await authenticatedFetch(
-      `${API_BASE_URL}/api/admin/swimmers?${searchParams}`,
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch swimmers");
-    }
-
-    return response.json();
+    return apiGet(`${API_BASE_URL}/api/admin/swimmers?${searchParams}`);
   },
 
   async update(
@@ -55,56 +47,16 @@ export const swimmersApi = {
     data: UpdateSwimmerRequest,
   ): Promise<Swimmer> {
     // Currently not used, will keep it if I decide to implement single swimmer editing (perhaps in the swimmers profile)
-    const response = await authenticatedFetch(
-      `${API_BASE_URL}/api/admin/swimmers/${swimmerId}`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      },
-    );
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.detail || "Failed to update swimmer");
-    }
-
-    return response.json();
+    return apiPatch(`${API_BASE_URL}/api/admin/swimmers/${swimmerId}`, data);
   },
 
   async bulkUpdate(
     data: BulkUpdateSwimmersRequest,
   ): Promise<BulkUpdateSwimmersResponse> {
-    const response = await authenticatedFetch(
-      `${API_BASE_URL}/api/admin/swimmers/bulk`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      },
-    );
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.detail || "Failed to bulk update swimmers");
-    }
-
-    return response.json();
+    return apiPatch(`${API_BASE_URL}/api/admin/swimmers/bulk`, data);
   },
 
   async getGroups(): Promise<Group[]> {
-    const response = await authenticatedFetch(
-      `${API_BASE_URL}/api/admin/groups`,
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch groups");
-    }
-
-    return response.json();
+    return apiGet(`${API_BASE_URL}/api/admin/groups`);
   },
 };
