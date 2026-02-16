@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {
-  Container,
+  Flex,
   Title,
   SimpleGrid,
   Button,
@@ -77,12 +77,12 @@ export function AdminGroupsPage() {
   };
 
   return (
-    <Container size="xl" py="xl">
+    <Flex direction="column" h="100%" w="100%" py="md" pb="xl">
       <Box pos="relative">
         <LoadingOverlay visible={loading} />
 
         <MantineGroup justify="space-between" mb="xl">
-          <Title order={1}>Správa skupin</Title>
+          <Title order={2}>Správa skupin</Title>
           <Button onClick={openCreate}>Přidat skupinu</Button>
         </MantineGroup>
 
@@ -117,6 +117,6 @@ export function AdminGroupsPage() {
           onDelete={handleDelete}
         />
       </Box>
-    </Container>
+    </Flex>
   );
 }

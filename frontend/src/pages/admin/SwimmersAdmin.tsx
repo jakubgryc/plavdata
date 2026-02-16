@@ -104,6 +104,18 @@ export function AdminSwimmersPage() {
     loadSwimmers();
   }, [page]);
 
+  // Compute select options once per groups load/change (avoid per-row map work)
+  const groupOptions = useMemo(
+    () => [
+      { value: "", label: "Bez skupiny" },
+      ...groups.map((g) => ({
+        value: g.id.toString(),
+        label: g.display_name_cs,
+      })),
+    ],
+    [groups],
+  );
+
   // Handle edit for a swimmer field
   const handleEdit = useCallback(
     (swimmerId: number, field: keyof SwimmerEdits, value: unknown) => {
@@ -396,7 +408,7 @@ export function AdminSwimmersPage() {
                     <SwimmerRow
                       key={swimmer.id}
                       swimmer={swimmer}
-                      groups={groups}
+                      groupOptions={groupOptions}
                       edits={editedSwimmers.get(swimmer.id)?.edits}
                       onEdit={handleEdit}
                     />

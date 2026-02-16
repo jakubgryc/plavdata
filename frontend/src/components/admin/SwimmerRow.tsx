@@ -1,19 +1,18 @@
 import { memo, useCallback } from "react";
 import type { ChangeEvent } from "react";
-import { Table, Switch, Select, Badge, Flex } from "@mantine/core";
+import { Table, Switch, Badge, Flex, Select } from "@mantine/core";
 import type { Swimmer, SwimmerEdits } from "../../schema/swimmers";
-import type { Group } from "../../schema/groups";
 
 interface SwimmerRowProps {
   swimmer: Swimmer;
-  groups: Group[];
+  groupOptions: Array<{ value: string; label: string }>;
   edits: SwimmerEdits | undefined;
   onEdit: (swimmerId: number, field: keyof SwimmerEdits, value: any) => void;
 }
 
 export const SwimmerRow = memo(function SwimmerRow({
   swimmer,
-  groups,
+  groupOptions,
   edits,
   onEdit,
 }: SwimmerRowProps) {
@@ -51,15 +50,6 @@ export const SwimmerRow = memo(function SwimmerRow({
     isComparisonEdited ||
     isPersonalBestsEdited ||
     isRelayBuilderEdited;
-
-  // Group select options
-  const groupOptions = [
-    { value: "", label: "Bez skupiny" },
-    ...groups.map((g) => ({
-      value: g.id.toString(),
-      label: g.display_name_cs,
-    })),
-  ];
 
   const handleGroupChange = useCallback(
     (value: string | null) => {

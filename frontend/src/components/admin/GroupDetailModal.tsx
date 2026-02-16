@@ -7,10 +7,22 @@ import {
   Text,
   Badge,
   Divider,
+  Table,
+  ScrollArea,
+  Loader,
+  Center,
+  ActionIcon,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useState } from "react";
-import type { GroupDetail, UpdateGroupRequest } from "../../schema/groups";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
+import { IconTrash } from "@tabler/icons-react";
+import type {
+  GroupDetail,
+  UpdateGroupRequest,
+  SwimmerInGroup,
+} from "../../schema/groups";
+import { groupsApi } from "../../utils/groupsApi";
 
 interface GroupDetailModalProps {
   group: GroupDetail | null;
@@ -27,7 +39,10 @@ export function GroupDetailModal({
   onUpdate,
   onDelete,
 }: GroupDetailModalProps) {
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
+  const [swimmers, setSwimmers] = useState<SwimmerInGroup[]>([]);
+  const [loadingSwimmers, setLoadingSwimmers] = useState(false);
 
   const form = useForm<UpdateGroupRequest>({
     initialValues: {
@@ -77,15 +92,63 @@ export function GroupDetailModal({
     }
   };
 
-  if (!group) return null;
+  const handleRemoveSwimmer = async (
+    swimmerId: number,
+    swimmerName: string,
+  ) => {
+    if (!group) return;
+
+    if (
+      !window.confirm(
+        `Opravdu chcete odebrat plavce "${swimmerName}" ze skupiny? Tímto se také skryjí jeho/její rekordy a štafety.`,
+      )
+    ) {
+      return;
+    }
+
+    try {
+      await groupsApi.removeSwimmerGroup(group.id, swimmerId);
+      // Refresh swimmers list
+      const data = await groupsApi.getSwimmers(group.id);
+      setSwimmers(data);
+    } catch (error) {
+      console.error("Failed to remove swimmer:", error);
+      alert(
+        error instanceof Error ? error.message : "Nepodařilo se odebrat plavce",
+      );
+    }
+  };
+
+  // Fetch swimmers when modal opens or group changes
+  useEffect(() => {
+    const fetchSwimmers = async () => {
+      if (!group || !opened) return;
+
+      setLoadingSwimmers(true);
+      try {
+        const data = await groupsApi.getSwimmers(group.id);
+        setSwimmers(data);
+      } catch (error) {
+        console.error("Failed to load swimmers:", error);
+      } finally {
+        setLoadingSwimmers(false);
+      }
+    };
+
+    fetchSwimmers();
+  }, [group?.id, opened]);
 
   // Reset form when group changes
-  if (group.name !== form.values.name) {
-    form.setValues({
-      name: group.name,
-      display_name_cs: group.display_name_cs,
-    });
-  }
+  useEffect(() => {
+    if (group) {
+      form.setValues({
+        name: group.name,
+        display_name_cs: group.display_name_cs,
+      });
+    }
+  }, [group?.id]);
+
+  if (!group) return null;
 
   return (
     <Modal
@@ -95,7 +158,7 @@ export function GroupDetailModal({
         onClose();
       }}
       title="Detail skupiny"
-      size="md"
+      size="lg"
     >
       {isEditing ? (
         <form onSubmit={form.onSubmit(handleSubmit)}>
@@ -167,6 +230,83 @@ export function GroupDetailModal({
               </Badge>
             </div>
           </MantineGroup>
+
+          <Divider />
+
+          <div>
+            <Text size="sm" c="dimmed" mb="xs">
+              Plavci ve skupině
+            </Text>
+            {loadingSwimmers ? (
+              <Center p="xl">
+                <Loader size="sm" />
+              </Center>
+            ) : swimmers.length === 0 ? (
+              <Text size="sm" c="dimmed" ta="center" py="md">
+                Ve skupině nejsou žádní plavci
+              </Text>
+            ) : (
+              <ScrollArea h={300} type="auto">
+                <Table striped highlightOnHover>
+                  <Table.Thead>
+                    <Table.Tr>
+                      <Table.Th>Jméno</Table.Th>
+                      <Table.Th>Ročník</Table.Th>
+                      <Table.Th>Pohlaví</Table.Th>
+                      <Table.Th>Status</Table.Th>
+                      <Table.Th></Table.Th>
+                    </Table.Tr>
+                  </Table.Thead>
+                  <Table.Tbody>
+                    {swimmers.map((swimmer) => {
+                      const isActive =
+                        !swimmer.membership_end ||
+                        new Date(swimmer.membership_end) >= new Date();
+                      const fullName = `${swimmer.surname} ${swimmer.name}`;
+
+                      return (
+                        <Table.Tr
+                          key={swimmer.id}
+                          style={{ cursor: "pointer" }}
+                          onClick={() => {
+                            navigate(`/swimmer/${swimmer.id}`);
+                            onClose();
+                          }}
+                        >
+                          <Table.Td>{fullName}</Table.Td>
+                          <Table.Td>{swimmer.birth_year}</Table.Td>
+                          <Table.Td>
+                            {swimmer.sex === "male" ? "M" : "Ž"}
+                          </Table.Td>
+                          <Table.Td>
+                            <Badge
+                              size="sm"
+                              color={isActive ? "green" : "gray"}
+                              variant="light"
+                            >
+                              {isActive ? "Aktivní" : "Neaktivní"}
+                            </Badge>
+                          </Table.Td>
+                          <Table.Td>
+                            <ActionIcon
+                              color="red"
+                              variant="subtle"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRemoveSwimmer(swimmer.id, fullName);
+                              }}
+                            >
+                              <IconTrash size={16} />
+                            </ActionIcon>
+                          </Table.Td>
+                        </Table.Tr>
+                      );
+                    })}
+                  </Table.Tbody>
+                </Table>
+              </ScrollArea>
+            )}
+          </div>
 
           <Divider />
 
