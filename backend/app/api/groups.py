@@ -283,9 +283,7 @@ async def remove_swimmer_from_group(
         raise HTTPException(status_code=404, detail="Swimmer not found")
 
     if swimmer.group_id != group_id:
-        raise HTTPException(
-            status_code=400, detail="Swimmer is not in this group"
-        )
+        raise HTTPException(status_code=400, detail="Swimmer is not in this group")
 
     # Remove from group and set visibility flags to False
     swimmer.group_id = None
@@ -296,4 +294,3 @@ async def remove_swimmer_from_group(
     db.commit()
 
     return {"message": "Swimmer removed from group successfully"}
-

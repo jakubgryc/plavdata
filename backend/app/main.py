@@ -4,7 +4,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi.errors import RateLimitExceeded
 
-from app.api import dashboard_stats, personal_bests, swimmers, utils, auth, admin, groups
+from app.api import (
+    dashboard_stats,
+    personal_bests,
+    swimmers,
+    utils,
+    auth,
+    admin,
+    groups,
+)
 from app.api.limiter import custom_rate_limit_handler, limiter
 from app.api.results import results_router
 

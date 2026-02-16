@@ -292,4 +292,3 @@ async def update_swimmer(
             group_display_name = group.display_name_cs
 
     return SwimmerAdminOut.from_swimmer(swimmer, group_display_name)
-
