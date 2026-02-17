@@ -42,7 +42,8 @@ def save_fetched_results(
                 name=swimmer_data.name,
                 surname=swimmer_data.surname,
                 birth_year=swimmer_data.birth_year,
-                group=swimmer_data.group,
+                group=None,
+                group_id=None,
                 sex=swimmer_data.sex,
                 membership_start=datetime.fromisoformat(
                     swimmer_data.membership_start
@@ -54,6 +55,9 @@ def save_fetched_results(
                 ).date()
                 if swimmer_data.membership_end
                 else None,
+                show_in_comparison=False,
+                show_in_personal_bests=False,
+                show_in_relay_builder=False,
             )
             db.add(new_swimmer)
             db.commit()

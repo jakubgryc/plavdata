@@ -17,6 +17,9 @@ import ClubRecords from "./pages/clubRecords";
 import NotFound from "./pages/notFound";
 import Utils from "./pages/utils";
 import SwimmerProfile from "./pages/swimmerProfile";
+import Login from "./pages/login";
+import { AdminSwimmersPage } from "./pages/admin/SwimmersAdmin.tsx";
+import { AdminGroupsPage } from "./pages/admin/groups";
 
 const router = createBrowserRouter([
   {
@@ -46,6 +49,18 @@ const router = createBrowserRouter([
       {
         path: "swimmer/:id",
         element: <SwimmerProfile />,
+      },
+      {
+        path: "admin",
+        element: <Login />,
+      },
+      {
+        path: "admin/swimmers",
+        element: <AdminSwimmersPage />,
+      },
+      {
+        path: "admin/groups",
+        element: <AdminGroupsPage />,
       },
       {
         path: "*",
