@@ -56,15 +56,14 @@ export function AdminSwimmersPage() {
   const [confirmOpened, { open: openConfirm, close: closeConfirm }] =
     useDisclosure(false);
 
-  // Check auth on mount
+  // Check auth on mount and prevent fetching if not authenticated
   useEffect(() => {
     if (!authApi.isAuthenticated()) {
       navigate("/admin");
+      return;
     }
-  }, [navigate]);
 
-  // Load groups once
-  useEffect(() => {
+    // Load groups once if authenticated
     const loadGroups = async () => {
       try {
         const data = await swimmersApi.getGroups();
@@ -79,10 +78,14 @@ export function AdminSwimmersPage() {
       }
     };
     loadGroups();
-  }, []);
+  }, [navigate]);
 
-  // Load swimmers when page changes
+  // Load swimmers when page changes, only if authenticated
   useEffect(() => {
+    if (!authApi.isAuthenticated()) {
+      return;
+    }
+
     const loadSwimmers = async () => {
       try {
         setLoading(true);
@@ -102,7 +105,7 @@ export function AdminSwimmersPage() {
       }
     };
     loadSwimmers();
-  }, [page]);
+  }, [page, navigate]);
 
   // Compute select options once per groups load/change (avoid per-row map work)
   const groupOptions = useMemo(

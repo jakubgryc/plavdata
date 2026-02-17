@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 import {
   Flex,
   Title,
@@ -14,9 +15,12 @@ import { GroupCard } from "../../components/admin/GroupCard";
 import { CreateGroupModal } from "../../components/admin/CreateGroupModal";
 import { GroupDetailModal } from "../../components/admin/GroupDetailModal";
 import { groupsApi } from "../../utils/groupsApi";
+import { authApi } from "../../utils/auth";
 import type { Group, GroupDetail } from "../../schema/groups";
 
 export function AdminGroupsPage() {
+  const navigate = useNavigate();
+
   const [groups, setGroups] = useState<Group[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<GroupDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -38,8 +42,11 @@ export function AdminGroupsPage() {
   };
 
   useEffect(() => {
+    if (!authApi.isAuthenticated()) {
+      navigate("/admin");
+    }
     loadGroups();
-  }, []);
+  }, [navigate]);
 
   const handleGroupClick = async (group: Group) => {
     try {
