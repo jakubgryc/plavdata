@@ -3,7 +3,7 @@ ifneq (,$(wildcard .env))
     export
 endif
 
-.PHONY: help dev down setup init-db sync-competition-tags sync-competitions sync-personal-bests sync-results
+.PHONY: help dev down setup init-db sync-competition-tags sync-competitions sync-personal-bests sync-results prod-up prod-down
 
 help:
 	@echo ""
@@ -47,6 +47,14 @@ dev:
 
 down:
 	docker compose down
+
+# ── Production stack ───────────────────────────────────────────────────────
+
+prod-up:
+	docker compose -f docker-compose.prod.yml --env-file .env.prod up --build -d
+
+prod-down:
+	docker compose -f docker-compose.prod.yml down
 
 # ── Ongoing sync tasks ───────────────────────────────────────────────────────
 sync-personal-bests:
