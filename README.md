@@ -1,9 +1,10 @@
 # Plavdata
 
+> ⚠️ **Work in progress** — this project is still heavily under development.
+
+🌐 [**Live demo**](https://data.jakubgryc.cz)
+
 Plavdata is a web app for analyzing swimming results for a single club using data from the Czech Swimming Association. It includes a public landing page with club statistics, personal bests, club records, relay building tools, and detailed swimmer profiles. You can also compare up to 8 swimmers on absolute or relative time axes to highlight performance across age gaps.
-
-
-### Main page
 
 ![Main page](docs/images/main-page.png)
 
