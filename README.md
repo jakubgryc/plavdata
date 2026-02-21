@@ -80,6 +80,38 @@ make dev
 
 The backend runs on `http://localhost:8000` and the frontend on `http://localhost:3000`.
 
+## Syncing results
+
+After the initial setup, you need to fetch swimmer results from CSPS and run several post-processing steps to populate personal bests, club records, and improvement data.
+
+### Full sync (recommended)
+
+Runs all steps in the correct order:
+
+```bash
+make sync
+```
+
+Optionally limit the date range:
+
+```bash
+make sync AFTER=2024-01-01 BEFORE=2024-12-31
+```
+
+### Individual steps
+
+If you need to re-run only part of the pipeline:
+
+| Command | What it does |
+|---|---|
+| `make sync-results` | Fetch raw results from CSPS |
+| `make link-results` | Match results to their competition records |
+| `make calculate-improvements` | Compute improvement flags per swimmer |
+| `make update-personal-bests` | Recompute personal bests from results |
+| `make update-club-records` | Recompute club records from results |
+
+> **Note:** All sync commands run locally via `uv` and do not require the app to be running.
+
 ## Configuration
 
 Key environment variables (see `.env` and `.env.prod.example`):
