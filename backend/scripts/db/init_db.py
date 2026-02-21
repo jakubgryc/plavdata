@@ -6,6 +6,7 @@ from pathlib import Path
 from sqlalchemy.orm import Session
 
 from app.db import SessionLocal, engine, Base
+from app.db.scripts.sync_competitions import 
 from app.constants import STROKE_TITLES, STROKE_CODES, DISTANCES
 from app.models import Swimmer, Discipline, Course, ApiSync, AgeCategory
 from scripts.config import DATA_DIR
@@ -74,6 +75,7 @@ def init_static_tables(db: Session):
 
 
 def init_swimmers(db: Session, swimmers_file: Path):
+    ## Deprecated, used to init swimmers from JSON file
     with open(swimmers_file) as f:
         swimmers = json.load(f)
 
@@ -102,7 +104,7 @@ def init_db(swimmers_file: Path, drop_all: bool):
     if drop_all:
         Base.metadata.drop_all(bind=engine)
 
-        Base.metadata.create_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
 
     db: Session = SessionLocal()
 
@@ -110,7 +112,7 @@ def init_db(swimmers_file: Path, drop_all: bool):
     init_static_tables(db)
 
     # Initialize swimmers
-    init_swimmers(db, swimmers_file)
+    # init_swimmers(db, swimmers_file)
 
     db.commit()
     db.close()
