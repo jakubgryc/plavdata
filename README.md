@@ -1,5 +1,7 @@
 # Plavdata
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 > ⚠️ **Work in progress** — this project is still heavily under development.
 
 🌐 [**Live demo**](https://data.jakubgryc.cz)
