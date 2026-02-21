@@ -20,9 +20,7 @@ app = FastAPI()
 
 TARGET_CLUB = os.getenv("TARGET_CLUB")
 if not TARGET_CLUB:
-    raise RuntimeError(
-        "TARGET_CLUB is not set. Define it in .env to start the API."
-    )
+    raise RuntimeError("TARGET_CLUB is not set. Define it in .env to start the API.")
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, custom_rate_limit_handler)

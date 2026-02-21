@@ -6,7 +6,6 @@ from pathlib import Path
 from sqlalchemy.orm import Session
 
 from app.db import SessionLocal, engine, Base
-from app.db.scripts.sync_competitions import 
 from app.constants import STROKE_TITLES, STROKE_CODES, DISTANCES
 from app.models import Swimmer, Discipline, Course, ApiSync, AgeCategory
 from scripts.config import DATA_DIR
