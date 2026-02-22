@@ -27,16 +27,6 @@ See [more examples](docs/screenshots.md).
 - Charts: Recharts.
 - Deployment: Docker + Nginx (see `docker-compose*.yml`).
 
-## Project structure
-
-```
-plavdata/
-  backend/       FastAPI service, SQLite database, data scripts
-  frontend/      React UI (Mantine)
-  nginx/         Reverse proxy config
-  docker-compose.yml
-  docker-compose.prod.yml
-```
 
 ## Getting started (dev)
 
@@ -59,7 +49,7 @@ At minimum you must set:
 - `DATABASE_URL` — path to the SQLite file (default: `sqlite:////app/data/plavdata.db`)
 - `VITE_API_BASE_URL` — backend API base URL (e.g. `http://localhost:8000`)
 
-### 2. One-time database initialisation
+### 2. One-time database initialization
 
 This creates the SQLite file and tables, then fetches competition metadata from CSPS. **No running app needed** — it runs directly via `uv`:
 

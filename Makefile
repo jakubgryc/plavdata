@@ -8,7 +8,7 @@ endif
 help:
 	@echo ""
 	@echo "Usage:"
-	@echo "  make setup                  One-time initialisation: create DB tables + sync competitions"
+	@echo "  make setup                  One-time initialization: create DB tables + sync competitions"
 	@echo "  make dev                    Start the full stack in development mode"
 	@echo "  make down                   Stop and remove containers"
 	@echo ""
@@ -36,7 +36,7 @@ setup: init-db sync-competition-tags sync-competitions
 	@echo "✓ Setup complete. You can now run: make dev"
 
 init-db:
-	@echo ">>> Initialising database schema..."
+	@echo ">>> Initializing database schema..."
 	cd backend && uv run python -m scripts.db.init_db
 
 sync-competition-tags:
