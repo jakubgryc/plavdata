@@ -49,6 +49,7 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - ENV=production
       - CORS_ORIGINS=${CORS_ORIGINS:-}
+      - TARGET_CLUB=${TARGET_CLUB}
     restart: unless-stopped
 
   frontend:

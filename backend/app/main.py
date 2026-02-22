@@ -13,10 +13,14 @@ from app.api import (
     admin,
     groups,
 )
+from app.constants import TARGET_CLUB
 from app.api.limiter import custom_rate_limit_handler, limiter
 from app.api.results import results_router
 
 app = FastAPI()
+
+if not TARGET_CLUB:
+    raise RuntimeError("TARGET_CLUB is not set. Define it in .env to start the API.")
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, custom_rate_limit_handler)

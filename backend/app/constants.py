@@ -1,3 +1,7 @@
+import os
+
+
+TARGET_CLUB = os.getenv("TARGET_CLUB")
 STROKE_TITLES = ["Volný způsob", "Znak", "Prsa", "Motýlek", "Polohový závod"]
 STROKE_CODES = ["K", "Z", "P", "M", "O"]
 DISTANCES = [50, 100, 200, 400, 800, 1500]
