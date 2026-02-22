@@ -13,12 +13,12 @@ from app.api import (
     admin,
     groups,
 )
+from app.constants import TARGET_CLUB
 from app.api.limiter import custom_rate_limit_handler, limiter
 from app.api.results import results_router
 
 app = FastAPI()
 
-TARGET_CLUB = os.getenv("TARGET_CLUB")
 if not TARGET_CLUB:
     raise RuntimeError("TARGET_CLUB is not set. Define it in .env to start the API.")
 

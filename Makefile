@@ -50,7 +50,7 @@ sync-competitions:
 # ── Development stack ────────────────────────────────────────────────────────
 
 dev:
-	docker compose up --build
+	docker compose up --watch
 
 down:
 	docker compose down
