@@ -24,7 +24,6 @@ def _fetch_competition_rows(db: Session, competition_id: int):
         .join(Swimmer, Result.swimmer_id == Swimmer.id)
         .join(Discipline, Result.discipline_id == Discipline.id)
         .filter(Result.competition_id == competition_id)
-        .filter(Swimmer.group.isnot(None))
         .filter(Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS))
         .filter(Result.split_time.is_(False) | Result.relay_part.is_(True))
         .order_by(Swimmer.surname, Swimmer.name, Discipline.code)
