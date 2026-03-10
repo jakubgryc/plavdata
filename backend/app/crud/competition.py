@@ -118,7 +118,6 @@ def get_competition_detail(db: Session, competition_id: int) -> dict | None:
             "location": competition.location,
             "poolLength": competition.pool_length,
             "stopwatchType": competition.stopwatch_type,
-            "resultsFileName": competition.results_file_name,
             "cspsCompetitionId": competition.csps_competition_id,
         },
         "swimmers": swimmers,

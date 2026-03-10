@@ -25,7 +25,6 @@ class CompetitionInfoOut(BaseModel):
     location: Optional[str]
     pool_length: Optional[int]
     stopwatch_type: Optional[str]
-    results_file_name: Optional[str]
     csps_competition_id: int
 
     class Config:

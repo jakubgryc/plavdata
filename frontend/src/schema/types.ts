@@ -232,7 +232,6 @@ export interface CompetitionInfo {
   location: string | null;
   poolLength: number | null;
   stopwatchType: string | null;
-  resultsFileName: string | null;
   cspsCompetitionId: number;
 }
 
