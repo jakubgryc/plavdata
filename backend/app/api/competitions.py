@@ -17,6 +17,7 @@ competitions_router = APIRouter(
 
 # ── Pydantic response schemas ──────────────────────────────────────────────────
 
+
 class CompetitionInfoOut(BaseModel):
     id: int
     title: str
@@ -87,13 +88,16 @@ class CompetitionListItemOut(BaseModel):
 
 # ── Endpoints ──────────────────────────────────────────────────────────────────
 
+
 @competitions_router.get(
     "",
     summary="List competitions with club swimmer results for a given year",
     response_model=List[CompetitionListItemOut],
 )
 async def get_competitions(
-    year: int = Query(default=None, description="Filter by year (defaults to current year)"),
+    year: int = Query(
+        default=None, description="Filter by year (defaults to current year)"
+    ),
     db: Session = Depends(get_db),
 ):
     """Return competitions for the given year where club swimmers have results, ordered newest first."""
@@ -119,9 +123,3 @@ async def get_competition(
             detail="Competition not found or no club swimmers participated",
         )
     return data
-
-
-
-
-
-

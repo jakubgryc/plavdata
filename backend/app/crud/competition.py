@@ -93,7 +93,12 @@ def _build_swimmers_data(rows, club_record_ids: set[int]) -> tuple[list, int, in
         if row.result_id in club_record_ids:
             club_records_count += 1
 
-    return list(swimmers_dict.values()), total_starts, total_personal_bests, club_records_count
+    return (
+        list(swimmers_dict.values()),
+        total_starts,
+        total_personal_bests,
+        club_records_count,
+    )
 
 
 def get_competition_detail(db: Session, competition_id: int) -> dict | None:
@@ -106,14 +111,20 @@ def get_competition_detail(db: Session, competition_id: int) -> dict | None:
         return None
 
     club_record_ids = _fetch_club_record_ids(db, [row.result_id for row in rows])
-    swimmers, total_starts, total_personal_bests, club_records_count = _build_swimmers_data(rows, club_record_ids)
+    swimmers, total_starts, total_personal_bests, club_records_count = (
+        _build_swimmers_data(rows, club_record_ids)
+    )
 
     return {
         "competition": {
             "id": competition.id,
             "title": competition.title,
-            "startDate": competition.start_date.isoformat() if competition.start_date else None,
-            "endDate": competition.end_date.isoformat() if competition.end_date else None,
+            "startDate": competition.start_date.isoformat()
+            if competition.start_date
+            else None,
+            "endDate": competition.end_date.isoformat()
+            if competition.end_date
+            else None,
             "location": competition.location,
             "poolLength": competition.pool_length,
             "cspsCompetitionId": competition.csps_competition_id,
@@ -160,8 +171,3 @@ def list_competitions(db: Session, year: int) -> list:
         }
         for comp in competitions
     ]
-
-
-
-
-
