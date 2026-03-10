@@ -201,11 +201,17 @@ function CompetitionSwimmersTable({swimmers}: CompetitionSwimmersTableProps) {
                                                                 <Table.Tr key={idx}>
                                                                     <Table.Td>
                                                                         <Group gap="xs">
-                                                                            <Text>{result.discipline}</Text>
+                                                                            <Text>{result.disciplineCode}</Text>
                                                                             {result.relayPart && (
                                                                                 <Badge size="xs" color="grape"
                                                                                        variant="outline">
                                                                                     štafeta
+                                                                                </Badge>
+                                                                            )}
+                                                                            {result.clubRecord && (
+                                                                                <Badge size="xs" color="orange"
+                                                                                       variant="outline">
+                                                                                    Rekord
                                                                                 </Badge>
                                                                             )}
                                                                         </Group>
