@@ -13,6 +13,8 @@ import { AdminGroupsPage } from "./pages/admin/groups";
 import { AdminSwimmersPage } from "./pages/admin/SwimmersAdmin.tsx";
 import ClubRecords from "./pages/clubRecords";
 import CompareSwimmers from "./pages/compareSwimmers";
+import CompetitionDetail from "./pages/competitionDetail";
+import Competitions from "./pages/competitions";
 import Home from "./pages/home";
 import Login from "./pages/login";
 import NotFound from "./pages/notFound";
@@ -22,52 +24,60 @@ import Utils from "./pages/utils";
 import { theme } from "./theme";
 
 const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App />,
-    children: [
-      {
-        index: true,
-        element: <Home />,
-      },
-      {
-        path: "compare-swimmers",
-        element: <CompareSwimmers />,
-      },
-      {
-        path: "personal-bests",
-        element: <PersonalBests />,
-      },
-      {
-        path: "club-records",
-        element: <ClubRecords />,
-      },
-      {
-        path: "utils",
-        element: <Utils />,
-      },
-      {
-        path: "swimmer/:id",
-        element: <SwimmerProfile />,
-      },
-      {
-        path: "admin",
-        element: <Login />,
-      },
-      {
-        path: "admin/swimmers",
-        element: <AdminSwimmersPage />,
-      },
-      {
-        path: "admin/groups",
-        element: <AdminGroupsPage />,
-      },
-      {
-        path: "*",
-        element: <NotFound />,
-      },
-    ],
-  },
+    {
+        path: "/",
+        element: <App />,
+        children: [
+            {
+                index: true,
+                element: <Home />,
+            },
+            {
+                path: "compare-swimmers",
+                element: <CompareSwimmers />,
+            },
+            {
+                path: "personal-bests",
+                element: <PersonalBests />,
+            },
+            {
+                path: "club-records",
+                element: <ClubRecords />,
+            },
+            {
+                path: "utils",
+                element: <Utils />,
+            },
+            {
+                path: "swimmer/:id",
+                element: <SwimmerProfile />,
+            },
+            {
+                path: "competitions",
+                element: <Competitions />,
+            },
+            {
+                path: "competitions/:id",
+                element: <CompetitionDetail />,
+            },
+            {
+                path: "admin",
+                element: <Login />,
+            },
+            {
+                path: "admin/swimmers",
+                element: <AdminSwimmersPage />,
+            },
+            {
+                path: "admin/groups",
+                element: <AdminGroupsPage />,
+            },
+            {
+                path: "*",
+                element: <NotFound />,
+            },
+        ],
+    },
 ]);
 const root = document.getElementById("root");
 
