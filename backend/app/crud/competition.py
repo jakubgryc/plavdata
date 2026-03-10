@@ -117,7 +117,6 @@ def get_competition_detail(db: Session, competition_id: int) -> dict | None:
             "endDate": competition.end_date.isoformat() if competition.end_date else None,
             "location": competition.location,
             "poolLength": competition.pool_length,
-            "stopwatchType": competition.stopwatch_type,
             "cspsCompetitionId": competition.csps_competition_id,
         },
         "swimmers": swimmers,

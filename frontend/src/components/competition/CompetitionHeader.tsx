@@ -7,7 +7,6 @@ import {
   Button,
   Grid,
   ThemeIcon,
-  Badge,
   useMantineColorScheme,
 } from "@mantine/core";
 import {
@@ -119,11 +118,6 @@ function CompetitionHeader({
                 Bazén: {competition.poolLength}m
               </Text>
             </Group>
-          )}
-          {competition.stopwatchType && (
-            <Badge variant="light" color="gray" size="sm">
-              {competition.stopwatchType}
-            </Badge>
           )}
         </Group>
 
