@@ -1,5 +1,6 @@
 import {
   ActionIcon,
+  Badge,
   Collapse,
   Group,
   Pagination,
@@ -14,6 +15,8 @@ import { IconCalendarMonth, IconChevronDown, IconChevronUp } from "@tabler/icons
 import { useState } from "react";
 import type { SwimmerCompetition } from "../../schema/types";
 import { parseTimeFromMillis } from "../../utils/timeUtils";
+import { DNF_THRESHOLD } from "../../utils/constants";
+import { getImprovementBadge } from "../shared/ImprovementBadge";
 
 interface CompetitionsTableProps {
   competitions: SwimmerCompetition[];
@@ -155,23 +158,24 @@ function CompetitionsTable({ competitions }: CompetitionsTableProps) {
                             </Table.Thead>
                             <Table.Tbody>
                               {comp.results.map((result) => {
-                                const performancePercent = (result.performance * 100).toFixed(2);
-                                const isImprovement = result.improvement;
-                                const performanceColor = isImprovement ? "green" : "red";
-
                                 return (
                                   <Table.Tr key={`${result.code}-${result.time}`}>
                                     <Table.Td>
                                       <Text size="sm">{result.discipline}</Text>
                                     </Table.Td>
                                     <Table.Td ff="monospace">
-                                      {parseTimeFromMillis(result.time)}
+                                      {result.time >= DNF_THRESHOLD ? (
+                                        <Badge color="gray" variant="light" size="sm">DNF</Badge>
+                                      ) : (
+                                        parseTimeFromMillis(result.time)
+                                      )}
                                     </Table.Td>
                                     <Table.Td>
-                                      <Text size="sm" fw={500} c={performanceColor}>
-                                        {isImprovement ? "+" : "-"}
-                                        {performancePercent}%
-                                      </Text>
+                                      {result.time >= DNF_THRESHOLD ? (
+                                        <Badge color="gray" variant="light" size="sm">–</Badge>
+                                      ) : (
+                                        getImprovementBadge(result)
+                                      )}
                                     </Table.Td>
                                     <Table.Td>
                                       {result.points ? (

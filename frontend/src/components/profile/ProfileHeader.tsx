@@ -75,7 +75,7 @@ function ProfileHeader({ basicInfo, stats }: ProfileHeaderProps) {
           <Group gap="sm">
             <Title
               order={1}
-              className="profile-header-title"
+              className="card-header-title"
             >{`${basicInfo.name} ${basicInfo.surname}`}</Title>
           </Group>
           {basicInfo.cspsId && (
