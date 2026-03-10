@@ -13,7 +13,7 @@ function Competitions() {
   const yearParam = parseInt(searchParams.get("year") ?? "");
   const selectedYear = isNaN(yearParam) ? MAX_YEAR : yearParam;
 
-  const [cache, setCache] = useState<Record<number, CompetitionListItem[]>>({});
+  const [competitions, setCompetitions] = useState<CompetitionListItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
@@ -22,20 +22,17 @@ function Competitions() {
     setSearchParams({ year: String(year) });
   };
 
-  // Fetch whenever selectedYear changes and it's not cached
   useEffect(() => {
-    const fetchYear = async (year: number) => {
-      if (cache[year]) return;
+    const fetchYear = async () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`${API_BASE_URL}/api/competitions?year=${year}`);
+        const res = await fetch(`${API_BASE_URL}/api/competitions?year=${selectedYear}`);
         if (!res.ok) {
           setError("Nepodařilo se načíst závody");
           return;
         }
-        const data: CompetitionListItem[] = await res.json();
-        setCache((prev) => ({ ...prev, [year]: data }));
+        setCompetitions(await res.json());
       } catch (err) {
         console.error(err);
         setError("Nepodařilo se načíst závody");
@@ -43,10 +40,10 @@ function Competitions() {
         setLoading(false);
       }
     };
-    fetchYear(selectedYear);
+    fetchYear();
   }, [selectedYear]);
 
-  const competitions = (cache[selectedYear] ?? []).filter(
+  const filtered = competitions.filter(
     (c) =>
       c.title.toLowerCase().includes(search.toLowerCase()) ||
       (c.location ?? "").toLowerCase().includes(search.toLowerCase()),
@@ -68,7 +65,7 @@ function Competitions() {
           <Text c="red">{error}</Text>
         </Center>
       ) : (
-        <CompetitionList competitions={competitions} loading={loading} />
+        <CompetitionList competitions={filtered} loading={loading} />
       )}
     </Flex>
   );
