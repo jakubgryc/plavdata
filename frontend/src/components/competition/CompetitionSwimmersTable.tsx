@@ -81,7 +81,11 @@ function CompetitionSwimmersTable({
           <Stack gap={0}>
             <Title order={3}>Výsledky plavců</Title>
             <Text size="xs" c="dimmed">
-              {swimmers.length} plavců
+              {swimmers.length === 1
+                ? "1 plavec"
+                : swimmers.length >= 2 && swimmers.length <= 4
+                  ? `${swimmers.length} plavci`
+                  : `${swimmers.length} plavců`}
             </Text>
           </Stack>
         </Group>
