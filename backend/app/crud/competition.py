@@ -62,6 +62,7 @@ def _build_result_entry(row, club_records_ids: set[int]) -> dict:
         "time": row.time,
         "points": row.points,
         "improvement": bool(row.improvement),
+        "comparisonToBest": row.comparison_to_best,
         "performance": performance,
         "relayPart": bool(row.relay_part),
         "clubRecord": row.result_id in club_records_ids,

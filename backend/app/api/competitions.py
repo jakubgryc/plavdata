@@ -38,6 +38,7 @@ class CompetitionResultDetailOut(BaseModel):
     time: int
     points: Optional[int]
     improvement: bool
+    comparison_to_best: int
     performance: float
     relay_part: bool
     club_record: bool
