@@ -35,5 +35,5 @@ services:
 
 networks:
   proxy-net:
-    external:
-      name: ${PROXY_NETWORK}
+    external: true
+    name: ${PROXY_NETWORK}
