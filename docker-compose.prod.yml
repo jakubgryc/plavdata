@@ -19,6 +19,7 @@ services:
       - ENV=production
       - CORS_ORIGINS=${CORS_ORIGINS:-}
       - TARGET_CLUB=${TARGET_CLUB}
+      - SECRET_KEY=${SECRET_KEY}
     restart: unless-stopped
 
   frontend:
