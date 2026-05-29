@@ -19,7 +19,7 @@ from app.api.schemas import (
     BestTimeResultOut,
 )
 
-results_router = APIRouter(
+router = APIRouter(
     prefix="/results",
     tags=["results"],
 )
@@ -65,7 +65,7 @@ class ClubRecordOut(BaseModel):
         populate_by_name = True
 
 
-@results_router.post(
+@router.post(
     "/compare",
     summary="Get results for given swimmers grouped by swimmer",
     response_model=List[SwimmerResultOut],
@@ -147,7 +147,7 @@ async def get_results(
     return swimmer_results
 
 
-@results_router.post(
+@router.post(
     "/best-times",
     summary="Get best times for given discipline",
     response_model=List[BestTimeResultOut],
@@ -196,7 +196,7 @@ async def best_times(
     return best_times_out
 
 
-@results_router.get(
+@router.get(
     "/club-records",
     summary="Get all club records for a given course",
     response_model=List[ClubRecordOut],
