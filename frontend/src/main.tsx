@@ -72,8 +72,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ColorSchemeScript defaultColorScheme="light" />
-    <MantineProvider theme={theme} defaultColorScheme="light">
+    <ColorSchemeScript defaultColorScheme="dark" />
+    <MantineProvider theme={theme} defaultColorScheme="dark">
       <Notifications position="top-right" zIndex={1000} />
       <RouterProvider router={router} />
     </MantineProvider>
