@@ -20,6 +20,8 @@ services:
       - CORS_ORIGINS=${CORS_ORIGINS:-}
       - TARGET_CLUB=${TARGET_CLUB}
       - SECRET_KEY=${SECRET_KEY}
+      - LOKI_ENABLED=${LOKI_ENABLED:-false}
+      - LOKI_URL=${LOKI_URL:-}
     restart: unless-stopped
 
   frontend:
