@@ -1,19 +1,19 @@
-import { useState } from "react";
 import {
-  Card,
-  Stack,
-  Group,
   Box,
-  Skeleton,
   Button,
+  Card,
   Collapse,
   Grid,
-  useMantineTheme,
+  Group,
+  Skeleton,
+  Stack,
   useMantineColorScheme,
+  useMantineTheme,
 } from "@mantine/core";
 import { IconChevronDown, IconChevronUp } from "@tabler/icons-react";
-import { FastestRelayCard } from "./FastestRelayCard.tsx";
+import { useState } from "react";
 import type { RelayResult } from "../schema/types";
+import { FastestRelayCard } from "./FastestRelayCard.tsx";
 
 interface FastestRelayResultsProps {
   results: RelayResult[];
@@ -21,11 +21,7 @@ interface FastestRelayResultsProps {
   isLoading: boolean;
 }
 
-export function FastestRelayResults({
-  results,
-  relayType,
-  isLoading,
-}: FastestRelayResultsProps) {
+export function FastestRelayResults({ results, relayType, isLoading }: FastestRelayResultsProps) {
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
   const [showAdditionalRelays, setShowAdditionalRelays] = useState(false);
@@ -46,10 +42,7 @@ export function FastestRelayResults({
           p="lg"
           style={{
             borderBottom: `1px solid ${colorScheme === "dark" ? theme.colors.dark[4] : theme.colors.gray[3]}`,
-            backgroundColor:
-              colorScheme === "dark"
-                ? theme.colors.dark[6]
-                : theme.colors.gray[0],
+            backgroundColor: colorScheme === "dark" ? theme.colors.dark[6] : theme.colors.gray[0],
           }}
         >
           <Skeleton height={24} width="60%" mb="xs" />
@@ -89,11 +82,7 @@ export function FastestRelayResults({
             variant="subtle"
             onClick={() => setShowAdditionalRelays(!showAdditionalRelays)}
             rightSection={
-              showAdditionalRelays ? (
-                <IconChevronUp size={16} />
-              ) : (
-                <IconChevronDown size={16} />
-              )
+              showAdditionalRelays ? <IconChevronUp size={16} /> : <IconChevronDown size={16} />
             }
             size="sm"
           >

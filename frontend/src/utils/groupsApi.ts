@@ -1,12 +1,12 @@
 import { API_BASE_URL } from "../../config";
-import { apiGet, apiPost, apiPatch, apiDelete } from "./apiHelpers";
 import type {
+  CreateGroupRequest,
   Group,
   GroupDetail,
-  CreateGroupRequest,
-  UpdateGroupRequest,
   SwimmerInGroup,
+  UpdateGroupRequest,
 } from "../schema/groups";
+import { apiDelete, apiGet, apiPatch, apiPost } from "./apiHelpers";
 
 export const groupsApi = {
   async getAll(): Promise<Group[]> {
@@ -34,8 +34,6 @@ export const groupsApi = {
   },
 
   async removeSwimmerGroup(groupId: number, swimmerId: number): Promise<void> {
-    return apiDelete(
-      `${API_BASE_URL}/api/admin/groups/${groupId}/swimmers/${swimmerId}`,
-    );
+    return apiDelete(`${API_BASE_URL}/api/admin/groups/${groupId}/swimmers/${swimmerId}`);
   },
 };

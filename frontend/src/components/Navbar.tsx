@@ -1,24 +1,18 @@
-import { NavLink } from "react-router";
-import { useState } from "react";
 import {
+  ActionIcon,
   Burger,
+  Button,
   Drawer,
   Flex,
-  Text,
-  ActionIcon,
-  useComputedColorScheme,
-  Button,
   Menu,
+  Text,
+  useComputedColorScheme,
 } from "@mantine/core";
-import {
-  IconSun,
-  IconMoon,
-  IconUser,
-  IconLogout,
-  IconClock,
-} from "@tabler/icons-react";
+import { IconClock, IconLogout, IconMoon, IconSun, IconUser } from "@tabler/icons-react";
+import { useState } from "react";
+import { NavLink } from "react-router";
+import { formatTimeRemaining, useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
-import { useAuth, formatTimeRemaining } from "../hooks/useAuth";
 import SwimmerSearch from "./SwimmerSearch";
 
 type LinkState = { isActive: boolean };
@@ -37,9 +31,7 @@ const Navbar = () => {
     fontWeight: isActive ? 600 : 500,
     margin: "0 8px",
     fontSize: "14px",
-    color: isActive
-      ? "var(--mantine-color-blue-5)"
-      : "var(--mantine-color-text)",
+    color: isActive ? "var(--mantine-color-blue-5)" : "var(--mantine-color-text)",
     textDecoration: "none",
     whiteSpace: "nowrap" as const,
   });
@@ -49,32 +41,16 @@ const Navbar = () => {
       <NavLink to="/" style={navLinkStyle} onClick={() => setOpened(false)}>
         Úvod
       </NavLink>
-      <NavLink
-        to="/compare-swimmers"
-        style={navLinkStyle}
-        onClick={() => setOpened(false)}
-      >
+      <NavLink to="/compare-swimmers" style={navLinkStyle} onClick={() => setOpened(false)}>
         Porovnání plavců
       </NavLink>
-      <NavLink
-        to="/personal-bests"
-        style={navLinkStyle}
-        onClick={() => setOpened(false)}
-      >
+      <NavLink to="/personal-bests" style={navLinkStyle} onClick={() => setOpened(false)}>
         Osobní rekordy
       </NavLink>
-      <NavLink
-        to="/club-records"
-        style={navLinkStyle}
-        onClick={() => setOpened(false)}
-      >
+      <NavLink to="/club-records" style={navLinkStyle} onClick={() => setOpened(false)}>
         Klubové rekordy
       </NavLink>
-      <NavLink
-        to="/utils"
-        style={navLinkStyle}
-        onClick={() => setOpened(false)}
-      >
+      <NavLink to="/utils" style={navLinkStyle} onClick={() => setOpened(false)}>
         Nástroje
       </NavLink>
     </>
@@ -97,11 +73,7 @@ const Navbar = () => {
       }}
     >
       <Flex align="center" gap="xs">
-        <img
-          src="/swimmer-solid.svg"
-          alt="logo"
-          className="h-7 w-7 md:h-8 md:w-8"
-        />
+        <img src="/swimmer-solid.svg" alt="logo" className="h-7 w-7 md:h-8 md:w-8" />
         <NavLink to="/" style={{ textDecoration: "none" }}>
           <Text size="sm" fw={600} c="var(--mantine-color-text)">
             Plavdata
@@ -122,21 +94,13 @@ const Navbar = () => {
           {isAuthenticated && username && (
             <Menu shadow="md" width={220} position="bottom-end">
               <Menu.Target>
-                <Button
-                  variant="subtle"
-                  leftSection={<IconUser size={14} />}
-                  size="xs"
-                  px="xs"
-                >
+                <Button variant="subtle" leftSection={<IconUser size={14} />} size="xs" px="xs">
                   <Flex direction="column" align="flex-start" gap={0}>
                     <Text size="xs" fw={500}>
                       {username}
                     </Text>
                     <Text size="xs" c="dimmed">
-                      <IconClock
-                        size={10}
-                        style={{ display: "inline", marginRight: 4 }}
-                      />
+                      <IconClock size={10} style={{ display: "inline", marginRight: 4 }} />
                       {formatTimeRemaining(timeRemaining)}
                     </Text>
                   </Flex>
@@ -160,11 +124,7 @@ const Navbar = () => {
                   Správa skupin
                 </Menu.Item>
                 <Menu.Divider />
-                <Menu.Item
-                  color="red"
-                  leftSection={<IconLogout size={14} />}
-                  onClick={logout}
-                >
+                <Menu.Item color="red" leftSection={<IconLogout size={14} />} onClick={logout}>
                   Odhlásit se
                 </Menu.Item>
               </Menu.Dropdown>
@@ -179,18 +139,9 @@ const Navbar = () => {
           aria-label="Toggle color scheme"
           visibleFrom="sm"
         >
-          {computedColorScheme === "dark" ? (
-            <IconSun size={18} />
-          ) : (
-            <IconMoon size={18} />
-          )}
+          {computedColorScheme === "dark" ? <IconSun size={18} /> : <IconMoon size={18} />}
         </ActionIcon>
-        <Burger
-          opened={opened}
-          onClick={() => setOpened(!opened)}
-          hiddenFrom="md"
-          size="sm"
-        />
+        <Burger opened={opened} onClick={() => setOpened(!opened)} hiddenFrom="md" size="sm" />
       </Flex>
 
       <Drawer
@@ -205,72 +156,63 @@ const Navbar = () => {
           {navLinks}
 
           {isAuthenticated && username && (
-            <>
-              <Menu shadow="md" position="bottom" withinPortal={false}>
-                <Menu.Target>
-                  <Button
-                    variant="light"
-                    leftSection={<IconUser size={16} />}
-                    fullWidth
-                    size="sm"
-                    style={{ justifyContent: "flex-start" }}
-                  >
-                    <Flex direction="column" align="flex-start" gap={0}>
-                      <Text size="sm" fw={500}>
-                        {username}
-                      </Text>
-                      <Text size="xs" c="dimmed">
-                        <IconClock
-                          size={10}
-                          style={{ display: "inline", marginRight: 4 }}
-                        />
-                        {formatTimeRemaining(timeRemaining)}
-                      </Text>
-                    </Flex>
-                  </Button>
-                </Menu.Target>
+            <Menu shadow="md" position="bottom" withinPortal={false}>
+              <Menu.Target>
+                <Button
+                  variant="light"
+                  leftSection={<IconUser size={16} />}
+                  fullWidth
+                  size="sm"
+                  style={{ justifyContent: "flex-start" }}
+                >
+                  <Flex direction="column" align="flex-start" gap={0}>
+                    <Text size="sm" fw={500}>
+                      {username}
+                    </Text>
+                    <Text size="xs" c="dimmed">
+                      <IconClock size={10} style={{ display: "inline", marginRight: 4 }} />
+                      {formatTimeRemaining(timeRemaining)}
+                    </Text>
+                  </Flex>
+                </Button>
+              </Menu.Target>
 
-                <Menu.Dropdown>
-                  <Menu.Item
-                    component={NavLink}
-                    to="/admin/swimmers"
-                    leftSection={<IconUser size={14} />}
-                    onClick={() => setOpened(false)}
-                  >
-                    Správa plavců
-                  </Menu.Item>
-                  <Menu.Item
-                    component={NavLink}
-                    to="/admin/groups"
-                    leftSection={<IconUser size={14} />}
-                    onClick={() => setOpened(false)}
-                  >
-                    Správa skupiny
-                  </Menu.Item>
-                  <Menu.Divider />
-                  <Menu.Item
-                    color="red"
-                    leftSection={<IconLogout size={14} />}
-                    onClick={() => {
-                      logout();
-                      setOpened(false);
-                    }}
-                  >
-                    Odhlásit se
-                  </Menu.Item>
-                </Menu.Dropdown>
-              </Menu>
-            </>
+              <Menu.Dropdown>
+                <Menu.Item
+                  component={NavLink}
+                  to="/admin/swimmers"
+                  leftSection={<IconUser size={14} />}
+                  onClick={() => setOpened(false)}
+                >
+                  Správa plavců
+                </Menu.Item>
+                <Menu.Item
+                  component={NavLink}
+                  to="/admin/groups"
+                  leftSection={<IconUser size={14} />}
+                  onClick={() => setOpened(false)}
+                >
+                  Správa skupiny
+                </Menu.Item>
+                <Menu.Divider />
+                <Menu.Item
+                  color="red"
+                  leftSection={<IconLogout size={14} />}
+                  onClick={() => {
+                    logout();
+                    setOpened(false);
+                  }}
+                >
+                  Odhlásit se
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
           )}
 
           <Button
             variant="light"
             leftSection={
-              computedColorScheme === "dark" ? (
-                <IconSun size={18} />
-              ) : (
-                <IconMoon size={18} />
-              )
+              computedColorScheme === "dark" ? <IconSun size={18} /> : <IconMoon size={18} />
             }
             onClick={toggleColorScheme}
             fullWidth

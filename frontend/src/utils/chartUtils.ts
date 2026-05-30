@@ -1,4 +1,4 @@
-import type { SwimmerResults, GroupedSwimmers } from "../schema/types";
+import type { GroupedSwimmers, SwimmerResults } from "../schema/types";
 import { DNF_THRESHOLD } from "./constants";
 
 export function findYoungestAndOldestYear(data: SwimmerResults[]) {
@@ -8,8 +8,7 @@ export function findYoungestAndOldestYear(data: SwimmerResults[]) {
   let oldest = Infinity;
 
   data.forEach((swimmerData) => {
-    const lastResultDate =
-      swimmerData.results[swimmerData.results.length - 1].date;
+    const lastResultDate = swimmerData.results[swimmerData.results.length - 1].date;
     const firstResult = swimmerData.results[0].date;
     const lastResultYear = new Date(lastResultDate).getFullYear();
     const firstResultYear = new Date(firstResult).getFullYear();
@@ -52,18 +51,12 @@ export function createAbsoluteDomainTicks(data: SwimmerResults[]): number[] {
 
   const [minDate, maxDate] = [
     new Date(
-      Math.min(
-        ...data.map((swimmerData) =>
-          new Date(swimmerData.results[0].date).getTime(),
-        ),
-      ),
+      Math.min(...data.map((swimmerData) => new Date(swimmerData.results[0].date).getTime())),
     ),
     new Date(
       Math.max(
         ...data.map((swimmerData) =>
-          new Date(
-            swimmerData.results[swimmerData.results.length - 1].date,
-          ).getTime(),
+          new Date(swimmerData.results[swimmerData.results.length - 1].date).getTime(),
         ),
       ),
     ),
@@ -71,11 +64,7 @@ export function createAbsoluteDomainTicks(data: SwimmerResults[]): number[] {
 
   const minYear = minDate.getFullYear();
   const minMonth = minDate.getMonth();
-  for (
-    let year = minMonth > 5 ? minYear + 1 : minYear;
-    year <= maxDate.getFullYear();
-    year++
-  ) {
+  for (let year = minMonth > 5 ? minYear + 1 : minYear; year <= maxDate.getFullYear(); year++) {
     ticks.push(new Date(year, 0, 1).getTime());
   }
 

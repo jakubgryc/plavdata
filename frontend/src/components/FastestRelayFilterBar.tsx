@@ -1,16 +1,5 @@
-import {
-  Button,
-  Grid,
-  Stack,
-  Group,
-  Text,
-  SegmentedControl,
-} from "@mantine/core";
-import {
-  IconSwimming,
-  IconWaveSine,
-  IconCalculator,
-} from "@tabler/icons-react";
+import { Button, Grid, Group, SegmentedControl, Stack, Text } from "@mantine/core";
+import { IconCalculator, IconSwimming, IconWaveSine } from "@tabler/icons-react";
 import type { GroupedSwimmers } from "../schema/types";
 import { SwimmerSelection } from "./SwimmerSelection";
 
@@ -37,8 +26,7 @@ export function FastestRelayFilterBar({
 }: FastestRelayFilterBarProps) {
   // Create hash from current selection
   const currentHash = `${selectedSwimmers.sort().join(",")}|${relayType}`;
-  const isOutdated =
-    lastFetchedRelayHash !== "" && lastFetchedRelayHash !== currentHash;
+  const isOutdated = lastFetchedRelayHash !== "" && lastFetchedRelayHash !== currentHash;
   const hasData = lastFetchedRelayHash !== "";
 
   return (
@@ -54,13 +42,7 @@ export function FastestRelayFilterBar({
       <Grid.Col span={{ base: 12, lg: 4 }}>
         <Stack gap="md">
           <Stack gap="xs">
-            <Text
-              size="xs"
-              tt="uppercase"
-              fw={500}
-              c="dimmed"
-              style={{ letterSpacing: "0.5px" }}
-            >
+            <Text size="xs" tt="uppercase" fw={500} c="dimmed" style={{ letterSpacing: "0.5px" }}>
               Typ štafety
             </Text>
             <SegmentedControl

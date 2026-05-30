@@ -1,4 +1,4 @@
-import { MultiSelect, Stack, Group, Text } from "@mantine/core";
+import { Group, MultiSelect, Stack, Text } from "@mantine/core";
 import type { GroupedSwimmers } from "../schema/types";
 import { swimmersFilter } from "../utils/filterUtils";
 
@@ -15,21 +15,13 @@ export function SwimmerSelection({
 }: SwimmerSelectionProps) {
   return (
     <Stack gap="xs">
-      <Text
-        size="xs"
-        tt="uppercase"
-        fw={500}
-        c="dimmed"
-        style={{ letterSpacing: "0.5px" }}
-      >
+      <Text size="xs" tt="uppercase" fw={500} c="dimmed" style={{ letterSpacing: "0.5px" }}>
         Výběr plavců
       </Text>
       <MultiSelect
         data={groupedSwimmers.map(({ group, swimmers }) => ({
           group: group === "veteran" ? "bývalí" : group,
-          items: swimmers.map(
-            (swimmer) => `${swimmer.surname} ${swimmer.name}`,
-          ),
+          items: swimmers.map((swimmer) => `${swimmer.surname} ${swimmer.name}`),
         }))}
         value={selectedSwimmers}
         onChange={onSwimmersChange}
@@ -59,9 +51,7 @@ export function SwimmerSelection({
                 onSwimmersChange(newSelection);
               }}
             >
-              {group.group === "veteran"
-                ? "Vybrat všechny bývalé"
-                : `Vybrat celou ${group.group}`}
+              {group.group === "veteran" ? "Vybrat všechny bývalé" : `Vybrat celou ${group.group}`}
             </Text>
           ))}
         </Group>

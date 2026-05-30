@@ -1,30 +1,24 @@
+import { Chip, Flex, Modal, SegmentedControl, Stack, Text, Title } from "@mantine/core";
+import { DataTable } from "mantine-datatable";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { SegmentedControl, Title } from "@mantine/core";
-import { Chip, Modal, Text, Stack, Flex } from "@mantine/core";
-import { DataTable } from "mantine-datatable";
 
 import { API_BASE_URL } from "../../config";
-import { GROUPS, POOLS, DISCIPLINES } from "../utils/constants";
+import { useTheme } from "../hooks/useTheme";
+import type { SwimmerPersonalBest } from "../schema/types";
+import { DISCIPLINES, GROUPS, POOLS } from "../utils/constants";
 import { buildTableData } from "../utils/tableUtils";
 import { formatDate } from "../utils/timeUtils";
-import { useTheme } from "../hooks/useTheme";
-
-import type { SwimmerPersonalBest } from "../schema/types";
 
 function PersonalBests() {
   const { colorScheme } = useTheme();
   const navigate = useNavigate();
   const [selectedGroup, setSelectedGroup] = useState<string | null>("Z1");
   const [selectedCourse, setSelectedCourse] = useState<string>("25");
-  const [personalBests, setPersonalBests] = useState<
-    Array<SwimmerPersonalBest>
-  >([]);
+  const [personalBests, setPersonalBests] = useState<Array<SwimmerPersonalBest>>([]);
   const [isFetching, setIsFetching] = useState<boolean>(false);
 
-  const [cache, setCache] = useState<
-    Record<string, Array<SwimmerPersonalBest>>
-  >({});
+  const [cache, setCache] = useState<Record<string, Array<SwimmerPersonalBest>>>({});
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalData, setModalData] = useState<{
@@ -215,18 +209,10 @@ function PersonalBests() {
           {modalData && (
             <Stack>
               <Text>Čas: {modalData.time}</Text>
-              {modalData.location && (
-                <Text>Místo zaplavání: {modalData.location}</Text>
-              )}
-              {modalData.date && (
-                <Text>Datum: {formatDate(modalData.date)}</Text>
-              )}
-              {modalData.isSplit && (
-                <Text style={{ color: "green" }}>mezičas</Text>
-              )}
-              {modalData.isRelayPart && (
-                <Text style={{ color: "purple" }}>štafeta</Text>
-              )}
+              {modalData.location && <Text>Místo zaplavání: {modalData.location}</Text>}
+              {modalData.date && <Text>Datum: {formatDate(modalData.date)}</Text>}
+              {modalData.isSplit && <Text style={{ color: "green" }}>mezičas</Text>}
+              {modalData.isRelayPart && <Text style={{ color: "purple" }}>štafeta</Text>}
             </Stack>
           )}
         </Modal>

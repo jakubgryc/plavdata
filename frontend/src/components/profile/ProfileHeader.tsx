@@ -1,26 +1,26 @@
 import {
-  Paper,
-  Group,
-  Stack,
-  Title,
   Button,
-  Text,
   Grid,
+  Group,
+  Paper,
+  Stack,
+  Text,
   ThemeIcon,
+  Title,
   useMantineColorScheme,
 } from "@mantine/core";
 import {
   IconCalendar,
-  IconUsers,
-  IconSwimming,
   IconCalendarEvent,
-  IconFlame,
-  IconTrophy,
   IconExternalLink,
+  IconFlame,
+  IconSwimming,
+  IconTrophy,
+  IconUsers,
 } from "@tabler/icons-react";
-import { getGroupLabel } from "../../utils/profileUtils";
-import { ACTIVE_GROUPS } from "../../utils/constants.ts";
 import type { SwimmerBasicInfo, SwimmerStats } from "../../schema/types";
+import { ACTIVE_GROUPS } from "../../utils/constants.ts";
+import { getGroupLabel } from "../../utils/profileUtils";
 
 interface ProfileHeaderProps {
   basicInfo: SwimmerBasicInfo;
@@ -115,9 +115,7 @@ function ProfileHeader({ basicInfo, stats }: ProfileHeaderProps) {
           mt="xs"
           pt="md"
           style={{
-            borderTop: `1px solid ${
-              colorScheme === "dark" ? "#373A40" : "#dee2e6"
-            }`,
+            borderTop: `1px solid ${colorScheme === "dark" ? "#373A40" : "#dee2e6"}`,
           }}
         >
           <Grid grow>

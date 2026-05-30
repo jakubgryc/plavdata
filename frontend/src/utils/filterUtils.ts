@@ -30,9 +30,7 @@ export const swimmersFilter: OptionsFilter = ({ options, search }) => {
 
       // For non-grouped items, filter by label
       if (option.label) {
-        const normalizedLabel = removeDiacritics(
-          option.label.toLowerCase().trim(),
-        );
+        const normalizedLabel = removeDiacritics(option.label.toLowerCase().trim());
         return normalizedLabel.includes(normalizedSearch) ? option : null;
       }
 

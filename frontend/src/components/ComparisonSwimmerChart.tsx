@@ -1,30 +1,19 @@
-import { useEffect, useState, useMemo } from "react";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-} from "recharts";
-import { format } from "date-fns";
 import { Flex, Paper, Title } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
+import { format } from "date-fns";
+import { useEffect, useMemo, useState } from "react";
+import { CartesianGrid, Legend, Line, LineChart, Tooltip, XAxis, YAxis } from "recharts";
 import { useTheme } from "../hooks/useTheme";
-
+import type { SwimmerResults } from "../schema/types";
 import {
   createAbsoluteDomainTicks,
   createRelativeDomainTicks,
   createYAxisTicks,
-  findOldestBirthYear,
   findMinMaxTimes,
+  findOldestBirthYear,
 } from "../utils/chartUtils.ts";
-
-import { getGraphColor, DNF_THRESHOLD } from "../utils/constants";
-import { parseTimeFromMillis, formatDateFromMs } from "../utils/timeUtils";
-
-import type { SwimmerResults } from "../schema/types";
+import { DNF_THRESHOLD, getGraphColor } from "../utils/constants";
+import { formatDateFromMs, parseTimeFromMillis } from "../utils/timeUtils";
 
 interface ComparisonSwimmerChartProps {
   parsedResults: SwimmerResults[];
@@ -101,16 +90,9 @@ function ComparisonSwimmerChart({
             type="number"
             tick={{
               fontSize: isMobile ? 14 : 15,
-              fill:
-                colorScheme === "dark"
-                  ? theme.colors.gray[3]
-                  : theme.colors.gray[7],
+              fill: colorScheme === "dark" ? theme.colors.gray[3] : theme.colors.gray[7],
             }}
-            tickFormatter={
-              timeAxis === "absolute"
-                ? dateFormatterAbsolute
-                : dateFormatterRelative
-            }
+            tickFormatter={timeAxis === "absolute" ? dateFormatterAbsolute : dateFormatterRelative}
             padding={{ left: 20, right: 20 }}
             ticks={
               timeAxis === "relative"
@@ -121,43 +103,31 @@ function ComparisonSwimmerChart({
           <YAxis
             tick={{
               fontSize: isMobile ? 14 : 15,
-              fill:
-                colorScheme === "dark"
-                  ? theme.colors.gray[3]
-                  : theme.colors.gray[7],
+              fill: colorScheme === "dark" ? theme.colors.gray[3] : theme.colors.gray[7],
             }}
             tickFormatter={parseTimeFromMillis}
             ticks={yAxisTicks}
             padding={{ bottom: 20 }}
           />
-          <CartesianGrid
-            strokeDasharray={colorScheme === "dark" ? "1 3" : ""}
-          />
+          <CartesianGrid strokeDasharray={colorScheme === "dark" ? "1 3" : ""} />
           <Legend
             wrapperStyle={{
               fontSize: isMobile ? "12px" : "14px",
-              color:
-                colorScheme === "dark"
-                  ? theme.colors.gray[3]
-                  : theme.colors.gray[7],
+              color: colorScheme === "dark" ? theme.colors.gray[3] : theme.colors.gray[7],
             }}
           />
           {parsedResults.map((swimmerData, index) => {
             const color = getGraphColor(index);
             return (
               <Line
-                key={index}
+                key={swimmerData.swimmer.id}
                 dot={{ fill: color, r: isMobile ? 1 : 1.5 }}
                 type="monotone"
                 dataKey="time"
                 data={swimmerData.results
                   .filter((result, index) => {
                     if (result.time > DNF_THRESHOLD) return false;
-                    if (
-                      intermediateTimes === "onlyFinal" &&
-                      result.split_time &&
-                      index !== 0
-                    ) {
+                    if (intermediateTimes === "onlyFinal" && result.split_time && index !== 0) {
                       return false;
                     }
                     return !(
@@ -180,21 +150,12 @@ function ComparisonSwimmerChart({
           <Tooltip
             contentStyle={{
               fontSize: isMobile ? "12px" : "14px",
-              backgroundColor:
-                colorScheme === "dark" ? theme.colors.dark[7] : theme.white,
+              backgroundColor: colorScheme === "dark" ? theme.colors.dark[7] : theme.white,
               border: `1px solid ${colorScheme === "dark" ? theme.colors.gray[7] : theme.colors.gray[4]}`,
-              color:
-                colorScheme === "dark"
-                  ? theme.colors.gray[3]
-                  : theme.colors.gray[7],
+              color: colorScheme === "dark" ? theme.colors.gray[3] : theme.colors.gray[7],
             }}
-            formatter={(value, name) => [
-              parseTimeFromMillis(Number(value)),
-              name,
-            ]}
-            labelFormatter={
-              timeAxis === "absolute" ? formatDateFromMs : () => ""
-            }
+            formatter={(value, name) => [parseTimeFromMillis(Number(value)), name]}
+            labelFormatter={timeAxis === "absolute" ? formatDateFromMs : () => ""}
           />
         </LineChart>
       </Flex>

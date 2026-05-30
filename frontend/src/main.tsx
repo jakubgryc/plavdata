@@ -1,25 +1,25 @@
+import { ColorSchemeScript, MantineProvider } from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { MantineProvider, ColorSchemeScript } from "@mantine/core";
-import { Notifications } from "@mantine/notifications";
 import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
 import "mantine-datatable/styles.css";
 import "./index.css";
-import { theme } from "./theme";
 import App from "./App.tsx";
-import Home from "./pages/home";
-import CompareSwimmers from "./pages/compareSwimmers";
-import PersonalBests from "./pages/personalBests";
-import ClubRecords from "./pages/clubRecords";
-import NotFound from "./pages/notFound";
-import Utils from "./pages/utils";
-import SwimmerProfile from "./pages/swimmerProfile";
-import Login from "./pages/login";
-import { AdminSwimmersPage } from "./pages/admin/SwimmersAdmin.tsx";
 import { AdminGroupsPage } from "./pages/admin/groups";
+import { AdminSwimmersPage } from "./pages/admin/SwimmersAdmin.tsx";
+import ClubRecords from "./pages/clubRecords";
+import CompareSwimmers from "./pages/compareSwimmers";
+import Home from "./pages/home";
+import Login from "./pages/login";
+import NotFound from "./pages/notFound";
+import PersonalBests from "./pages/personalBests";
+import SwimmerProfile from "./pages/swimmerProfile";
+import Utils from "./pages/utils";
+import { theme } from "./theme";
 
 const router = createBrowserRouter([
   {

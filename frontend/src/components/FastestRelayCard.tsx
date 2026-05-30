@@ -1,19 +1,19 @@
 import {
+  Anchor,
+  Badge,
+  Box,
   Card,
   Group,
-  Text,
-  Badge,
-  Table,
-  Box,
   rem,
-  useMantineTheme,
+  Table,
+  Text,
   useMantineColorScheme,
-  Anchor,
+  useMantineTheme,
 } from "@mantine/core";
 import { IconSwimming } from "@tabler/icons-react";
 import { useNavigate } from "react-router";
-import { parseTimeFromMillis } from "../utils/timeUtils";
 import type { RelaySwimmer } from "../schema/types";
+import { parseTimeFromMillis } from "../utils/timeUtils";
 
 interface FastestRelayCard {
   swimmers: RelaySwimmer[];
@@ -67,10 +67,7 @@ export function FastestRelayCard({
         justify="space-between"
         style={{
           borderBottom: `1px solid ${colorScheme === "dark" ? theme.colors.dark[4] : theme.colors.gray[3]}`,
-          backgroundColor:
-            colorScheme === "dark"
-              ? theme.colors.dark[6]
-              : theme.colors.gray[0],
+          backgroundColor: colorScheme === "dark" ? theme.colors.dark[6] : theme.colors.gray[0],
         }}
       >
         <Group gap="md">
@@ -80,15 +77,10 @@ export function FastestRelayCard({
               style={{
                 borderRadius: theme.radius.md,
                 backgroundColor:
-                  colorScheme === "dark"
-                    ? "rgba(76, 175, 80, 0.2)"
-                    : "rgba(76, 175, 80, 0.1)",
+                  colorScheme === "dark" ? "rgba(76, 175, 80, 0.2)" : "rgba(76, 175, 80, 0.1)",
               }}
             >
-              <IconSwimming
-                size={24}
-                color={colorScheme === "dark" ? "#81c784" : "#4caf50"}
-              />
+              <IconSwimming size={24} color={colorScheme === "dark" ? "#81c784" : "#4caf50"} />
             </Box>
           )}
           <Box>
@@ -106,11 +98,7 @@ export function FastestRelayCard({
         </Group>
 
         <Box ta="right">
-          <Text
-            size={isBest ? "xl" : "lg"}
-            fw={700}
-            style={{ fontVariantNumeric: "tabular-nums" }}
-          >
+          <Text size={isBest ? "xl" : "lg"} fw={700} style={{ fontVariantNumeric: "tabular-nums" }}>
             {parseTimeFromMillis(totalTime)}
           </Text>
           {isBest && (
@@ -125,16 +113,11 @@ export function FastestRelayCard({
       <Table highlightOnHover>
         <Table.Thead
           style={{
-            backgroundColor:
-              colorScheme === "dark"
-                ? theme.colors.dark[6]
-                : theme.colors.gray[0],
+            backgroundColor: colorScheme === "dark" ? theme.colors.dark[6] : theme.colors.gray[0],
           }}
         >
           <Table.Tr>
-            <Table.Th
-              style={{ width: relayType === "medley" ? "80px" : "60px" }}
-            >
+            <Table.Th style={{ width: relayType === "medley" ? "80px" : "60px" }}>
               <Text size="xs" tt="uppercase" fw={500} c="dimmed">
                 {relayType === "medley" ? "Poloha" : "#"}
               </Text>
@@ -159,9 +142,7 @@ export function FastestRelayCard({
         <Table.Tbody>
           {swimmers.map((swimmer, idx) => {
             const isLast = idx === swimmers.length - 1;
-            const cumulativeTime = swimmers
-              .slice(0, idx + 1)
-              .reduce((sum, s) => sum + s.time, 0);
+            const cumulativeTime = swimmers.slice(0, idx + 1).reduce((sum, s) => sum + s.time, 0);
 
             return (
               <Table.Tr key={`${swimmer.swimmerId}-${idx}`}>

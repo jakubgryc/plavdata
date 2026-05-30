@@ -1,17 +1,8 @@
-import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router";
-import {
-  TextInput,
-  Loader,
-  Paper,
-  Text,
-  Stack,
-  Group,
-  UnstyledButton,
-  Box,
-} from "@mantine/core";
+import { Box, Group, Loader, Paper, Stack, Text, TextInput, UnstyledButton } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconSearch } from "@tabler/icons-react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router";
 import { API_BASE_URL } from "../../config";
 import type { SwimmerSearchResult } from "../schema/types";
 
@@ -27,10 +18,7 @@ function SwimmerSearch() {
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        searchRef.current &&
-        !searchRef.current.contains(event.target as Node)
-      ) {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setIsFocused(false);
       }
     };

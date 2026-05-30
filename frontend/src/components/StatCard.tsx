@@ -1,10 +1,5 @@
-import { Paper, Group, Title, Text, ThemeIcon, Badge } from "@mantine/core";
-import {
-  IconTrendingUp,
-  IconTrendingDown,
-  IconMinus,
-  type Icon,
-} from "@tabler/icons-react";
+import { Badge, Group, Paper, Text, ThemeIcon, Title } from "@mantine/core";
+import { type Icon, IconMinus, IconTrendingDown, IconTrendingUp } from "@tabler/icons-react";
 
 interface StatCardProps {
   title: string;
@@ -49,11 +44,9 @@ function StatCard({
 
   // Generate labels based on period type
   const currentLabel =
-    currentPeriodLabel ||
-    (periodType === "season" ? "tuto sezónu" : "tento rok");
+    currentPeriodLabel || (periodType === "season" ? "tuto sezónu" : "tento rok");
   const previousLabel =
-    previousPeriodLabel ||
-    (periodType === "season" ? "minulou sezónu" : "předešlý rok");
+    previousPeriodLabel || (periodType === "season" ? "minulou sezónu" : "předešlý rok");
 
   return (
     <Paper p="lg" radius="md" withBorder shadow="sm">

@@ -28,9 +28,7 @@ export function buildTableData(data: SwimmerPersonalBest[]): TableRow[] {
       swimmerId: swimmerBests.swimmer.id,
     };
     for (const discipline of DISCIPLINES) {
-      const pb = swimmerBests.personal_bests.find(
-        (p) => p.discipline?.code === discipline,
-      );
+      const pb = swimmerBests.personal_bests.find((p) => p.discipline?.code === discipline);
       let pbDescription: DisciplineDescription = emptyDescription;
       if (pb) {
         pbDescription = {

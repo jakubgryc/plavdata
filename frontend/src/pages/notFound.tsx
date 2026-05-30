@@ -1,4 +1,4 @@
-import { Center, Title, Text, Button } from "@mantine/core";
+import { Button, Center, Text, Title } from "@mantine/core";
 
 export default function NotFound() {
   return (
@@ -39,8 +39,7 @@ export default function NotFound() {
 
         <Title order={2}>Jejda — tady nic není</Title>
         <Text color="dimmed" style={{ maxWidth: 420, textAlign: "center" }}>
-          Stránka, kterou hledáte, neexistuje. Zkuste se vrátit na domovskou
-          stránku.
+          Stránka, kterou hledáte, neexistuje. Zkuste se vrátit na domovskou stránku.
         </Text>
 
         <Button component="a" href="/" variant="outline">

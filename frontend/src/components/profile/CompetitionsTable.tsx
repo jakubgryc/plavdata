@@ -1,23 +1,19 @@
-import { useState } from "react";
 import {
-  Paper,
-  Title,
-  Group,
-  ThemeIcon,
-  Table,
-  Pagination,
   ActionIcon,
   Collapse,
+  Group,
+  Pagination,
+  Paper,
+  Table,
   Text,
+  ThemeIcon,
+  Title,
   useMantineColorScheme,
 } from "@mantine/core";
-import {
-  IconCalendarMonth,
-  IconChevronDown,
-  IconChevronUp,
-} from "@tabler/icons-react";
-import { parseTimeFromMillis } from "../../utils/timeUtils";
+import { IconCalendarMonth, IconChevronDown, IconChevronUp } from "@tabler/icons-react";
+import { useState } from "react";
 import type { SwimmerCompetition } from "../../schema/types";
+import { parseTimeFromMillis } from "../../utils/timeUtils";
 
 interface CompetitionsTableProps {
   competitions: SwimmerCompetition[];
@@ -59,11 +55,7 @@ function CompetitionsTable({ competitions }: CompetitionsTableProps) {
 
   return (
     <Paper radius="lg" withBorder>
-      <Group
-        justify="space-between"
-        p={{ base: "sm", sm: "lg" }}
-        pb={{ base: "xs", sm: "md" }}
-      >
+      <Group justify="space-between" p={{ base: "sm", sm: "lg" }} pb={{ base: "xs", sm: "md" }}>
         <Group gap="xs">
           <ThemeIcon variant="transparent" color="blue">
             <IconCalendarMonth />
@@ -73,11 +65,7 @@ function CompetitionsTable({ competitions }: CompetitionsTableProps) {
       </Group>
 
       <Table.ScrollContainer minWidth={700}>
-        <Table
-          highlightOnHover
-          verticalSpacing="sm"
-          className="competitions-table"
-        >
+        <Table highlightOnHover verticalSpacing="sm" className="competitions-table">
           <Table.Thead>
             <Table.Tr>
               <Table.Th w={120}>Datum</Table.Th>
@@ -96,10 +84,7 @@ function CompetitionsTable({ competitions }: CompetitionsTableProps) {
               return (
                 <>
                   <Table.Tr key={comp.competitionId}>
-                    <Table.Td
-                      fw={500}
-                      style={{ fontVariantNumeric: "tabular-nums" }}
-                    >
+                    <Table.Td fw={500} style={{ fontVariantNumeric: "tabular-nums" }}>
                       {formatDate(comp.date)}
                     </Table.Td>
                     <Table.Td
@@ -144,11 +129,7 @@ function CompetitionsTable({ competitions }: CompetitionsTableProps) {
                         size="sm"
                         onClick={() => toggleRow(comp.competitionId)}
                       >
-                        {isExpanded ? (
-                          <IconChevronUp size={16} />
-                        ) : (
-                          <IconChevronDown size={16} />
-                        )}
+                        {isExpanded ? <IconChevronUp size={16} /> : <IconChevronDown size={16} />}
                       </ActionIcon>
                     </Table.Td>
                   </Table.Tr>
@@ -174,13 +155,9 @@ function CompetitionsTable({ competitions }: CompetitionsTableProps) {
                             </Table.Thead>
                             <Table.Tbody>
                               {comp.results.map((result, idx) => {
-                                const performancePercent = (
-                                  result.performance * 100
-                                ).toFixed(2);
+                                const performancePercent = (result.performance * 100).toFixed(2);
                                 const isImprovement = result.improvement;
-                                const performanceColor = isImprovement
-                                  ? "green"
-                                  : "red";
+                                const performanceColor = isImprovement ? "green" : "red";
 
                                 return (
                                   <Table.Tr key={idx}>
@@ -191,11 +168,7 @@ function CompetitionsTable({ competitions }: CompetitionsTableProps) {
                                       {parseTimeFromMillis(result.time)}
                                     </Table.Td>
                                     <Table.Td>
-                                      <Text
-                                        size="sm"
-                                        fw={500}
-                                        c={performanceColor}
-                                      >
+                                      <Text size="sm" fw={500} c={performanceColor}>
                                         {isImprovement ? "+" : "-"}
                                         {performancePercent}%
                                       </Text>
@@ -229,12 +202,7 @@ function CompetitionsTable({ competitions }: CompetitionsTableProps) {
 
       {totalPages > 1 && (
         <Group justify="center" p="md">
-          <Pagination
-            total={totalPages}
-            value={activePage}
-            onChange={setActivePage}
-            size="sm"
-          />
+          <Pagination total={totalPages} value={activePage} onChange={setActivePage} size="sm" />
         </Group>
       )}
     </Paper>

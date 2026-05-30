@@ -1,20 +1,9 @@
-import {
-  Paper,
-  Group,
-  Box,
-  Title,
-  Text,
-  ThemeIcon,
-  Anchor,
-  Table,
-  Badge,
-} from "@mantine/core";
-import { IconMedal, IconArrowRight } from "@tabler/icons-react";
+import { Anchor, Badge, Box, Group, Paper, Table, Text, ThemeIcon, Title } from "@mantine/core";
+import { IconArrowRight, IconMedal } from "@tabler/icons-react";
 import { useNavigate } from "react-router";
-
-import { parseTimeFromMillis, formatDate } from "../utils/timeUtils";
-import { getAgeCategoryLabel } from "../utils/constants";
 import type { RecentClubRecord } from "../schema/types";
+import { getAgeCategoryLabel } from "../utils/constants";
+import { formatDate, parseTimeFromMillis } from "../utils/timeUtils";
 
 interface ClubRecordsTableProps {
   records: RecentClubRecord[];
@@ -23,12 +12,7 @@ interface ClubRecordsTableProps {
   variant: "recent" | "oldest";
 }
 
-function ClubRecordsTable({
-  records,
-  title,
-  subtitle,
-  variant,
-}: ClubRecordsTableProps) {
+function ClubRecordsTable({ records, title, subtitle, variant }: ClubRecordsTableProps) {
   const navigate = useNavigate();
   const color = variant === "recent" ? "green" : "orange";
   const iconColor = variant === "recent" ? "yellow" : "orange";

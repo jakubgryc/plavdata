@@ -1,19 +1,12 @@
-import { useEffect, useState } from "react";
-import {
-  SegmentedControl,
-  Title,
-  Modal,
-  Text,
-  Stack,
-  Flex,
-} from "@mantine/core";
+import { Flex, Modal, SegmentedControl, Stack, Text, Title } from "@mantine/core";
 import { DataTable } from "mantine-datatable";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { API_BASE_URL } from "../../config";
-import { POOLS, DISCIPLINES } from "../utils/constants";
-import { parseTimeFromMillis, formatDate } from "../utils/timeUtils";
 import { useTheme } from "../hooks/useTheme";
+import { DISCIPLINES, POOLS } from "../utils/constants";
+import { formatDate, parseTimeFromMillis } from "../utils/timeUtils";
 
 interface ClubRecord {
   discipline: string;
@@ -66,10 +59,9 @@ function ClubRecords() {
     const fetchClubRecords = async (course: string) => {
       setIsFetching(true);
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/api/results/club-records?course=${course}`,
-          { method: "GET" },
-        );
+        const response = await fetch(`${API_BASE_URL}/api/results/club-records?course=${course}`, {
+          method: "GET",
+        });
         if (!response.ok) throw new Error("Failed to fetch club records");
         const records = await response.json();
 
@@ -138,9 +130,7 @@ function ClubRecords() {
   // Build table data
   const buildTableData = () => {
     const disciplinesList =
-      selectedCourse === "50"
-        ? DISCIPLINES.filter((d) => d !== "100 O")
-        : DISCIPLINES;
+      selectedCourse === "50" ? DISCIPLINES.filter((d) => d !== "100 O") : DISCIPLINES;
 
     const rows: any[] = [];
 
@@ -158,9 +148,7 @@ function ClubRecords() {
       // Check if this is the first row of a new discipline type
       const currentType = getDisciplineType(discipline);
       const prevType =
-        disciplineIndex > 0
-          ? getDisciplineType(disciplinesList[disciplineIndex - 1])
-          : null;
+        disciplineIndex > 0 ? getDisciplineType(disciplinesList[disciplineIndex - 1]) : null;
       femaleRow.isFirstOfType = currentType !== prevType;
 
       rows.push(femaleRow);
@@ -214,9 +202,7 @@ function ClubRecords() {
           pinFirstColumn={true}
           highlightOnHover
           fetching={isFetching}
-          rowClassName={(record) =>
-            record.isFirstOfType ? "first-of-type" : ""
-          }
+          rowClassName={(record) => (record.isFirstOfType ? "first-of-type" : "")}
           columns={[
             {
               accessor: "discipline",
@@ -235,11 +221,7 @@ function ClubRecords() {
                         ? "Absolutní"
                         : `${category}letí`}
                   </Text>
-                  <Flex
-                    w="100%"
-                    justify="flex-start"
-                    gap={{ base: 4, sm: "xs" }}
-                  >
+                  <Flex w="100%" justify="flex-start" gap={{ base: 4, sm: "xs" }}>
                     <Text
                       size="xs"
                       style={{
@@ -328,11 +310,7 @@ function ClubRecords() {
                     >
                       {parseTimeFromMillis(data.time)}
                     </Text>
-                    <Text
-                      size="xs"
-                      style={{ flex: 1.5, textAlign: "left" }}
-                      truncate
-                    >
+                    <Text size="xs" style={{ flex: 1.5, textAlign: "left" }} truncate>
                       {data.date || "-"}
                     </Text>
                   </Flex>
@@ -357,9 +335,7 @@ function ClubRecords() {
         {modalData && (
           <Stack>
             <Text>Čas: {modalData.time}</Text>
-            {modalData.location && (
-              <Text>Místo zaplavání: {modalData.location}</Text>
-            )}
+            {modalData.location && <Text>Místo zaplavání: {modalData.location}</Text>}
             {modalData.date && <Text>Datum: {modalData.date}</Text>}
             {modalData.isSplit && (
               <Text

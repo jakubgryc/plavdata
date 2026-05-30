@@ -1,6 +1,6 @@
-import { memo, useCallback } from "react";
+import { Badge, Flex, Select, Switch, Table } from "@mantine/core";
 import type { ChangeEvent } from "react";
-import { Table, Switch, Badge, Flex, Select } from "@mantine/core";
+import { memo, useCallback } from "react";
 import type { Swimmer, SwimmerEdits } from "../../schema/swimmers";
 
 interface SwimmerRowProps {
@@ -17,12 +17,9 @@ export const SwimmerRow = memo(function SwimmerRow({
   onEdit,
 }: SwimmerRowProps) {
   // Current values (edited or original)
-  const currentGroupId =
-    edits?.group_id !== undefined ? edits.group_id : swimmer.group_id;
+  const currentGroupId = edits?.group_id !== undefined ? edits.group_id : swimmer.group_id;
   const currentComparison =
-    edits?.show_in_comparison !== undefined
-      ? edits.show_in_comparison
-      : swimmer.show_in_comparison;
+    edits?.show_in_comparison !== undefined ? edits.show_in_comparison : swimmer.show_in_comparison;
   const currentPersonalBests =
     edits?.show_in_personal_bests !== undefined
       ? edits.show_in_personal_bests
@@ -33,8 +30,7 @@ export const SwimmerRow = memo(function SwimmerRow({
       : swimmer.show_in_relay_builder;
 
   // Check if each field has been edited
-  const isGroupEdited =
-    edits?.group_id !== undefined && edits.group_id !== swimmer.group_id;
+  const isGroupEdited = edits?.group_id !== undefined && edits.group_id !== swimmer.group_id;
   const isComparisonEdited =
     edits?.show_in_comparison !== undefined &&
     edits.show_in_comparison !== swimmer.show_in_comparison;
@@ -46,10 +42,7 @@ export const SwimmerRow = memo(function SwimmerRow({
     edits.show_in_relay_builder !== swimmer.show_in_relay_builder;
 
   const hasAnyEdit =
-    isGroupEdited ||
-    isComparisonEdited ||
-    isPersonalBestsEdited ||
-    isRelayBuilderEdited;
+    isGroupEdited || isComparisonEdited || isPersonalBestsEdited || isRelayBuilderEdited;
 
   const handleGroupChange = useCallback(
     (value: string | null) => {
@@ -81,13 +74,7 @@ export const SwimmerRow = memo(function SwimmerRow({
   );
 
   return (
-    <Table.Tr
-      style={
-        hasAnyEdit
-          ? { backgroundColor: "rgba(255, 236, 153, 0.15)" }
-          : undefined
-      }
-    >
+    <Table.Tr style={hasAnyEdit ? { backgroundColor: "rgba(255, 236, 153, 0.15)" } : undefined}>
       <Table.Td fw={500} style={{ minWidth: 120 }}>
         {swimmer.surname}
       </Table.Td>
@@ -125,9 +112,7 @@ export const SwimmerRow = memo(function SwimmerRow({
               isComparisonEdited
                 ? {
                     track: {
-                      backgroundColor: currentComparison
-                        ? undefined
-                        : "rgba(250, 200, 60, 0.5)",
+                      backgroundColor: currentComparison ? undefined : "rgba(250, 200, 60, 0.5)",
                     },
                   }
                 : undefined
@@ -145,9 +130,7 @@ export const SwimmerRow = memo(function SwimmerRow({
               isPersonalBestsEdited
                 ? {
                     track: {
-                      backgroundColor: currentPersonalBests
-                        ? undefined
-                        : "rgba(250, 200, 60, 0.5)",
+                      backgroundColor: currentPersonalBests ? undefined : "rgba(250, 200, 60, 0.5)",
                     },
                   }
                 : undefined
@@ -165,9 +148,7 @@ export const SwimmerRow = memo(function SwimmerRow({
               isRelayBuilderEdited
                 ? {
                     track: {
-                      backgroundColor: currentRelayBuilder
-                        ? undefined
-                        : "rgba(250, 200, 60, 0.5)",
+                      backgroundColor: currentRelayBuilder ? undefined : "rgba(250, 200, 60, 0.5)",
                     },
                   }
                 : undefined
@@ -176,11 +157,7 @@ export const SwimmerRow = memo(function SwimmerRow({
         </Flex>
       </Table.Td>
       <Table.Td ta="center" w={80}>
-        <Badge
-          color="yellow"
-          size="xs"
-          style={{ visibility: hasAnyEdit ? "visible" : "hidden" }}
-        >
+        <Badge color="yellow" size="xs" style={{ visibility: hasAnyEdit ? "visible" : "hidden" }}>
           Upraveno
         </Badge>
       </Table.Td>

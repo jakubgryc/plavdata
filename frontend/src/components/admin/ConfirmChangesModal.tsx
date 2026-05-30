@@ -1,6 +1,6 @@
-import { Modal, Button, Group, Text, Stack, Table, Badge } from "@mantine/core";
-import type { Swimmer, SwimmerEdits } from "../../schema/swimmers";
+import { Badge, Button, Group, Modal, Stack, Table, Text } from "@mantine/core";
 import type { Group as GroupType } from "../../schema/groups";
+import type { Swimmer, SwimmerEdits } from "../../schema/swimmers";
 
 interface EditedSwimmerData {
   edits: SwimmerEdits;
@@ -39,10 +39,7 @@ export function ConfirmChangesModal({
     .map(([_swimmerId, { edits, original }]) => {
       const fieldChanges: { field: string; from: string; to: string }[] = [];
 
-      if (
-        edits.group_id !== undefined &&
-        edits.group_id !== original.group_id
-      ) {
+      if (edits.group_id !== undefined && edits.group_id !== original.group_id) {
         fieldChanges.push({
           field: "Skupina",
           from: getGroupName(original.group_id),
@@ -93,13 +90,7 @@ export function ConfirmChangesModal({
     .filter(Boolean);
 
   return (
-    <Modal
-      opened={opened}
-      onClose={onClose}
-      title="Potvrdit změny"
-      size="lg"
-      centered
-    >
+    <Modal opened={opened} onClose={onClose} title="Potvrdit změny" size="lg" centered>
       <Stack gap="md">
         <Text size="sm" c="dimmed">
           Chystáte se uložit následující změny u {changesList.length} plavců:

@@ -1,17 +1,11 @@
-import {
-  Paper,
-  Title,
-  Group,
-  ThemeIcon,
-  useMantineColorScheme,
-} from "@mantine/core";
+import { Group, Paper, ThemeIcon, Title, useMantineColorScheme } from "@mantine/core";
 import { IconChartRadar } from "@tabler/icons-react";
 import {
-  RadarChart,
-  PolarGrid,
   PolarAngleAxis,
+  PolarGrid,
   PolarRadiusAxis,
   Radar,
+  RadarChart,
   ResponsiveContainer,
   Tooltip,
 } from "recharts";

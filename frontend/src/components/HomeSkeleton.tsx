@@ -1,13 +1,13 @@
 import {
   Flex,
-  SimpleGrid,
-  Paper,
   Group,
-  Stack,
-  Skeleton,
-  Title,
+  Paper,
   SegmentedControl,
+  SimpleGrid,
+  Skeleton,
+  Stack,
   ThemeIcon,
+  Title,
 } from "@mantine/core";
 import { IconChartBar } from "@tabler/icons-react";
 
@@ -16,10 +16,7 @@ interface HomeSkeletonProps {
   onPeriodTypeChange?: (value: string) => void;
 }
 
-function HomeSkeleton({
-  periodType = "season",
-  onPeriodTypeChange,
-}: HomeSkeletonProps) {
+function HomeSkeleton({ periodType = "season", onPeriodTypeChange }: HomeSkeletonProps) {
   return (
     <Flex direction="column" w="100%" py="md" pb="xl">
       {/* Header */}

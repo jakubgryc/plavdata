@@ -1,266 +1,270 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Work+Sans:wght@400;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Work+Sans:wght@400;600;700&display=swap");
 @import "tailwindcss";
 
-html, body {
-    height: 100%;
-    overflow: hidden;
+html,
+body {
+  height: 100%;
+  overflow: hidden;
 }
 
 body {
-    margin: 0;
-    font-family: var(--mantine-font-family);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    background-color: #f1f5f9;
-    color: var(--mantine-color-text);
+  margin: 0;
+  font-family: var(--mantine-font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f1f5f9;
+  color: var(--mantine-color-text);
 }
 
 /* Dark mode background */
 [data-mantine-color-scheme="dark"] body {
-    background-color: var(--mantine-color-dark-8);
+  background-color: var(--mantine-color-dark-8);
 }
 
 /* headings use a slightly different font and weight */
-h1, h2, h3, h4 {
-    font-family: var(--mantine-font-family-headings);
-    font-weight: 600;
-    margin: 0;
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--mantine-font-family-headings);
+  font-weight: 600;
+  margin: 0;
 }
 
 button {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 /* Swimmer search result button hover */
 .swimmer-search-result-button:hover {
-    background-color: var(--mantine-color-gray-1);
+  background-color: var(--mantine-color-gray-1);
 }
 
 [data-mantine-color-scheme="dark"] .swimmer-search-result-button:hover {
-    background-color: var(--mantine-color-dark-5);
+  background-color: var(--mantine-color-dark-5);
 }
 
 .no-scrollbar::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+  display: none; /* Chrome, Safari, Opera */
 }
 
 /* Responsive table font sizes */
 .responsive-table th,
 .responsive-table td {
-    font-size: 0.9rem;
+  font-size: 0.9rem;
 }
 
 .responsive-table th {
-    padding: 8px 4px;
-    text-align: center;
+  padding: 8px 4px;
+  text-align: center;
 }
 
 .responsive-table th:first-child,
 .responsive-table td:first-child {
-    padding-left: 8px;
+  padding-left: 8px;
 }
 
 .club-records-table th:not(:first-child),
 .club-records-table td:not(:first-child) {
-    border-left: 2px solid #898989 !important;
+  border-left: 2px solid #898989 !important;
 }
 .club-records-table tr.first-of-type td {
-    border-top: 2px solid #898989 !important;
+  border-top: 2px solid #898989 !important;
 }
 .club-records-table tbody td:not(:first-child),
 .club-records-table tbody td:not(:first-child) *,
 .club-records-table tbody td:not(:first-child) .mantine-Text-root {
-    font-size: 0.8rem !important;
+  font-size: 0.8rem !important;
 }
 
 .club-records-table th:first-child,
 .club-records-table td:first-child {
-    padding: 8px !important;
+  padding: 8px !important;
 }
 
 @media (max-width: 768px) {
-    /* Make h2 titles (Mantine Title with order 2) smaller on mobile */
-    h2,
-    .mantine-Title-root[data-order="2"] {
-        font-size: 1.25rem !important;
-    }
+  /* Make h2 titles (Mantine Title with order 2) smaller on mobile */
+  h2,
+  .mantine-Title-root[data-order="2"] {
+    font-size: 1.25rem !important;
+  }
 
-    .responsive-table th,
-    .responsive-table td {
-        font-size: 0.7rem;
-    }
+  .responsive-table th,
+  .responsive-table td {
+    font-size: 0.7rem;
+  }
 
-    /* Make first column narrower on mobile */
-    .responsive-table th:first-child,
-    .responsive-table td:first-child {
-        width: 120px !important;
-        max-width: 120px !important;
-        min-width: 110px !important;
-    }
+  /* Make first column narrower on mobile */
+  .responsive-table th:first-child,
+  .responsive-table td:first-child {
+    width: 120px !important;
+    max-width: 120px !important;
+    min-width: 110px !important;
+  }
 
-    .club-records-table table {
-        table-layout: fixed !important;
-    }
-    .club-records-table th:not(:first-child),
-    .club-records-table td:not(:first-child) {
-        width: 240px !important;
-        max-width: 240px !important;
-        min-width: 240px !important;
-    }
+  .club-records-table table {
+    table-layout: fixed !important;
+  }
+  .club-records-table th:not(:first-child),
+  .club-records-table td:not(:first-child) {
+    width: 240px !important;
+    max-width: 240px !important;
+    min-width: 240px !important;
+  }
 
-    /* Personal bests table responsive styles */
-    .personal-bests-table th,
-    .personal-bests-table td {
-        font-size: 0.65rem !important;
-        padding: 4px 2px !important;
-    }
+  /* Personal bests table responsive styles */
+  .personal-bests-table th,
+  .personal-bests-table td {
+    font-size: 0.65rem !important;
+    padding: 4px 2px !important;
+  }
 
-    .personal-bests-table th:first-child,
-    .personal-bests-table td:first-child {
-        font-size: 0.7rem !important;
-        padding-left: 6px !important;
-        padding-right: 4px !important;
-    }
+  .personal-bests-table th:first-child,
+  .personal-bests-table td:first-child {
+    font-size: 0.7rem !important;
+    padding-left: 6px !important;
+    padding-right: 4px !important;
+  }
 
-    /* Make the group header text smaller on mobile */
-    .personal-bests-table td[colspan="5"] span {
-        font-size: 0.5rem !important;
-    }
+  /* Make the group header text smaller on mobile */
+  .personal-bests-table td[colspan="5"] span {
+    font-size: 0.5rem !important;
+  }
 
-    /* Swimmer profile mobile responsive styles */
-    .profile-header-title {
-        font-size: 1.5rem !important;
-    }
+  /* Swimmer profile mobile responsive styles */
+  .profile-header-title {
+    font-size: 1.5rem !important;
+  }
 
-    .profile-stat-value {
-        font-size: 1.25rem !important;
-    }
+  .profile-stat-value {
+    font-size: 1.25rem !important;
+  }
 
-    .profile-stat-label {
-        font-size: 0.625rem !important;
-    }
+  .profile-stat-label {
+    font-size: 0.625rem !important;
+  }
 
-    .profile-info-text {
-        font-size: 0.75rem !important;
-    }
+  .profile-info-text {
+    font-size: 0.75rem !important;
+  }
 
-    .top-results-time {
-        font-size: 1.125rem !important;
-    }
+  .top-results-time {
+    font-size: 1.125rem !important;
+  }
 
-    .top-results-points {
-        font-size: 1rem !important;
-    }
+  .top-results-points {
+    font-size: 1rem !important;
+  }
 
-    /* Make avatar smaller on mobile */
-    .mantine-Avatar-root {
-        width: 64px !important;
-        height: 64px !important;
-    }
+  /* Make avatar smaller on mobile */
+  .mantine-Avatar-root {
+    width: 64px !important;
+    height: 64px !important;
+  }
 
-    .mantine-Avatar-root svg {
-        width: 32px !important;
-        height: 32px !important;
-    }
+  .mantine-Avatar-root svg {
+    width: 32px !important;
+    height: 32px !important;
+  }
 
-    .club-records-table th:first-child,
-    .club-records-table td:first-child {
-        width: 80px !important;
-        max-width: 80px !important;
-        min-width: 70px !important;
-        font-size: 9px !important;
-        white-space: normal !important;
-        word-wrap: break-word !important;
-        line-height: 1.1 !important;
-        padding: 4px !important;
-    }
-    .club-records-table th,
-    .club-records-table td {
-        padding: 0px 0px !important;
-    }
-    .club-records-table tbody td:not(:first-child) {
-        font-size: 11px !important;
-        line-height: 1.2 !important;
-    }
-    .club-records-table tbody td:not(:first-child) * {
-        font-size: 11px !important;
-        line-height: 1.2 !important;
-    }
-    .club-records-table tbody td:not(:first-child) .mantine-Text-root {
-        font-size: 10px !important;
-        line-height: 1.2 !important;
-    }
+  .club-records-table th:first-child,
+  .club-records-table td:first-child {
+    width: 80px !important;
+    max-width: 80px !important;
+    min-width: 70px !important;
+    font-size: 9px !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    line-height: 1.1 !important;
+    padding: 4px !important;
+  }
+  .club-records-table th,
+  .club-records-table td {
+    padding: 0px 0px !important;
+  }
+  .club-records-table tbody td:not(:first-child) {
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+  }
+  .club-records-table tbody td:not(:first-child) * {
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+  }
+  .club-records-table tbody td:not(:first-child) .mantine-Text-root {
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+  }
 
-    /* Relay team cards - smaller text on mobile */
-    .mantine-Card-root table th {
-        font-size: 0.625rem !important;
-        padding: 0.375rem 0.5rem !important;
-    }
-    
-    .mantine-Card-root table td {
-        font-size: 0.6875rem !important;
-        padding: 0.375rem 0.5rem !important;
-    }
-    
-    .mantine-Card-root table td .mantine-Text-root {
-        font-size: 0.6875rem !important;
-    }
-    
-    .mantine-Card-root table td .mantine-Badge-root {
-        font-size: 0.5rem !important;
-        padding: 0.125rem 0.25rem !important;
-    }
+  /* Relay team cards - smaller text on mobile */
+  .mantine-Card-root table th {
+    font-size: 0.625rem !important;
+    padding: 0.375rem 0.5rem !important;
+  }
 
-    /* Competitions table - smaller text on mobile */
-    .competitions-table th,
-    .competitions-table td {
-        font-size: 0.7rem !important;
-        padding: 0.5rem 0.375rem !important;
-    }
+  .mantine-Card-root table td {
+    font-size: 0.6875rem !important;
+    padding: 0.375rem 0.5rem !important;
+  }
 
-    .competitions-table td .mantine-Text-root {
-        font-size: 0.7rem !important;
-    }
+  .mantine-Card-root table td .mantine-Text-root {
+    font-size: 0.6875rem !important;
+  }
 
-    .competitions-table .mantine-Table-table {
-        font-size: 0.7rem !important;
-    }
+  .mantine-Card-root table td .mantine-Badge-root {
+    font-size: 0.5rem !important;
+    padding: 0.125rem 0.25rem !important;
+  }
 
-    /* Nested table in expanded rows */
-    .competitions-table .mantine-Table-table .mantine-Table-table th,
-    .competitions-table .mantine-Table-table .mantine-Table-table td {
-        font-size: 0.65rem !important;
-        padding: 0.375rem 0.25rem !important;
-    }
+  /* Competitions table - smaller text on mobile */
+  .competitions-table th,
+  .competitions-table td {
+    font-size: 0.7rem !important;
+    padding: 0.5rem 0.375rem !important;
+  }
 
-    /* Admin tables - smaller text on mobile */
-    .responsive-table table th,
-    .responsive-table table td {
-        font-size: 0.7rem !important;
-        padding: 0.5rem 0.375rem !important;
-    }
+  .competitions-table td .mantine-Text-root {
+    font-size: 0.7rem !important;
+  }
 
-    .responsive-table table td .mantine-Select-input {
-        font-size: 0.7rem !important;
-        min-height: 28px !important;
-        padding: 0.25rem 0.5rem !important;
-    }
+  .competitions-table .mantine-Table-table {
+    font-size: 0.7rem !important;
+  }
 
-    .responsive-table table td .mantine-Checkbox-label {
-        font-size: 0.7rem !important;
-    }
+  /* Nested table in expanded rows */
+  .competitions-table .mantine-Table-table .mantine-Table-table th,
+  .competitions-table .mantine-Table-table .mantine-Table-table td {
+    font-size: 0.65rem !important;
+    padding: 0.375rem 0.25rem !important;
+  }
 
-    .responsive-table table td .mantine-Badge-root {
-        font-size: 0.625rem !important;
-        padding: 0.125rem 0.375rem !important;
-    }
+  /* Admin tables - smaller text on mobile */
+  .responsive-table table th,
+  .responsive-table table td {
+    font-size: 0.7rem !important;
+    padding: 0.5rem 0.375rem !important;
+  }
 
-    .responsive-table table td .mantine-Text-root {
-        font-size: 0.7rem !important;
-    }
+  .responsive-table table td .mantine-Select-input {
+    font-size: 0.7rem !important;
+    min-height: 28px !important;
+    padding: 0.25rem 0.5rem !important;
+  }
+
+  .responsive-table table td .mantine-Checkbox-label {
+    font-size: 0.7rem !important;
+  }
+
+  .responsive-table table td .mantine-Badge-root {
+    font-size: 0.625rem !important;
+    padding: 0.125rem 0.375rem !important;
+  }
+
+  .responsive-table table td .mantine-Text-root {
+    font-size: 0.7rem !important;
+  }
 }
 
 .no-scrollbar {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }

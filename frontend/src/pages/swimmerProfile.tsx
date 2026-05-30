@@ -1,22 +1,20 @@
+import { Center, Flex, Loader, Tabs, Text } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import { Flex, Tabs, Center, Text, Loader } from "@mantine/core";
 import { API_BASE_URL } from "../../config";
-import type { SwimmerProfileResponse } from "../schema/types";
-import ProfileHeader from "../components/profile/ProfileHeader";
-import PerformanceChart from "../components/profile/PerformanceChart";
-import TopResultsCard from "../components/profile/TopResultsCard";
 import CompetitionsTable from "../components/profile/CompetitionsTable";
+import PerformanceChart from "../components/profile/PerformanceChart";
 import PersonalBestsTable from "../components/profile/PersonalBestsTable";
-import StrokeRadarChart from "../components/profile/StrokeRadarChart";
+import ProfileHeader from "../components/profile/ProfileHeader";
 import QuarterlyImprovementChart from "../components/profile/QuarterlyImprovementChart";
+import StrokeRadarChart from "../components/profile/StrokeRadarChart";
+import TopResultsCard from "../components/profile/TopResultsCard";
+import type { SwimmerProfileResponse } from "../schema/types";
 
 function SwimmerProfile() {
   const params = useParams();
   const id = params.id;
-  const [profileData, setProfileData] = useState<SwimmerProfileResponse | null>(
-    null,
-  );
+  const [profileData, setProfileData] = useState<SwimmerProfileResponse | null>(null);
   const [isFetching, setIsFetching] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,12 +26,9 @@ function SwimmerProfile() {
       setError(null);
 
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/api/swimmers/${id}/profile`,
-          {
-            method: "GET",
-          },
-        );
+        const response = await fetch(`${API_BASE_URL}/api/swimmers/${id}/profile`, {
+          method: "GET",
+        });
 
         if (!response.ok) {
           throw new Error("Nepodařilo se načíst profil plavce");
@@ -92,11 +87,7 @@ function SwimmerProfile() {
 
         <Tabs.Panel value="overview" pt="md">
           <Flex direction="column" gap="md">
-            <Flex
-              direction={{ base: "column", lg: "row" }}
-              gap="md"
-              align="stretch"
-            >
+            <Flex direction={{ base: "column", lg: "row" }} gap="md" align="stretch">
               <div style={{ flex: 4 }}>
                 <PerformanceChart data={startsByYear} />
               </div>
