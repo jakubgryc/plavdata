@@ -34,9 +34,20 @@ def setup_logging(app: FastAPI):
     @app.middleware("http")
     async def log_requests(request: Request, call_next):
         start_time = time.time()
-        response = await call_next(request)
+        client_ip = request.headers.get(
+            "x-real-ip", request.client.host if request.client else "-"
+        )
+        try:
+            response = await call_next(request)
+        except Exception:
+            duration = time.time() - start_time
+            logger.exception(
+                f"{client_ip} - {request.method} {request.url.path} "
+                f"- Status: 500 "
+                f"- Duration: {duration:.3f}s"
+            )
+            raise
         duration = time.time() - start_time
-        client_ip = request.headers.get("x-real-ip", request.client.host)
         logger.info(
             f"{client_ip} - {request.method} {request.url.path} "
             f"- Status: {response.status_code} "
