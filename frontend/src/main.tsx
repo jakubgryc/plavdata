@@ -69,8 +69,13 @@ const router = createBrowserRouter([
     ],
   },
 ]);
+const root = document.getElementById("root");
 
-createRoot(document.getElementById("root")!).render(
+if (!root) {
+  throw new Error("Root element not found");
+}
+
+createRoot(root).render(
   <StrictMode>
     <ColorSchemeScript defaultColorScheme="dark" />
     <MantineProvider theme={theme} defaultColorScheme="dark">

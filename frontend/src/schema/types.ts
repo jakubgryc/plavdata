@@ -91,10 +91,6 @@ interface BasePersonalBest {
   date?: string; // ISO date string
 }
 
-export interface PersonalBest extends BasePersonalBest {
-  swimmer: Swimmer;
-}
-
 interface Result {
   discipline: Discipline;
   course: Course;

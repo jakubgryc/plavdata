@@ -123,7 +123,7 @@ export function GroupDetailModal({
     };
 
     fetchSwimmers();
-  }, [group?.id, opened]);
+  }, [group, opened]);
 
   // Reset form when group changes
   useEffect(() => {
@@ -133,7 +133,7 @@ export function GroupDetailModal({
         display_name_cs: group.display_name_cs,
       });
     }
-  }, [group?.id]);
+  }, [group, form.setValues]);
 
   if (!group) return null;
 

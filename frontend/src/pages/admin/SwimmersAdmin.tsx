@@ -74,7 +74,7 @@ export function AdminSwimmersPage() {
         });
       }
     };
-    loadGroups();
+    void loadGroups();
   }, [navigate]);
 
   // Load swimmers when page changes, only if authenticated
@@ -101,8 +101,8 @@ export function AdminSwimmersPage() {
         setLoading(false);
       }
     };
-    loadSwimmers();
-  }, [page, navigate]);
+    void loadSwimmers();
+  }, [page]);
 
   // Compute select options once per groups load/change (avoid per-row map work)
   const groupOptions = useMemo(

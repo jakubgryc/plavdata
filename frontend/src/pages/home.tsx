@@ -60,7 +60,10 @@ function Home() {
             method: "GET",
           },
         );
-        if (!response.ok) throw new Error("Failed to fetch dashboard stats");
+        if (!response.ok) {
+          console.error("Error fetching dashboard", response.status);
+          return;
+        }
         const data: DashboardResponse = await response.json();
 
         // Store in cache
@@ -77,7 +80,7 @@ function Home() {
     setShowAllMen(false);
     setShowAllWomen(false);
     setShowAllCombined(false);
-    fetchDashboardStats();
+    void fetchDashboardStats();
   }, [periodType, cache]);
 
   if (isFetching) {

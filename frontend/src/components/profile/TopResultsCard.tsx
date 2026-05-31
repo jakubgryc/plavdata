@@ -34,7 +34,7 @@ function TopResultsCard({ results }: TopResultsCardProps) {
       <Stack gap="sm">
         {topResults.map((result, index) => (
           <Paper
-            key={`${result.discipline}-${index}`}
+            key={`${result.discipline}-${result.time}`}
             p={{ base: "xs", sm: "md" }}
             radius="md"
             withBorder

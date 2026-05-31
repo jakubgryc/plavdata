@@ -7,7 +7,11 @@ interface SwimmerRowProps {
   swimmer: Swimmer;
   groupOptions: Array<{ value: string; label: string }>;
   edits: SwimmerEdits | undefined;
-  onEdit: (swimmerId: number, field: keyof SwimmerEdits, value: any) => void;
+  onEdit: (
+    swimmerId: number,
+    field: keyof SwimmerEdits,
+    value: SwimmerEdits[keyof SwimmerEdits],
+  ) => void;
 }
 
 export const SwimmerRow = memo(function SwimmerRow({

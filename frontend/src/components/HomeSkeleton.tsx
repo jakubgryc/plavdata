@@ -17,6 +17,13 @@ interface HomeSkeletonProps {
 }
 
 function HomeSkeleton({ periodType = "season", onPeriodTypeChange }: HomeSkeletonProps) {
+  const STATS_SKELETON_KEYS = Array.from({ length: 4 }, (_, i) => `stats-skeleton-${i}`);
+  const MEN_WOMEN_SKELETON_KEYS = Array.from({ length: 2 }, (_, i) => `men-women-skeleton-${i}`);
+  const TOP_SWIMMERS_SKELETON_KEYS = Array.from(
+    { length: 5 },
+    (_, i) => `top-swimmer-skeleton-${i}`,
+  );
+  const RECORDS_SKELETON_KEYS = Array.from({ length: 5 }, (_, i) => `record-skeleton-${i}`);
   return (
     <Flex direction="column" w="100%" py="md" pb="xl">
       {/* Header */}
@@ -34,8 +41,8 @@ function HomeSkeleton({ periodType = "season", onPeriodTypeChange }: HomeSkeleto
 
       {/* Stats Grid Skeleton */}
       <SimpleGrid cols={{ base: 1, xs: 2, lg: 4 }} mb="xl">
-        {[...Array(4)].map((_, i) => (
-          <Paper key={i} p="lg" radius="md" withBorder shadow="sm">
+        {STATS_SKELETON_KEYS.map((key) => (
+          <Paper key={key} p="lg" radius="md" withBorder shadow="sm">
             <Group justify="space-between" mb="md">
               <Skeleton height={40} width={40} radius="md" />
               <Skeleton height={20} width={60} radius="xl" />
@@ -56,12 +63,12 @@ function HomeSkeleton({ periodType = "season", onPeriodTypeChange }: HomeSkeleto
       </Group>
 
       <SimpleGrid cols={{ base: 1, lg: 2 }} mb="xl">
-        {[...Array(2)].map((_, i) => (
-          <Paper key={i} p="lg" radius="md" withBorder shadow="sm">
+        {MEN_WOMEN_SKELETON_KEYS.map((men_women_key) => (
+          <Paper key={men_women_key} p="lg" radius="md" withBorder shadow="sm">
             <Skeleton height={24} width={120} mb="lg" />
             <Stack gap="xs">
-              {[...Array(5)].map((_, j) => (
-                <Skeleton key={j} height={48} radius="md" />
+              {TOP_SWIMMERS_SKELETON_KEYS.map((top_swimmer_key) => (
+                <Skeleton key={top_swimmer_key} height={48} radius="md" />
               ))}
             </Stack>
           </Paper>
@@ -73,8 +80,8 @@ function HomeSkeleton({ periodType = "season", onPeriodTypeChange }: HomeSkeleto
         <Skeleton height={24} width={200} mb={4} />
         <Skeleton height={14} width={300} mb="lg" />
         <Stack gap="xs">
-          {[...Array(5)].map((_, j) => (
-            <Skeleton key={j} height={40} radius="sm" />
+          {RECORDS_SKELETON_KEYS.map((record_key) => (
+            <Skeleton key={record_key} height={40} radius="sm" />
           ))}
         </Stack>
       </Paper>
@@ -83,8 +90,8 @@ function HomeSkeleton({ periodType = "season", onPeriodTypeChange }: HomeSkeleto
         <Skeleton height={24} width={200} mb={4} />
         <Skeleton height={14} width={300} mb="lg" />
         <Stack gap="xs">
-          {[...Array(5)].map((_, j) => (
-            <Skeleton key={j} height={40} radius="sm" />
+          {RECORDS_SKELETON_KEYS.map((record_key) => (
+            <Skeleton key={record_key} height={40} radius="sm" />
           ))}
         </Stack>
       </Paper>

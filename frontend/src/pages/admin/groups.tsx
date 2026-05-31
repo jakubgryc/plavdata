@@ -9,7 +9,7 @@ import {
   Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { CreateGroupModal } from "../../components/admin/CreateGroupModal";
 import { GroupCard } from "../../components/admin/GroupCard";
@@ -27,7 +27,7 @@ export function AdminGroupsPage() {
   const [createOpened, { open: openCreate, close: closeCreate }] = useDisclosure(false);
   const [detailOpened, { open: openDetail, close: closeDetail }] = useDisclosure(false);
 
-  const loadGroups = async () => {
+  const loadGroups = useCallback(async () => {
     try {
       setLoading(true);
       const data = await groupsApi.getAll();
@@ -37,14 +37,14 @@ export function AdminGroupsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (!authApi.isAuthenticated()) {
       navigate("/admin");
     }
-    loadGroups();
-  }, [navigate]);
+    void loadGroups();
+  }, [navigate, loadGroups]);
 
   const handleGroupClick = async (group: Group) => {
     try {

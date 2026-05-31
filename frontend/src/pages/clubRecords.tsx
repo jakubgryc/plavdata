@@ -1,6 +1,6 @@
 import { Flex, Modal, SegmentedControl, Stack, Text, Title } from "@mantine/core";
 import { DataTable } from "mantine-datatable";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { API_BASE_URL } from "../../config";
@@ -23,13 +23,36 @@ interface ClubRecord {
   date: string;
 }
 
-interface ClubRecordsData {
-  [discipline: string]: {
-    [sex: string]: {
-      [ageCategory: string]: ClubRecord;
-    };
-  };
+interface ApiClubRecord {
+  disciplineCode: string;
+  ageCategory: AgeCategory;
+  swimmerId: number;
+  name: string;
+  surname: string;
+  sex: Sex;
+  time: number;
+  ageAtResult: number;
+  splitTime?: boolean;
+  relayPart?: boolean;
+  competitionLocation?: string;
+  date: string;
 }
+
+const ageCategories = ["9", "10", "11", "12", "13", "14", "junior", "open"] as const;
+
+type AgeCategory = (typeof ageCategories)[number];
+type Sex = "female" | "male";
+
+type ClubRecordsData = Record<
+  string,
+  Partial<Record<Sex, Partial<Record<AgeCategory, ClubRecord>>>>
+>;
+
+type ClubRecordRow = {
+  discipline: string;
+  sex: Sex;
+  isFirstOfType: boolean;
+} & Partial<Record<AgeCategory, ClubRecord | null>>;
 
 function ClubRecords() {
   const navigate = useNavigate();
@@ -37,7 +60,7 @@ function ClubRecords() {
   const [clubRecords, setClubRecords] = useState<ClubRecordsData>({});
   const [isFetching, setIsFetching] = useState<boolean>(false);
 
-  const [cache, setCache] = useState<Record<string, ClubRecordsData>>({});
+  const cacheRef = useRef<Record<string, ClubRecordsData>>({});
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalData, setModalData] = useState<{
@@ -62,12 +85,15 @@ function ClubRecords() {
         const response = await fetch(`${API_BASE_URL}/api/results/club-records?course=${course}`, {
           method: "GET",
         });
-        if (!response.ok) throw new Error("Failed to fetch club records");
-        const records = await response.json();
+        if (!response.ok) {
+          console.error("Failed to fetch club records:", response.status);
+          return;
+        }
+        const records = (await response.json()) as ApiClubRecord[];
 
         // Transform the flat list of records into nested structure
         const data: ClubRecordsData = {};
-        records.forEach((record: any) => {
+        records.forEach((record) => {
           const disciplineCode = record.disciplineCode;
           const ageCategory = record.ageCategory;
           const sex = record.sex;
@@ -76,7 +102,7 @@ function ClubRecords() {
             data[disciplineCode] = {};
           }
 
-          if (!data[disciplineCode][sex]) {
+          if (!data[disciplineCode]?.[sex]) {
             data[disciplineCode][sex] = {};
           }
 
@@ -96,8 +122,7 @@ function ClubRecords() {
           };
         });
 
-        const cacheKey = course;
-        setCache((prevCache) => ({ ...prevCache, [cacheKey]: data }));
+        cacheRef.current[course] = data;
         setClubRecords(data);
       } catch (error) {
         console.error("Error fetching club records:", error);
@@ -106,11 +131,10 @@ function ClubRecords() {
       }
     };
 
-    const cacheKey = selectedCourse;
-    if (cache[cacheKey]) {
-      setClubRecords(cache[cacheKey]);
+    if (cacheRef.current[selectedCourse]) {
+      setClubRecords(cacheRef.current[selectedCourse]);
     } else {
-      fetchClubRecords(selectedCourse);
+      void fetchClubRecords(selectedCourse);
     }
   }, [selectedCourse]);
 
@@ -124,24 +148,22 @@ function ClubRecords() {
     return "";
   };
 
-  // Age categories that match the API response
-  const ageCategories = ["9", "10", "11", "12", "13", "14", "junior", "open"];
-
   // Build table data
   const buildTableData = () => {
     const disciplinesList =
       selectedCourse === "50" ? DISCIPLINES.filter((d) => d !== "100 O") : DISCIPLINES;
 
-    const rows: any[] = [];
+    const rows: ClubRecordRow[] = [];
 
     disciplinesList.forEach((discipline, disciplineIndex) => {
       // Create female row
-      const femaleRow: any = {
+      const femaleRow: ClubRecordRow = {
         discipline: `${discipline} - ženy`,
         sex: "female",
+        isFirstOfType: false,
       };
       ageCategories.forEach((category) => {
-        const record = clubRecords[discipline]?.["female"]?.[category];
+        const record = clubRecords[discipline]?.female?.[category];
         femaleRow[category] = record || null;
       });
 
@@ -154,9 +176,13 @@ function ClubRecords() {
       rows.push(femaleRow);
 
       // Create male row
-      const maleRow: any = { discipline: `${discipline} - muži`, sex: "male" };
+      const maleRow: ClubRecordRow = {
+        discipline: `${discipline} - muži`,
+        sex: "male",
+        isFirstOfType: false,
+      };
       ageCategories.forEach((category) => {
-        const record = clubRecords[discipline]?.["male"]?.[category];
+        const record = clubRecords[discipline]?.male?.[category];
         maleRow[category] = record || null;
       });
 
@@ -191,7 +217,7 @@ function ClubRecords() {
       </Flex>
 
       <Flex direction="column" mah="80vh" style={{ overflowY: "auto" }}>
-        <DataTable
+        <DataTable<ClubRecordRow>
           className="shadow-xl club-records-table"
           withTableBorder
           borderRadius="lg"
@@ -247,10 +273,10 @@ function ClubRecords() {
                   </Flex>
                 </Stack>
               ),
-              render: (record: any) => {
+              render: (record: ClubRecordRow) => {
                 const data = record[category];
                 if (!data) {
-                  return <></>;
+                  return;
                 }
                 const bgColor = data.splitTime
                   ? colorScheme === "dark"

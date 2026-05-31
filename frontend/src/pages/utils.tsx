@@ -31,14 +31,17 @@ function Utils() {
     const fetchSwimmers = async () => {
       try {
         const response = await fetch(`${API_BASE_URL}/api/swimmers/grouped`);
-        if (!response.ok) throw new Error("Failed to fetch swimmers");
+        if (!response.ok) {
+          console.error("Error fetching grouped swimmers", response.status);
+          return;
+        }
         const data: GroupedSwimmers[] = await response.json();
         setSwimmers(data);
       } catch (error) {
         console.error("Error fetching swimmers:", error);
       }
     };
-    fetchSwimmers();
+    void fetchSwimmers();
   }, []);
 
   const handleCalculate = async () => {
@@ -82,7 +85,8 @@ function Utils() {
       }
 
       if (!response.ok) {
-        throw new Error("Failed to calculate relay");
+        console.error("Nepodařilo se vypočítat štafetu", response.status);
+        return;
       }
 
       const data = await response.json();
@@ -142,7 +146,8 @@ function Utils() {
       }
 
       if (!response.ok) {
-        throw new Error("Failed to calculate equal fun relays");
+        console.error("Nepodařilo se vypočítat štafety", response.status);
+        return;
       }
 
       const data = await response.json();

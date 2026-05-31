@@ -165,7 +165,7 @@ export function EqualRelayTeamCard({
 
               return (
                 <Table.Tr
-                  key={`${swimmer.swimmerId}-${idx}`}
+                  key={swimmer.swimmerId}
                   style={{
                     backgroundColor:
                       swimsTwice && !isFirstOccurrence

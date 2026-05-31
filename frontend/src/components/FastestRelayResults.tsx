@@ -26,6 +26,8 @@ export function FastestRelayResults({ results, relayType, isLoading }: FastestRe
   const { colorScheme } = useMantineColorScheme();
   const [showAdditionalRelays, setShowAdditionalRelays] = useState(false);
 
+  const SKELETON_KEYS = Array.from({ length: 4 }, (_, i) => `skeleton-${i}`);
+
   if (isLoading) {
     return (
       <Card
@@ -49,8 +51,8 @@ export function FastestRelayResults({ results, relayType, isLoading }: FastestRe
           <Skeleton height={16} width="80%" />
         </Box>
         <Stack gap="xs" p="lg">
-          {[1, 2, 3, 4].map((_, idx) => (
-            <Group key={idx} justify="space-between">
+          {SKELETON_KEYS.map((key) => (
+            <Group key={key} justify="space-between">
               <Skeleton height={16} width="40%" />
               <Skeleton height={16} width={60} />
             </Group>
@@ -97,7 +99,7 @@ export function FastestRelayResults({ results, relayType, isLoading }: FastestRe
           <Collapse in={showAdditionalRelays}>
             <Grid>
               {results.slice(1).map((result, index) => (
-                <Grid.Col key={index} span={{ base: 12, md: 6 }}>
+                <Grid.Col key={result.totalTime} span={{ base: 12, md: 6 }}>
                   <FastestRelayCard
                     swimmers={result.swimmers}
                     totalTime={result.totalTime}

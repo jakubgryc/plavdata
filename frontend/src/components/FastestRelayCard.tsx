@@ -145,7 +145,7 @@ export function FastestRelayCard({
             const cumulativeTime = swimmers.slice(0, idx + 1).reduce((sum, s) => sum + s.time, 0);
 
             return (
-              <Table.Tr key={`${swimmer.swimmerId}-${idx}`}>
+              <Table.Tr key={swimmer.swimmerId}>
                 <Table.Td>
                   {relayType === "medley" ? (
                     <Badge

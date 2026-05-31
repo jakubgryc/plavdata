@@ -43,7 +43,10 @@ function CompareSwimmers() {
         const response = await fetch(`${API_BASE_URL}/api/swimmers/grouped?include_former=true`, {
           method: "GET",
         });
-        if (!response.ok) throw new Error("Failed to fetch grouped swimmers");
+        if (!response.ok) {
+          console.error("Error fetching grouped swimmers", response.status);
+          return;
+        }
         const data: GroupedSwimmers[] = await response.json();
         setGroupedSwimmers(data);
       } catch (error) {
@@ -51,7 +54,7 @@ function CompareSwimmers() {
       }
     };
 
-    fetchGroupedSwimmers();
+    void fetchGroupedSwimmers();
   }, []);
 
   const fetchComparisonResults = async () => {
@@ -77,7 +80,10 @@ function CompareSwimmers() {
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to fetch comparison results");
+      if (!response.ok) {
+        console.error("Error fetching comparison results", response.status);
+        return;
+      }
       const data: SwimmerResults[] = await response.json();
       setResults(data);
       const currentDiscipline = parseCurrentDiscipline(data);

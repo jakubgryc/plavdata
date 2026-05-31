@@ -11,12 +11,6 @@ export interface LoginResponse {
   username: string;
 }
 
-export interface User {
-  id: number;
-  username: string;
-  is_active: boolean;
-}
-
 interface DecodedToken {
   sub: string;
   exp: number;
@@ -33,7 +27,7 @@ class AuthApi {
       const jsonPayload = decodeURIComponent(
         atob(base64)
           .split("")
-          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .map((c) => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`)
           .join(""),
       );
       return JSON.parse(jsonPayload);
@@ -81,25 +75,6 @@ class AuthApi {
     }
 
     return await response.json();
-  }
-
-  async getCurrentUser(): Promise<User> {
-    const token = this.getToken();
-    if (!token) {
-      throw new Error("No token found");
-    }
-
-    const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch user");
-    }
-
-    return response.json();
   }
 
   saveToken(token: string, username: string): void {

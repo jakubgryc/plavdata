@@ -31,7 +31,9 @@ function SwimmerProfile() {
         });
 
         if (!response.ok) {
-          throw new Error("Nepodařilo se načíst profil plavce");
+          console.error("Error fetching profile", response.status);
+          setError("Nepodařilo se načíst profil plavce");
+          return;
         }
 
         const data: SwimmerProfileResponse = await response.json();
@@ -44,7 +46,7 @@ function SwimmerProfile() {
       }
     };
 
-    fetchProfile();
+    void fetchProfile();
   }, [id]);
 
   if (isFetching) {

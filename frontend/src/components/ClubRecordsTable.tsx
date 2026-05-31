@@ -51,8 +51,8 @@ function ClubRecordsTable({ records, title, subtitle, variant }: ClubRecordsTabl
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            {records.map((record, idx) => (
-              <Table.Tr key={idx}>
+            {records.map((record) => (
+              <Table.Tr key={record.resultId}>
                 <Table.Td fw={500}>{record.discipline}</Table.Td>
                 <Table.Td
                   style={{ cursor: "pointer" }}

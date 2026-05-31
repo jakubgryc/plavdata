@@ -1,5 +1,18 @@
-import type { OptionsFilter } from "@mantine/core";
+import type { ComboboxParsedItem, ComboboxParsedItemGroup, OptionsFilter } from "@mantine/core";
 import { removeDiacritics } from "./constants";
+
+type OptionLike = ComboboxParsedItem;
+
+const isGroup = (option: ComboboxParsedItem): option is ComboboxParsedItemGroup => {
+  return typeof option === "object" && option !== null && "items" in option;
+};
+
+const getLabel = (item: ComboboxParsedItem): string => {
+  if (typeof item === "object" && item !== null && "label" in item) {
+    return item.label === "string" ? item.label : "";
+  }
+  return "";
+};
 
 // Custom filter that ignores Czech diacritics for swimmer selection, heavily inspired by Claude
 export const swimmersFilter: OptionsFilter = ({ options, search }) => {
@@ -12,29 +25,27 @@ export const swimmersFilter: OptionsFilter = ({ options, search }) => {
 
   // Filter grouped options - keep groups but filter items within them
   return options
-    .map((option: any) => {
+    .map((option) => {
+      const typedOption = option as ComboboxParsedItem;
       // If it's a group with items, filter the items
-      if (option.items && Array.isArray(option.items)) {
-        const filteredItems = option.items.filter((item: any) => {
-          const label = item.label || item;
+      if (isGroup(typedOption) && Array.isArray(typedOption.items)) {
+        const filteredItems = typedOption.items.filter((item) => {
+          const label = getLabel(item);
           const normalizedLabel = removeDiacritics(label.toLowerCase().trim());
           return normalizedLabel.includes(normalizedSearch);
         });
 
         // Only return the group if it has matching items
         if (filteredItems.length > 0) {
-          return { ...option, items: filteredItems };
+          return { ...typedOption, items: filteredItems };
         }
         return null;
       }
 
       // For non-grouped items, filter by label
-      if (option.label) {
-        const normalizedLabel = removeDiacritics(option.label.toLowerCase().trim());
-        return normalizedLabel.includes(normalizedSearch) ? option : null;
-      }
-
-      return option;
+      const label = getLabel(typedOption);
+      const normalizedLabel = removeDiacritics(label.toLowerCase().trim());
+      return normalizedLabel.includes(normalizedSearch) ? typedOption : null;
     })
-    .filter((option: any) => option !== null);
+    .filter((option): option is OptionLike => option !== null);
 };

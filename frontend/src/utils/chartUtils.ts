@@ -144,21 +144,6 @@ export function findSwimmerIds(
   return swimmerIds;
 }
 
-export function findMinMaxDates(data: SwimmerResults[]): [number, number] {
-  let minDate = Infinity;
-  let maxDate = -Infinity;
-
-  data.forEach((swimmerData) => {
-    swimmerData.results.forEach((result) => {
-      const resultDate = new Date(result.date).getTime();
-      if (resultDate < minDate) minDate = resultDate;
-      if (resultDate > maxDate) maxDate = resultDate;
-    });
-  });
-
-  return [minDate, maxDate];
-}
-
 export function parseCurrentDiscipline(data: SwimmerResults[]): string | null {
   if (data.length === 0) return null;
 

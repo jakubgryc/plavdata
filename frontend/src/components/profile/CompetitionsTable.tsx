@@ -154,13 +154,13 @@ function CompetitionsTable({ competitions }: CompetitionsTableProps) {
                               </Table.Tr>
                             </Table.Thead>
                             <Table.Tbody>
-                              {comp.results.map((result, idx) => {
+                              {comp.results.map((result) => {
                                 const performancePercent = (result.performance * 100).toFixed(2);
                                 const isImprovement = result.improvement;
                                 const performanceColor = isImprovement ? "green" : "red";
 
                                 return (
-                                  <Table.Tr key={idx}>
+                                  <Table.Tr key={`${result.code}-${result.time}`}>
                                     <Table.Td>
                                       <Text size="sm">{result.discipline}</Text>
                                     </Table.Td>

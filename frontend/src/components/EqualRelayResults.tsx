@@ -21,6 +21,8 @@ interface EqualRelayResultsProps {
 export function EqualRelayResults({ results, isLoading }: EqualRelayResultsProps) {
   const { colorScheme } = useMantineColorScheme();
 
+  const SKELETON_KEYS = Array.from({ length: 4 }, (_, i) => `skeleton-${i}`);
+
   if (isLoading) {
     return (
       <Grid>
@@ -28,8 +30,8 @@ export function EqualRelayResults({ results, isLoading }: EqualRelayResultsProps
           <Card withBorder shadow="sm" p="lg">
             <Skeleton height={20} width="70%" mb="md" />
             <Stack gap="xs">
-              {[1, 2, 3, 4].map((_, idx) => (
-                <Group key={idx} justify="space-between">
+              {SKELETON_KEYS.map((key) => (
+                <Group key={key} justify="space-between">
                   <Skeleton height={16} width="50%" />
                   <Skeleton height={16} width={60} />
                 </Group>
@@ -45,7 +47,7 @@ export function EqualRelayResults({ results, isLoading }: EqualRelayResultsProps
     return null;
   }
 
-  // Find fastest team time to calculate deltas
+  // Find the fastest team time to calculate deltas
   const fastestTime = Math.min(...results.teams.map((t) => t.totalTime));
 
   return (
@@ -61,8 +63,10 @@ export function EqualRelayResults({ results, isLoading }: EqualRelayResultsProps
           const delta = team.totalTime - fastestTime;
           const isFastest = delta === 0;
 
+          const key_id = team.swimmers[0]?.swimmerId || teamIndex; // Fallback to team index if swimmer ID is not available
+
           return (
-            <Grid.Col key={teamIndex} span={{ base: 12, md: 6, lg: 4 }}>
+            <Grid.Col key={key_id} span={{ base: 12, md: 6, lg: 4 }}>
               <EqualRelayTeamCard
                 teamNumber={teamIndex + 1}
                 swimmers={team.swimmers}
