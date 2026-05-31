@@ -1,29 +1,29 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
-import { useNavigate } from "react-router";
 import {
-  Title,
+  Badge,
+  Box,
+  Button,
+  Center,
+  Flex,
+  Group,
+  Loader,
+  Pagination,
+  Paper,
+  Stack,
   Table,
   Text,
-  Group,
-  Pagination,
-  Loader,
-  Center,
-  Stack,
-  Button,
-  Paper,
-  Box,
-  Badge,
-  Flex,
+  Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { IconDeviceFloppy, IconX } from "@tabler/icons-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router";
+import { ConfirmChangesModal } from "../../components/admin/ConfirmChangesModal";
+import { SwimmerRow } from "../../components/admin/SwimmerRow";
+import type { Group as GroupType } from "../../schema/groups";
+import type { Swimmer, SwimmerEdits } from "../../schema/swimmers";
 import { authApi } from "../../utils/auth";
 import { swimmersApi } from "../../utils/swimmersApi";
-import { SwimmerRow } from "../../components/admin/SwimmerRow";
-import { ConfirmChangesModal } from "../../components/admin/ConfirmChangesModal";
-import type { Swimmer, SwimmerEdits } from "../../schema/swimmers";
-import type { Group as GroupType } from "../../schema/groups";
 
 const PAGE_SIZE = 50;
 
@@ -48,13 +48,10 @@ export function AdminSwimmersPage() {
   const [saving, setSaving] = useState(false);
 
   // Edits tracking - Map of swimmerId -> edits with original data
-  const [editedSwimmers, setEditedSwimmers] = useState<
-    Map<number, EditedSwimmerData>
-  >(new Map());
+  const [editedSwimmers, setEditedSwimmers] = useState<Map<number, EditedSwimmerData>>(new Map());
 
   // Confirmation modal
-  const [confirmOpened, { open: openConfirm, close: closeConfirm }] =
-    useDisclosure(false);
+  const [confirmOpened, { open: openConfirm, close: closeConfirm }] = useDisclosure(false);
 
   // Check auth on mount and prevent fetching if not authenticated
   useEffect(() => {
@@ -77,7 +74,7 @@ export function AdminSwimmersPage() {
         });
       }
     };
-    loadGroups();
+    void loadGroups();
   }, [navigate]);
 
   // Load swimmers when page changes, only if authenticated
@@ -104,8 +101,8 @@ export function AdminSwimmersPage() {
         setLoading(false);
       }
     };
-    loadSwimmers();
-  }, [page, navigate]);
+    void loadSwimmers();
+  }, [page]);
 
   // Compute select options once per groups load/change (avoid per-row map work)
   const groupOptions = useMemo(
@@ -161,8 +158,7 @@ export function AdminSwimmersPage() {
   const pendingChangesCount = useMemo(() => {
     let count = 0;
     editedSwimmers.forEach(({ edits, original }) => {
-      if (edits.group_id !== undefined && edits.group_id !== original.group_id)
-        count++;
+      if (edits.group_id !== undefined && edits.group_id !== original.group_id) count++;
       if (
         edits.show_in_comparison !== undefined &&
         edits.show_in_comparison !== original.show_in_comparison
@@ -189,10 +185,7 @@ export function AdminSwimmersPage() {
     editedSwimmers.forEach(({ edits, original }, swimmerId) => {
       const actualChanges: SwimmerEdits = {};
 
-      if (
-        edits.group_id !== undefined &&
-        edits.group_id !== original.group_id
-      ) {
+      if (edits.group_id !== undefined && edits.group_id !== original.group_id) {
         actualChanges.group_id = edits.group_id;
       }
       if (
@@ -235,12 +228,10 @@ export function AdminSwimmersPage() {
 
     try {
       // Build bulk update request
-      const updates = Array.from(realChanges.entries()).map(
-        ([swimmerId, changes]) => ({
-          swimmer_id: swimmerId,
-          updates: changes,
-        }),
-      );
+      const updates = Array.from(realChanges.entries()).map(([swimmerId, changes]) => ({
+        swimmer_id: swimmerId,
+        updates: changes,
+      }));
 
       const result = await swimmersApi.bulkUpdate({ updates });
 
@@ -323,10 +314,7 @@ export function AdminSwimmersPage() {
                 >
                   Zahodit
                 </Button>
-                <Button
-                  leftSection={<IconDeviceFloppy size={16} />}
-                  onClick={openConfirm}
-                >
+                <Button leftSection={<IconDeviceFloppy size={16} />} onClick={openConfirm}>
                   Uložit změny
                 </Button>
               </>
@@ -360,14 +348,7 @@ export function AdminSwimmersPage() {
             }}
           >
             {loading && (
-              <Center
-                pos="absolute"
-                top={0}
-                left={0}
-                right={0}
-                bottom={0}
-                style={{ zIndex: 10 }}
-              >
+              <Center pos="absolute" top={0} left={0} right={0} bottom={0} style={{ zIndex: 10 }}>
                 <Loader />
               </Center>
             )}
@@ -377,13 +358,7 @@ export function AdminSwimmersPage() {
               className="responsive-table admin-table-scroll"
               style={{ flex: 1, minHeight: 0 }}
             >
-              <Table
-                striped
-                highlightOnHover
-                stickyHeader
-                withColumnBorders
-                stickyHeaderOffset={0}
-              >
+              <Table striped highlightOnHover stickyHeader withColumnBorders stickyHeaderOffset={0}>
                 <Table.Thead>
                   <Table.Tr>
                     <Table.Th style={{ minWidth: 120 }}>Příjmení</Table.Th>

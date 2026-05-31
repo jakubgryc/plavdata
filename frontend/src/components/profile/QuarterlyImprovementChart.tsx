@@ -1,21 +1,15 @@
-import {
-  Paper,
-  Title,
-  Group,
-  ThemeIcon,
-  useMantineColorScheme,
-} from "@mantine/core";
+import { Group, Paper, ThemeIcon, Title, useMantineColorScheme } from "@mantine/core";
 import { IconTrendingUp } from "@tabler/icons-react";
 import {
-  ComposedChart,
   Bar,
+  CartesianGrid,
+  ComposedChart,
+  Legend,
   Line,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  CartesianGrid,
 } from "recharts";
 import type { QuarterlyImprovement } from "../../schema/types";
 
@@ -40,10 +34,7 @@ function QuarterlyImprovementChart({ data }: QuarterlyImprovementChartProps) {
 
       <ResponsiveContainer width="100%" height={350}>
         <ComposedChart data={data}>
-          <CartesianGrid
-            strokeDasharray="3 3"
-            stroke={isDark ? "#373A40" : "#dee2e6"}
-          />
+          <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#373A40" : "#dee2e6"} />
           <XAxis
             dataKey="quarter"
             tick={{
@@ -121,12 +112,7 @@ function QuarterlyImprovementChart({ data }: QuarterlyImprovementChartProps) {
             radius={[4, 4, 0, 0]}
             opacity={0.7}
           />
-          <Bar
-            yAxisId="left"
-            dataKey="improvements"
-            fill="#22c55e"
-            radius={[4, 4, 0, 0]}
-          />
+          <Bar yAxisId="left" dataKey="improvements" fill="#22c55e" radius={[4, 4, 0, 0]} />
           <Line
             yAxisId="right"
             type="monotone"

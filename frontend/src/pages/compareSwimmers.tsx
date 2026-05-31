@@ -1,12 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
 import { Flex, Title } from "@mantine/core";
-import { DISCIPLINES } from "../utils/constants";
-import type { SwimmerResults, GroupedSwimmers } from "../schema/types";
+import { useEffect, useMemo, useState } from "react";
+import { API_BASE_URL } from "../../config";
 import ComparisonFilterBar from "../components/ComparisonFilterBar";
 import ComparisonSwimmerChart from "../components/ComparisonSwimmerChart";
-import { API_BASE_URL } from "../../config";
-
-import { shiftResults, parseCurrentDiscipline } from "../utils/chartUtils";
+import type { GroupedSwimmers, SwimmerResults } from "../schema/types";
+import { parseCurrentDiscipline, shiftResults } from "../utils/chartUtils";
+import { DISCIPLINES } from "../utils/constants";
 
 function CompareSwimmers() {
   const [results, setResults] = useState<SwimmerResults[]>([]);
@@ -16,8 +15,7 @@ function CompareSwimmers() {
   // Filter bar states
   const [pool, setPool] = useState<string>("25");
   const [timeAxis, setTimeAxis] = useState<string>("absolute");
-  const [intermediateTimes, setIntermediateTimes] =
-    useState<string>("onlyFinal");
+  const [intermediateTimes, setIntermediateTimes] = useState<string>("onlyFinal");
   const [resultType, setResultType] = useState<string>("all");
 
   /*
@@ -27,13 +25,10 @@ function CompareSwimmers() {
    * parsedDiscipline can be different when user selects discipline but does not
    * update the results yet
    */
-  const [selectedDiscipline, setSelectedDiscipline] = useState<string | null>(
-    DISCIPLINES[0],
-  );
+  const [selectedDiscipline, setSelectedDiscipline] = useState<string | null>(DISCIPLINES[0]);
   const [parsedDiscipline, setParsedDiscipline] = useState<string | null>(null);
 
-  const [lastFetchedFilterHash, setLastFetchedFilterHash] =
-    useState<string>("");
+  const [lastFetchedFilterHash, setLastFetchedFilterHash] = useState<string>("");
 
   const parsedResults = useMemo(() => {
     if (timeAxis === "relative") {
@@ -45,13 +40,13 @@ function CompareSwimmers() {
   useEffect(() => {
     const fetchGroupedSwimmers = async () => {
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/api/swimmers/grouped?include_former=true`,
-          {
-            method: "GET",
-          },
-        );
-        if (!response.ok) throw new Error("Failed to fetch grouped swimmers");
+        const response = await fetch(`${API_BASE_URL}/api/swimmers/grouped?include_former=true`, {
+          method: "GET",
+        });
+        if (!response.ok) {
+          console.error("Error fetching grouped swimmers", response.status);
+          return;
+        }
         const data: GroupedSwimmers[] = await response.json();
         setGroupedSwimmers(data);
       } catch (error) {
@@ -59,7 +54,7 @@ function CompareSwimmers() {
       }
     };
 
-    fetchGroupedSwimmers();
+    void fetchGroupedSwimmers();
   }, []);
 
   const fetchComparisonResults = async () => {
@@ -85,14 +80,15 @@ function CompareSwimmers() {
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to fetch comparison results");
+      if (!response.ok) {
+        console.error("Error fetching comparison results", response.status);
+        return;
+      }
       const data: SwimmerResults[] = await response.json();
       setResults(data);
       const currentDiscipline = parseCurrentDiscipline(data);
       setParsedDiscipline(currentDiscipline);
-      setLastFetchedFilterHash(
-        `${selectedSwimmers.join(",")}|${selectedDiscipline}|${pool}`,
-      );
+      setLastFetchedFilterHash(`${selectedSwimmers.join(",")}|${selectedDiscipline}|${pool}`);
     } catch (error) {
       console.error("Error fetching comparison results:", error);
     }

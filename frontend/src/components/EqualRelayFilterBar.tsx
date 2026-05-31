@@ -1,4 +1,4 @@
-import { Button, Grid, Stack, Text, NumberInput } from "@mantine/core";
+import { Button, Grid, NumberInput, Stack, Text } from "@mantine/core";
 import { IconCalculator } from "@tabler/icons-react";
 import type { GroupedSwimmers } from "../schema/types";
 import { SwimmerSelection } from "./SwimmerSelection";
@@ -36,13 +36,7 @@ export function EqualRelayFilterBar({
         <Stack gap="md">
           <NumberInput
             label={
-              <Text
-                size="xs"
-                tt="uppercase"
-                fw={500}
-                c="dimmed"
-                style={{ letterSpacing: "0.5px" }}
-              >
+              <Text size="xs" tt="uppercase" fw={500} c="dimmed" style={{ letterSpacing: "0.5px" }}>
                 Počet štafet
               </Text>
             }

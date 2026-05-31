@@ -38,10 +38,7 @@ async function apiRequest<T>(
  * @param url - The URL to fetch
  * @param authenticated - Whether to use authenticated fetch (default: true)
  */
-export function apiGet<T>(
-  url: string,
-  authenticated: boolean = true,
-): Promise<T> {
+export function apiGet<T>(url: string, authenticated: boolean = true): Promise<T> {
   return apiRequest<T>(url, undefined, authenticated);
 }
 
@@ -51,11 +48,7 @@ export function apiGet<T>(
  * @param data - The data to send in the request body
  * @param authenticated - Whether to use authenticated fetch (default: true)
  */
-export function apiPost<T>(
-  url: string,
-  data: unknown,
-  authenticated: boolean = true,
-): Promise<T> {
+export function apiPost<T>(url: string, data: unknown, authenticated: boolean = true): Promise<T> {
   return apiRequest<T>(
     url,
     {
@@ -73,11 +66,7 @@ export function apiPost<T>(
  * @param data - The data to send in the request body
  * @param authenticated - Whether to use authenticated fetch (default: true)
  */
-export function apiPatch<T>(
-  url: string,
-  data: unknown,
-  authenticated: boolean = true,
-): Promise<T> {
+export function apiPatch<T>(url: string, data: unknown, authenticated: boolean = true): Promise<T> {
   return apiRequest<T>(
     url,
     {
@@ -94,10 +83,7 @@ export function apiPatch<T>(
  * @param url - The URL to fetch
  * @param authenticated - Whether to use authenticated fetch (default: true)
  */
-export function apiDelete<T = void>(
-  url: string,
-  authenticated: boolean = true,
-): Promise<T> {
+export function apiDelete<T = void>(url: string, authenticated: boolean = true): Promise<T> {
   return apiRequest<T>(
     url,
     {

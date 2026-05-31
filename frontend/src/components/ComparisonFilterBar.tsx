@@ -1,16 +1,16 @@
 import {
+  Button,
+  Flex,
   MultiSelect,
+  Paper,
   SegmentedControl,
   Select,
-  Flex,
   SimpleGrid,
-  Paper,
 } from "@mantine/core";
-import { Button } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
+import type { GroupedSwimmers } from "../schema/types";
 import { DISCIPLINES } from "../utils/constants";
 import { swimmersFilter } from "../utils/filterUtils";
-import type { GroupedSwimmers } from "../schema/types";
 
 interface ComparisonFilterBarProps {
   groupedSwimmers: GroupedSwimmers[];
@@ -48,18 +48,12 @@ function ComparisonFilterBar({
   lastFetchedFilterHash,
 }: ComparisonFilterBarProps) {
   const filterHash = `${selectedSwimmers.join(",")}|${selectedDiscipline}|${pool}`;
-  const isOutdated =
-    lastFetchedFilterHash !== "" && lastFetchedFilterHash !== filterHash;
+  const isOutdated = lastFetchedFilterHash !== "" && lastFetchedFilterHash !== filterHash;
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   return (
     <Paper p="md" shadow="md" radius="md" withBorder>
-      <Flex
-        direction={{ base: "column", md: "row" }}
-        justify="space-between"
-        gap="md"
-        p="sm"
-      >
+      <Flex direction={{ base: "column", md: "row" }} justify="space-between" gap="md" p="sm">
         <MultiSelect
           label="Plavci"
           placeholder="Vyber až 8 plavců"

@@ -1,4 +1,4 @@
-import { Center, Title, Text, Button } from "@mantine/core";
+import { Button, Center, Text, Title } from "@mantine/core";
 
 export default function NotFound() {
   return (
@@ -19,6 +19,7 @@ export default function NotFound() {
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
+          <title>oopsie</title>
           <g transform="translate(2,1) scale(0.9)">
             <ellipse cx="10" cy="15" rx="6" ry="7" fill="#111827" />
             <ellipse cx="10" cy="12" rx="4.5" ry="5.5" fill="#ffffff" />
@@ -38,9 +39,8 @@ export default function NotFound() {
         </svg>
 
         <Title order={2}>Jejda — tady nic není</Title>
-        <Text color="dimmed" style={{ maxWidth: 420, textAlign: "center" }}>
-          Stránka, kterou hledáte, neexistuje. Zkuste se vrátit na domovskou
-          stránku.
+        <Text c="dimmed" style={{ maxWidth: 420, textAlign: "center" }}>
+          Stránka, kterou hledáte, neexistuje. Zkuste se vrátit na domovskou stránku.
         </Text>
 
         <Button component="a" href="/" variant="outline">

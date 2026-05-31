@@ -1,22 +1,22 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
 import {
-  Flex,
-  Title,
-  SimpleGrid,
-  Button,
-  Group as MantineGroup,
-  LoadingOverlay,
-  Text,
   Box,
+  Button,
+  Flex,
+  LoadingOverlay,
+  Group as MantineGroup,
+  SimpleGrid,
+  Text,
+  Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { GroupCard } from "../../components/admin/GroupCard";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { CreateGroupModal } from "../../components/admin/CreateGroupModal";
+import { GroupCard } from "../../components/admin/GroupCard";
 import { GroupDetailModal } from "../../components/admin/GroupDetailModal";
-import { groupsApi } from "../../utils/groupsApi";
-import { authApi } from "../../utils/auth";
 import type { Group, GroupDetail } from "../../schema/groups";
+import { authApi } from "../../utils/auth";
+import { groupsApi } from "../../utils/groupsApi";
 
 export function AdminGroupsPage() {
   const navigate = useNavigate();
@@ -24,12 +24,10 @@ export function AdminGroupsPage() {
   const [groups, setGroups] = useState<Group[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<GroupDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [createOpened, { open: openCreate, close: closeCreate }] =
-    useDisclosure(false);
-  const [detailOpened, { open: openDetail, close: closeDetail }] =
-    useDisclosure(false);
+  const [createOpened, { open: openCreate, close: closeCreate }] = useDisclosure(false);
+  const [detailOpened, { open: openDetail, close: closeDetail }] = useDisclosure(false);
 
-  const loadGroups = async () => {
+  const loadGroups = useCallback(async () => {
     try {
       setLoading(true);
       const data = await groupsApi.getAll();
@@ -39,14 +37,14 @@ export function AdminGroupsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (!authApi.isAuthenticated()) {
       navigate("/admin");
     }
-    loadGroups();
-  }, [navigate]);
+    void loadGroups();
+  }, [navigate, loadGroups]);
 
   const handleGroupClick = async (group: Group) => {
     try {
@@ -58,10 +56,7 @@ export function AdminGroupsPage() {
     }
   };
 
-  const handleCreate = async (data: {
-    name: string;
-    display_name_cs: string;
-  }) => {
+  const handleCreate = async (data: { name: string; display_name_cs: string }) => {
     await groupsApi.create(data);
     await loadGroups();
   };
@@ -95,26 +90,17 @@ export function AdminGroupsPage() {
 
         {groups.length === 0 && !loading ? (
           <Text c="dimmed" ta="center" mt="xl">
-            Zatím nejsou žádné skupiny. Vytvořte první skupinu pomocí tlačítka
-            výše.
+            Zatím nejsou žádné skupiny. Vytvořte první skupinu pomocí tlačítka výše.
           </Text>
         ) : (
           <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="lg">
             {groups.map((group) => (
-              <GroupCard
-                key={group.id}
-                group={group}
-                onClick={() => handleGroupClick(group)}
-              />
+              <GroupCard key={group.id} group={group} onClick={() => handleGroupClick(group)} />
             ))}
           </SimpleGrid>
         )}
 
-        <CreateGroupModal
-          opened={createOpened}
-          onClose={closeCreate}
-          onCreate={handleCreate}
-        />
+        <CreateGroupModal opened={createOpened} onClose={closeCreate} onCreate={handleCreate} />
 
         <GroupDetailModal
           group={selectedGroup}

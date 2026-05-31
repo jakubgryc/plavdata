@@ -1,18 +1,18 @@
 import {
+  Anchor,
+  Avatar,
+  Badge,
+  Box,
   Card,
   Group,
-  Text,
-  Box,
   Table,
-  Badge,
-  Avatar,
-  useMantineTheme,
+  Text,
   useMantineColorScheme,
-  Anchor,
+  useMantineTheme,
 } from "@mantine/core";
 import { useNavigate } from "react-router";
-import { parseTimeFromMillis } from "../utils/timeUtils";
 import type { RelaySwimmer } from "../schema/types";
+import { parseTimeFromMillis } from "../utils/timeUtils";
 
 interface TeamColor {
   letter: string;
@@ -44,10 +44,7 @@ export function EqualRelayTeamCard({
   // Count swimmer occurrences
   const swimmerCounts = new Map<number, number>();
   swimmers.forEach((swimmer) => {
-    swimmerCounts.set(
-      swimmer.swimmerId,
-      (swimmerCounts.get(swimmer.swimmerId) || 0) + 1,
-    );
+    swimmerCounts.set(swimmer.swimmerId, (swimmerCounts.get(swimmer.swimmerId) || 0) + 1);
   });
 
   return (
@@ -75,10 +72,7 @@ export function EqualRelayTeamCard({
         justify="space-between"
         style={{
           borderBottom: `1px solid ${colorScheme === "dark" ? theme.colors.dark[4] : theme.colors.gray[3]}`,
-          backgroundColor:
-            colorScheme === "dark"
-              ? theme.colors.dark[6]
-              : theme.colors.gray[0],
+          backgroundColor: colorScheme === "dark" ? theme.colors.dark[6] : theme.colors.gray[0],
         }}
       >
         <Group gap="sm">
@@ -141,10 +135,7 @@ export function EqualRelayTeamCard({
         >
           <Table.Thead
             style={{
-              backgroundColor:
-                colorScheme === "dark"
-                  ? theme.colors.dark[6]
-                  : theme.colors.gray[0],
+              backgroundColor: colorScheme === "dark" ? theme.colors.dark[6] : theme.colors.gray[0],
               borderBottom: `1px solid ${colorScheme === "dark" ? theme.colors.dark[4] : theme.colors.gray[3]}`,
             }}
           >
@@ -168,16 +159,13 @@ export function EqualRelayTeamCard({
           </Table.Thead>
           <Table.Tbody>
             {swimmers.map((swimmer, idx) => {
-              const swimsTwice =
-                (swimmerCounts.get(swimmer.swimmerId) || 0) > 1;
+              const swimsTwice = (swimmerCounts.get(swimmer.swimmerId) || 0) > 1;
               const isFirstOccurrence =
-                swimsTwice &&
-                swimmers.findIndex((s) => s.swimmerId === swimmer.swimmerId) ===
-                  idx;
+                swimsTwice && swimmers.findIndex((s) => s.swimmerId === swimmer.swimmerId) === idx;
 
               return (
                 <Table.Tr
-                  key={`${swimmer.swimmerId}-${idx}`}
+                  key={swimmer.swimmerId}
                   style={{
                     backgroundColor:
                       swimsTwice && !isFirstOccurrence
@@ -201,14 +189,8 @@ export function EqualRelayTeamCard({
                         component="button"
                         fw={500}
                         underline="never"
-                        c={
-                          swimsTwice && !isFirstOccurrence
-                            ? "orange"
-                            : "inherit"
-                        }
-                        onClick={() =>
-                          navigate(`/swimmer/${swimmer.swimmerId}`)
-                        }
+                        c={swimsTwice && !isFirstOccurrence ? "orange" : "inherit"}
+                        onClick={() => navigate(`/swimmer/${swimmer.swimmerId}`)}
                         style={{ cursor: "pointer" }}
                       >
                         {swimmer.surname} {swimmer.name}

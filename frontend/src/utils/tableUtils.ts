@@ -2,7 +2,7 @@ import type { SwimmerPersonalBest } from "../schema/types.ts";
 import { DISCIPLINES } from "./constants.ts";
 import { parseTimeFromMillis } from "./timeUtils.ts";
 
-type DisciplineDescription = {
+export type DisciplineDescription = {
   time: string;
   date: string | undefined;
   isSplit: boolean | undefined;
@@ -11,9 +11,13 @@ type DisciplineDescription = {
   points: number | undefined;
 };
 
-type TableRow = Record<string, string | number | DisciplineDescription>;
+export type PersonalBestRow = {
+  name: string;
+  swimmerId: number;
+  [discipline: string]: DisciplineDescription | string | number;
+};
 
-export function buildTableData(data: SwimmerPersonalBest[]): TableRow[] {
+export function buildTableData(data: SwimmerPersonalBest[]): PersonalBestRow[] {
   const emptyDescription: DisciplineDescription = {
     time: "",
     date: "",
@@ -23,14 +27,12 @@ export function buildTableData(data: SwimmerPersonalBest[]): TableRow[] {
     points: undefined,
   };
   return data.map((swimmerBests) => {
-    const row: TableRow = {
+    const row: PersonalBestRow = {
       name: `${swimmerBests.swimmer.surname} ${swimmerBests.swimmer.name}`,
       swimmerId: swimmerBests.swimmer.id,
     };
     for (const discipline of DISCIPLINES) {
-      const pb = swimmerBests.personal_bests.find(
-        (p) => p.discipline?.code === discipline,
-      );
+      const pb = swimmerBests.personal_bests.find((p) => p.discipline?.code === discipline);
       let pbDescription: DisciplineDescription = emptyDescription;
       if (pb) {
         pbDescription = {

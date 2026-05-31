@@ -1,18 +1,18 @@
-import { useState } from "react";
-import type { FormEvent } from "react";
-import { useNavigate } from "react-router";
 import {
+  Button,
+  Center,
   Container,
   Paper,
-  Title,
-  TextInput,
   PasswordInput,
-  Button,
   Stack,
   Text,
-  Center,
+  TextInput,
+  Title,
 } from "@mantine/core";
-import { IconUser, IconLock } from "@tabler/icons-react";
+import { IconLock, IconUser } from "@tabler/icons-react";
+import type { FormEvent } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router";
 import { authApi } from "../utils/auth";
 
 function Login() {

@@ -1,27 +1,23 @@
 import {
-  Modal,
-  TextInput,
-  Button,
-  Stack,
-  Group as MantineGroup,
-  Text,
-  Badge,
-  Divider,
-  Table,
-  ScrollArea,
-  Loader,
-  Center,
   ActionIcon,
+  Badge,
+  Button,
+  Center,
+  Divider,
+  Loader,
+  Group as MantineGroup,
+  Modal,
+  ScrollArea,
+  Stack,
+  Table,
+  Text,
+  TextInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
 import { IconTrash } from "@tabler/icons-react";
-import type {
-  GroupDetail,
-  UpdateGroupRequest,
-  SwimmerInGroup,
-} from "../../schema/groups";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
+import type { GroupDetail, SwimmerInGroup, UpdateGroupRequest } from "../../schema/groups";
 import { groupsApi } from "../../utils/groupsApi";
 
 interface GroupDetailModalProps {
@@ -53,9 +49,7 @@ export function GroupDetailModal({
       name: (value: string | undefined) =>
         value && value.trim().length === 0 ? "Klíč skupiny je povinný" : null,
       display_name_cs: (value: string | undefined) =>
-        value && value.trim().length === 0
-          ? "Zobrazovaný název je povinný"
-          : null,
+        value && value.trim().length === 0 ? "Zobrazovaný název je povinný" : null,
     },
   });
 
@@ -86,16 +80,11 @@ export function GroupDetailModal({
       onClose();
     } catch (error) {
       console.error("Failed to delete group:", error);
-      alert(
-        error instanceof Error ? error.message : "Nepodařilo se smazat skupinu",
-      );
+      alert(error instanceof Error ? error.message : "Nepodařilo se smazat skupinu");
     }
   };
 
-  const handleRemoveSwimmer = async (
-    swimmerId: number,
-    swimmerName: string,
-  ) => {
+  const handleRemoveSwimmer = async (swimmerId: number, swimmerName: string) => {
     if (!group) return;
 
     if (
@@ -113,9 +102,7 @@ export function GroupDetailModal({
       setSwimmers(data);
     } catch (error) {
       console.error("Failed to remove swimmer:", error);
-      alert(
-        error instanceof Error ? error.message : "Nepodařilo se odebrat plavce",
-      );
+      alert(error instanceof Error ? error.message : "Nepodařilo se odebrat plavce");
     }
   };
 
@@ -136,7 +123,7 @@ export function GroupDetailModal({
     };
 
     fetchSwimmers();
-  }, [group?.id, opened]);
+  }, [group, opened]);
 
   // Reset form when group changes
   useEffect(() => {
@@ -146,7 +133,7 @@ export function GroupDetailModal({
         display_name_cs: group.display_name_cs,
       });
     }
-  }, [group?.id]);
+  }, [group, form.setValues]);
 
   if (!group) return null;
 
@@ -260,8 +247,7 @@ export function GroupDetailModal({
                   <Table.Tbody>
                     {swimmers.map((swimmer) => {
                       const isActive =
-                        !swimmer.membership_end ||
-                        new Date(swimmer.membership_end) >= new Date();
+                        !swimmer.membership_end || new Date(swimmer.membership_end) >= new Date();
                       const fullName = `${swimmer.surname} ${swimmer.name}`;
 
                       return (
@@ -275,15 +261,9 @@ export function GroupDetailModal({
                         >
                           <Table.Td>{fullName}</Table.Td>
                           <Table.Td>{swimmer.birth_year}</Table.Td>
+                          <Table.Td>{swimmer.sex === "male" ? "M" : "Ž"}</Table.Td>
                           <Table.Td>
-                            {swimmer.sex === "male" ? "M" : "Ž"}
-                          </Table.Td>
-                          <Table.Td>
-                            <Badge
-                              size="sm"
-                              color={isActive ? "green" : "gray"}
-                              variant="light"
-                            >
+                            <Badge size="sm" color={isActive ? "green" : "gray"} variant="light">
                               {isActive ? "Aktivní" : "Neaktivní"}
                             </Badge>
                           </Table.Td>

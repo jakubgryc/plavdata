@@ -1,4 +1,4 @@
-import { Card, Text, Badge, Group as MantineGroup } from "@mantine/core";
+import { Badge, Card, Group as MantineGroup, Text } from "@mantine/core";
 import type { Group } from "../../schema/groups";
 
 interface GroupCardProps {

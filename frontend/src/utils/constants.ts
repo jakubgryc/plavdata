@@ -89,10 +89,7 @@ export function removeDiacritics(text: string): string {
     Ž: "Z",
   };
 
-  return text.replace(
-    /[áčďéěíňóřšťúůýžÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]/g,
-    (char) => diacriticsMap[char] || char,
-  );
+  return text.replace(/[áčďéěíňóřšťúůýžÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ]/g, (char) => diacriticsMap[char] || char);
 }
 
 const GRAPH_COLORS = [

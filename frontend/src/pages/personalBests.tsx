@@ -1,30 +1,29 @@
+import { Chip, Flex, Modal, SegmentedControl, Stack, Text, Title } from "@mantine/core";
+import { DataTable } from "mantine-datatable";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { SegmentedControl, Title } from "@mantine/core";
-import { Chip, Modal, Text, Stack, Flex } from "@mantine/core";
-import { DataTable } from "mantine-datatable";
 
 import { API_BASE_URL } from "../../config";
-import { GROUPS, POOLS, DISCIPLINES } from "../utils/constants";
+import { useTheme } from "../hooks/useTheme";
+import type { SwimmerPersonalBest } from "../schema/types";
+import { DISCIPLINES, GROUPS, POOLS } from "../utils/constants";
+import type { DisciplineDescription, PersonalBestRow } from "../utils/tableUtils";
 import { buildTableData } from "../utils/tableUtils";
 import { formatDate } from "../utils/timeUtils";
-import { useTheme } from "../hooks/useTheme";
 
-import type { SwimmerPersonalBest } from "../schema/types";
+function isDisciplineDescription(value: unknown): value is DisciplineDescription {
+  return typeof value === "object" && value !== null && "time" in value;
+}
 
 function PersonalBests() {
   const { colorScheme } = useTheme();
   const navigate = useNavigate();
   const [selectedGroup, setSelectedGroup] = useState<string | null>("Z1");
   const [selectedCourse, setSelectedCourse] = useState<string>("25");
-  const [personalBests, setPersonalBests] = useState<
-    Array<SwimmerPersonalBest>
-  >([]);
+  const [personalBests, setPersonalBests] = useState<Array<SwimmerPersonalBest>>([]);
   const [isFetching, setIsFetching] = useState<boolean>(false);
 
-  const [cache, setCache] = useState<
-    Record<string, Array<SwimmerPersonalBest>>
-  >({});
+  const [cache, setCache] = useState<Record<string, Array<SwimmerPersonalBest>>>({});
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalData, setModalData] = useState<{
@@ -45,8 +44,11 @@ function PersonalBests() {
           `${API_BASE_URL}/api/personal_bests/grouped?group=${group}&course=${course}`,
           { method: "GET" },
         );
-        if (!response.ok) throw new Error("Failed to fetch personal bests");
-        const data = await response.json();
+        if (!response.ok) {
+          console.error("Error fetching personal bests", response.status);
+          return;
+        }
+        const data = (await response.json()) as SwimmerPersonalBest[];
         const cacheKey = `${group}-${course}`;
         setCache((prevCache) => ({ ...prevCache, [cacheKey]: data }));
         setPersonalBests(data);
@@ -62,7 +64,7 @@ function PersonalBests() {
       if (cache[cacheKey]) {
         setPersonalBests(cache[cacheKey]);
       } else {
-        fetchPersonalBests(selectedGroup, selectedCourse);
+        void fetchPersonalBests(selectedGroup, selectedCourse);
       }
     }
   }, [selectedGroup, selectedCourse, cache]);
@@ -117,7 +119,7 @@ function PersonalBests() {
         />
       </Flex>
       <Flex direction="column" mah="80vh" pt="sm" style={{ overflowY: "auto" }}>
-        <DataTable
+        <DataTable<PersonalBestRow>
           className="shadow-xl responsive-table"
           withTableBorder
           borderRadius="lg"
@@ -134,8 +136,9 @@ function PersonalBests() {
               width: 145,
               noWrap: true,
               title: "",
-              render: (record: any) => (
+              render: (record: PersonalBestRow) => (
                 <button
+                  type="button"
                   onClick={() => navigate(`/swimmer/${record.swimmerId}`)}
                   style={{
                     background: "transparent",
@@ -159,19 +162,23 @@ function PersonalBests() {
             }).map((discipline) => ({
               accessor: discipline,
               title: discipline,
-              render: (record: any) => {
+              render: (record: PersonalBestRow) => {
                 const description = record[discipline];
-                const bgColor = description?.isSplit
+                if (!isDisciplineDescription(description)) {
+                  return null;
+                }
+                const bgColor = description.isSplit
                   ? colorScheme === "dark"
                     ? "#4A5D4A"
                     : "#D4EDDA" // dimmer green in dark
-                  : description?.isRelayPart
+                  : description.isRelayPart
                     ? colorScheme === "dark"
                       ? "#5A4A7A"
                       : "#E2E3F1" // dimmer purple in dark
                     : "transparent";
-                return description?.time !== "" ? (
+                return description.time !== "" ? (
                   <button
+                    type="button"
                     onClick={() => {
                       setModalData({
                         ...description,
@@ -192,11 +199,9 @@ function PersonalBests() {
                       display: "block",
                     }}
                   >
-                    {record[discipline].time}
+                    {description.time}
                   </button>
-                ) : (
-                  <></>
-                );
+                ) : null;
               },
             })),
           ]}
@@ -215,18 +220,10 @@ function PersonalBests() {
           {modalData && (
             <Stack>
               <Text>Čas: {modalData.time}</Text>
-              {modalData.location && (
-                <Text>Místo zaplavání: {modalData.location}</Text>
-              )}
-              {modalData.date && (
-                <Text>Datum: {formatDate(modalData.date)}</Text>
-              )}
-              {modalData.isSplit && (
-                <Text style={{ color: "green" }}>mezičas</Text>
-              )}
-              {modalData.isRelayPart && (
-                <Text style={{ color: "purple" }}>štafeta</Text>
-              )}
+              {modalData.location && <Text>Místo zaplavání: {modalData.location}</Text>}
+              {modalData.date && <Text>Datum: {formatDate(modalData.date)}</Text>}
+              {modalData.isSplit && <Text style={{ color: "green" }}>mezičas</Text>}
+              {modalData.isRelayPart && <Text style={{ color: "purple" }}>štafeta</Text>}
             </Stack>
           )}
         </Modal>

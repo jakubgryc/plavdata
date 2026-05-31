@@ -1,16 +1,8 @@
-import {
-  Paper,
-  Title,
-  Group,
-  ThemeIcon,
-  Table,
-  Badge,
-  useMantineColorScheme,
-} from "@mantine/core";
+import { Badge, Group, Paper, Table, ThemeIcon, Title, useMantineColorScheme } from "@mantine/core";
 import { IconClock } from "@tabler/icons-react";
-import { parseTimeFromMillis, formatDate } from "../../utils/timeUtils";
-import type { SwimmerPersonalBests } from "../../schema/types";
 import type { ReactElement } from "react";
+import type { SwimmerPersonalBestRecord, SwimmerPersonalBests } from "../../schema/types";
+import { formatDate, parseTimeFromMillis } from "../../utils/timeUtils";
 
 interface PersonalBestsTableProps {
   personalBests: SwimmerPersonalBests;
@@ -31,8 +23,8 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
   };
 
   // Group personal bests by stroke type
-  const groupByStroke = (records: any[]) => {
-    const groups: Record<string, any[]> = {
+  const groupByStroke = (records: SwimmerPersonalBestRecord[]) => {
+    const groups: Record<string, SwimmerPersonalBestRecord[]> = {
       Znak: [],
       Prsa: [],
       Motýlek: [],
@@ -46,11 +38,11 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
       if (code.includes("K") && !code.includes("PZ")) {
         groups["Volný způsob"].push(record);
       } else if (code.includes("Z") && !code.includes("PZ")) {
-        groups["Znak"].push(record);
+        groups.Znak.push(record);
       } else if (code.includes("P") && !code.includes("PZ")) {
-        groups["Prsa"].push(record);
+        groups.Prsa.push(record);
       } else if (code.includes("M")) {
-        groups["Motýlek"].push(record);
+        groups.Motýlek.push(record);
       } else if (code.includes("O") || code.includes("PZ")) {
         // Backend returns O for medley (pOlohový závod)
         groups["Polohový závod"].push(record);
@@ -73,10 +65,7 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
   const groups25m = groupByStroke(personalBests.pb25M);
   const groups50m = groupByStroke(personalBests.pb50M);
 
-  const allGroups = new Set([
-    ...Object.keys(groups25m),
-    ...Object.keys(groups50m),
-  ]);
+  const allGroups = new Set([...Object.keys(groups25m), ...Object.keys(groups50m)]);
 
   const renderRows = () => {
     const rows: ReactElement[] = [];
@@ -125,7 +114,7 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
       );
 
       // Discipline rows
-      allDisciplinesInGroup.forEach((code) => {
+      allDisciplinesInGroup.forEach((code: string) => {
         const pb25 = pb25mMap.get(code);
         const pb50 = pb50mMap.get(code);
 
@@ -152,9 +141,7 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
               ta="center"
               w={40}
               style={{
-                backgroundColor: isDark
-                  ? "rgba(14, 165, 233, 0.05)"
-                  : "rgba(14, 165, 233, 0.03)",
+                backgroundColor: isDark ? "rgba(14, 165, 233, 0.05)" : "rgba(14, 165, 233, 0.03)",
                 paddingRight: 4,
               }}
             >
@@ -173,9 +160,7 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
               ta="left"
               ff="monospace"
               style={{
-                backgroundColor: isDark
-                  ? "rgba(14, 165, 233, 0.05)"
-                  : "rgba(14, 165, 233, 0.03)",
+                backgroundColor: isDark ? "rgba(14, 165, 233, 0.05)" : "rgba(14, 165, 233, 0.03)",
                 paddingLeft: 4,
               }}
             >
@@ -184,9 +169,7 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
             <Table.Td
               ta="center"
               style={{
-                backgroundColor: isDark
-                  ? "rgba(14, 165, 233, 0.05)"
-                  : "rgba(14, 165, 233, 0.03)",
+                backgroundColor: isDark ? "rgba(14, 165, 233, 0.05)" : "rgba(14, 165, 233, 0.03)",
               }}
             >
               {pb25?.points || "-"}
@@ -194,9 +177,7 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
             <Table.Td
               ta="center"
               style={{
-                backgroundColor: isDark
-                  ? "rgba(14, 165, 233, 0.05)"
-                  : "rgba(14, 165, 233, 0.03)",
+                backgroundColor: isDark ? "rgba(14, 165, 233, 0.05)" : "rgba(14, 165, 233, 0.03)",
               }}
             >
               {pb25?.location || "-"}
@@ -205,9 +186,7 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
               ta="center"
               style={{
                 borderRight: `1px solid ${isDark ? "#373A40" : "#dee2e6"}`,
-                backgroundColor: isDark
-                  ? "rgba(14, 165, 233, 0.05)"
-                  : "rgba(14, 165, 233, 0.03)",
+                backgroundColor: isDark ? "rgba(14, 165, 233, 0.05)" : "rgba(14, 165, 233, 0.03)",
               }}
             >
               {pb25?.date ? formatDate(pb25.date) : "-"}
@@ -216,9 +195,7 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
               ta="center"
               w={40}
               style={{
-                backgroundColor: isDark
-                  ? "rgba(6, 182, 212, 0.05)"
-                  : "rgba(6, 182, 212, 0.03)",
+                backgroundColor: isDark ? "rgba(6, 182, 212, 0.05)" : "rgba(6, 182, 212, 0.03)",
                 paddingRight: 4,
               }}
             >
@@ -237,9 +214,7 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
               ta="left"
               ff="monospace"
               style={{
-                backgroundColor: isDark
-                  ? "rgba(6, 182, 212, 0.05)"
-                  : "rgba(6, 182, 212, 0.03)",
+                backgroundColor: isDark ? "rgba(6, 182, 212, 0.05)" : "rgba(6, 182, 212, 0.03)",
                 paddingLeft: 4,
               }}
             >
@@ -248,9 +223,7 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
             <Table.Td
               ta="center"
               style={{
-                backgroundColor: isDark
-                  ? "rgba(6, 182, 212, 0.05)"
-                  : "rgba(6, 182, 212, 0.03)",
+                backgroundColor: isDark ? "rgba(6, 182, 212, 0.05)" : "rgba(6, 182, 212, 0.03)",
               }}
             >
               {pb50?.points || "-"}
@@ -258,9 +231,7 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
             <Table.Td
               ta="center"
               style={{
-                backgroundColor: isDark
-                  ? "rgba(6, 182, 212, 0.05)"
-                  : "rgba(6, 182, 212, 0.03)",
+                backgroundColor: isDark ? "rgba(6, 182, 212, 0.05)" : "rgba(6, 182, 212, 0.03)",
               }}
             >
               {pb50?.location || "-"}
@@ -268,9 +239,7 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
             <Table.Td
               ta="center"
               style={{
-                backgroundColor: isDark
-                  ? "rgba(6, 182, 212, 0.05)"
-                  : "rgba(6, 182, 212, 0.03)",
+                backgroundColor: isDark ? "rgba(6, 182, 212, 0.05)" : "rgba(6, 182, 212, 0.03)",
               }}
             >
               {pb50?.date ? formatDate(pb50.date) : "-"}
@@ -328,9 +297,7 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
                 colSpan={5}
                 ta="center"
                 style={{
-                  backgroundColor: isDark
-                    ? "rgba(14, 165, 233, 0.1)"
-                    : "rgba(14, 165, 233, 0.05)",
+                  backgroundColor: isDark ? "rgba(14, 165, 233, 0.1)" : "rgba(14, 165, 233, 0.05)",
                   color: "#0ea5e9",
                   borderRight: `1px solid ${isDark ? "#373A40" : "#dee2e6"}`,
                 }}
@@ -341,9 +308,7 @@ function PersonalBestsTable({ personalBests }: PersonalBestsTableProps) {
                 colSpan={5}
                 ta="center"
                 style={{
-                  backgroundColor: isDark
-                    ? "rgba(6, 182, 212, 0.1)"
-                    : "rgba(6, 182, 212, 0.05)",
+                  backgroundColor: isDark ? "rgba(6, 182, 212, 0.1)" : "rgba(6, 182, 212, 0.05)",
                   color: "#06b6d4",
                 }}
               >

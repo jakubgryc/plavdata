@@ -1,14 +1,6 @@
-import { Paper, Title, Group, ThemeIcon } from "@mantine/core";
+import { Group, Paper, ThemeIcon, Title, useMantineColorScheme } from "@mantine/core";
 import { IconChartBar } from "@tabler/icons-react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-import { useMantineColorScheme } from "@mantine/core";
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import type { SwimmerStartsByYear } from "../../schema/types";
 
 interface PerformanceChartProps {
@@ -57,9 +49,7 @@ function PerformanceChart({ data }: PerformanceChartProps) {
               fontWeight: 600,
             }}
             cursor={{
-              fill: isDark
-                ? "rgba(14, 165, 233, 0.1)"
-                : "rgba(8, 138, 198, 0.1)",
+              fill: isDark ? "rgba(14, 165, 233, 0.1)" : "rgba(8, 138, 198, 0.1)",
               radius: 8,
             }}
             formatter={(value: number) => [value, "Počet startů"]}

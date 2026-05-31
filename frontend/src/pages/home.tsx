@@ -1,34 +1,32 @@
-import { useEffect, useState } from "react";
 import {
-  Flex,
-  Title,
-  Text,
-  SimpleGrid,
-  Group,
-  ThemeIcon,
   Center,
+  Flex,
+  Group,
   SegmentedControl,
+  SimpleGrid,
+  Text,
+  ThemeIcon,
+  Title,
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import {
-  IconSwimming,
   IconCalendarEvent,
-  IconTrophy,
-  IconFlame,
   IconChartBar,
+  IconFlame,
+  IconSwimming,
+  IconTrophy,
 } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
 
 import { API_BASE_URL } from "../../config";
-import StatCard from "../components/StatCard";
-import TopSwimmersCard from "../components/TopSwimmersCard";
 import ClubRecordsTable from "../components/ClubRecordsTable";
 import HomeSkeleton from "../components/HomeSkeleton";
+import StatCard from "../components/StatCard";
+import TopSwimmersCard from "../components/TopSwimmersCard";
 import type { DashboardResponse } from "../schema/types";
 
 function Home() {
-  const [dashboardData, setDashboardData] = useState<DashboardResponse | null>(
-    null,
-  );
+  const [dashboardData, setDashboardData] = useState<DashboardResponse | null>(null);
   const [isFetching, setIsFetching] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [periodType, setPeriodType] = useState<string>("season");
@@ -62,7 +60,10 @@ function Home() {
             method: "GET",
           },
         );
-        if (!response.ok) throw new Error("Failed to fetch dashboard stats");
+        if (!response.ok) {
+          console.error("Error fetching dashboard", response.status);
+          return;
+        }
         const data: DashboardResponse = await response.json();
 
         // Store in cache
@@ -79,16 +80,11 @@ function Home() {
     setShowAllMen(false);
     setShowAllWomen(false);
     setShowAllCombined(false);
-    fetchDashboardStats();
+    void fetchDashboardStats();
   }, [periodType, cache]);
 
   if (isFetching) {
-    return (
-      <HomeSkeleton
-        periodType={periodType}
-        onPeriodTypeChange={setPeriodType}
-      />
-    );
+    return <HomeSkeleton periodType={periodType} onPeriodTypeChange={setPeriodType} />;
   }
 
   if (error || !dashboardData) {
@@ -99,24 +95,13 @@ function Home() {
     );
   }
 
-  const {
-    stats,
-    topMen,
-    topWomen,
-    recentRecords,
-    oldestRecords,
-    currentPeriod,
-    previousPeriod,
-  } = dashboardData;
+  const { stats, topMen, topWomen, recentRecords, oldestRecords, currentPeriod, previousPeriod } =
+    dashboardData;
 
   const currentPeriodLabel =
-    periodType === "season"
-      ? `za sezónu ${currentPeriod}`
-      : `za rok ${currentPeriod}`;
+    periodType === "season" ? `za sezónu ${currentPeriod}` : `za rok ${currentPeriod}`;
   const previousPeriodLabel =
-    periodType === "season"
-      ? `za sezónu ${previousPeriod}`
-      : `za rok ${previousPeriod}`;
+    periodType === "season" ? `za sezónu ${previousPeriod}` : `za rok ${previousPeriod}`;
 
   const statCards = [
     {

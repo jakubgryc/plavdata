@@ -1,20 +1,9 @@
-import {
-  Paper,
-  Group,
-  Stack,
-  Title,
-  Text,
-  Box,
-  Avatar,
-  Button,
-  Collapse,
-} from "@mantine/core";
+import { Avatar, Box, Button, Collapse, Group, Paper, Stack, Text, Title } from "@mantine/core";
 import { IconChevronDown } from "@tabler/icons-react";
 import { useNavigate } from "react-router";
 import { useTheme } from "../hooks/useTheme";
-import { parseTimeFromMillis } from "../utils/timeUtils";
-
 import type { TopSwimmer } from "../schema/types";
+import { parseTimeFromMillis } from "../utils/timeUtils";
 
 function getRowStyles(rank: number, colorScheme: "light" | "dark" | "auto") {
   const isDark = colorScheme === "dark";
@@ -22,9 +11,7 @@ function getRowStyles(rank: number, colorScheme: "light" | "dark" | "auto") {
   switch (rank) {
     case 1:
       return {
-        bg: isDark
-          ? ("rgba(251, 191, 36, 0.1)" as const)
-          : ("#fef3c7" as const), // Very light gold background in dark
+        bg: isDark ? ("rgba(251, 191, 36, 0.1)" as const) : ("#fef3c7" as const), // Very light gold background in dark
         borderColor: isDark ? ("#fcd34d" as const) : ("#f59e0b" as const), // Bright gold border in dark
         avatarColor: isDark ? ("yellow" as const) : ("#d97706" as const), // Use theme color in dark
         avatarVariant: "filled",
@@ -35,9 +22,7 @@ function getRowStyles(rank: number, colorScheme: "light" | "dark" | "auto") {
       };
     case 2:
       return {
-        bg: isDark
-          ? ("rgba(156, 163, 175, 0.1)" as const)
-          : ("#f3f4f6" as const), // Very light silver background in dark
+        bg: isDark ? ("rgba(156, 163, 175, 0.1)" as const) : ("#f3f4f6" as const), // Very light silver background in dark
         borderColor: isDark ? ("#d1d5db" as const) : ("#9ca3af" as const), // Bright silver border in dark
         avatarColor: isDark ? ("gray" as const) : ("#6b7280" as const), // Use theme color in dark
         avatarVariant: "filled",
@@ -48,9 +33,7 @@ function getRowStyles(rank: number, colorScheme: "light" | "dark" | "auto") {
       };
     case 3:
       return {
-        bg: isDark
-          ? ("rgba(251, 146, 60, 0.1)" as const)
-          : ("#fed7aa" as const), // Very light bronze background in dark
+        bg: isDark ? ("rgba(251, 146, 60, 0.1)" as const) : ("#fed7aa" as const), // Very light bronze background in dark
         borderColor: isDark ? ("#fdba74" as const) : ("#fb923c" as const), // Bright bronze border in dark
         avatarColor: isDark ? ("orange" as const) : ("#ea580c" as const), // Use theme color in dark
         avatarVariant: "filled",
@@ -62,9 +45,7 @@ function getRowStyles(rank: number, colorScheme: "light" | "dark" | "auto") {
     default:
       return {
         bg: undefined,
-        borderColor: isDark
-          ? "rgba(55, 65, 81, 0.5)"
-          : "rgba(229, 231, 235, 0.8)",
+        borderColor: isDark ? "rgba(55, 65, 81, 0.5)" : "rgba(229, 231, 235, 0.8)",
         avatarColor: "gray",
         avatarVariant: "light" as const,
         withBorder: true,
@@ -75,15 +56,7 @@ function getRowStyles(rank: number, colorScheme: "light" | "dark" | "auto") {
   }
 }
 
-function SwimmerRow({
-  rank,
-  name,
-  surname,
-  discipline,
-  points,
-  time,
-  swimmerId,
-}: TopSwimmer) {
+function SwimmerRow({ rank, name, surname, discipline, points, time, swimmerId }: TopSwimmer) {
   const { colorScheme } = useTheme();
   const navigate = useNavigate();
   const styles = getRowStyles(rank, colorScheme);
@@ -140,12 +113,7 @@ interface TopSwimmersCardProps {
   onToggle: () => void;
 }
 
-function TopSwimmersCard({
-  title,
-  swimmers,
-  showAll,
-  onToggle,
-}: TopSwimmersCardProps) {
+function TopSwimmersCard({ title, swimmers, showAll, onToggle }: TopSwimmersCardProps) {
   const topSwimmers = swimmers.slice(0, 5);
   const additionalSwimmers = swimmers.slice(5);
   const hasAdditionalSwimmers = additionalSwimmers.length > 0;
@@ -185,9 +153,7 @@ function TopSwimmersCard({
                 />
               }
             >
-              {showAll
-                ? "Skrýt"
-                : `Zobrazit dalších ${additionalSwimmers.length}`}
+              {showAll ? "Skrýt" : `Zobrazit dalších ${additionalSwimmers.length}`}
             </Button>
           </>
         )}

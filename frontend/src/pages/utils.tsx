@@ -1,18 +1,14 @@
-import { useEffect, useState } from "react";
-import { Title, Flex, Paper, Stack, Tabs, Box } from "@mantine/core";
-import { IconTrophy, IconUsers } from "@tabler/icons-react";
+import { Box, Flex, Paper, Stack, Tabs, Title } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
+import { IconTrophy, IconUsers } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
 
 import { API_BASE_URL } from "../../config";
-import type {
-  GroupedSwimmers,
-  RelayResult,
-  EqualRelayResult,
-} from "../schema/types";
-import { FastestRelayFilterBar } from "../components/FastestRelayFilterBar.tsx";
 import { EqualRelayFilterBar } from "../components/EqualRelayFilterBar.tsx";
-import { FastestRelayResults } from "../components/FastestRelayResults";
 import { EqualRelayResults } from "../components/EqualRelayResults";
+import { FastestRelayFilterBar } from "../components/FastestRelayFilterBar.tsx";
+import { FastestRelayResults } from "../components/FastestRelayResults";
+import type { EqualRelayResult, GroupedSwimmers, RelayResult } from "../schema/types";
 import { findSwimmerIds } from "../utils/chartUtils";
 
 function Utils() {
@@ -26,26 +22,26 @@ function Utils() {
   const [lastFetchedRelayHash, setLastFetchedRelayHash] = useState<string>("");
 
   // Equal Relays state
-  const [selectedEqualRelaySwimmers, setSelectedEqualRelaySwimmers] = useState<
-    string[]
-  >([]);
+  const [selectedEqualRelaySwimmers, setSelectedEqualRelaySwimmers] = useState<string[]>([]);
   const [numRelays, setNumRelays] = useState<number>(2);
-  const [equalRelayResults, setequalRelayResults] =
-    useState<EqualRelayResult | null>(null);
+  const [equalRelayResults, setequalRelayResults] = useState<EqualRelayResult | null>(null);
   const [isLoadingEqualRelay, setIsLoadingEqualRelay] = useState(false);
 
   useEffect(() => {
     const fetchSwimmers = async () => {
       try {
         const response = await fetch(`${API_BASE_URL}/api/swimmers/grouped`);
-        if (!response.ok) throw new Error("Failed to fetch swimmers");
+        if (!response.ok) {
+          console.error("Error fetching grouped swimmers", response.status);
+          return;
+        }
         const data: GroupedSwimmers[] = await response.json();
         setSwimmers(data);
       } catch (error) {
         console.error("Error fetching swimmers:", error);
       }
     };
-    fetchSwimmers();
+    void fetchSwimmers();
   }, []);
 
   const handleCalculate = async () => {
@@ -62,8 +58,7 @@ function Utils() {
     if (swimmerIds.length > 30) {
       notifications.show({
         title: "Chyba",
-        message:
-          "Maximální počet plavců je 30 pro výpočet nejrychlejší štafety",
+        message: "Maximální počet plavců je 30 pro výpočet nejrychlejší štafety",
         color: "red",
       });
       return;
@@ -82,8 +77,7 @@ function Utils() {
       if (response.status === 429) {
         notifications.show({
           title: "Příliš mnoho požadavků",
-          message:
-            "Překročili jste limit 20 výpočtů za minutu. Zkuste to prosím za chvíli.",
+          message: "Překročili jste limit 20 výpočtů za minutu. Zkuste to prosím za chvíli.",
           color: "orange",
           autoClose: 5000,
         });
@@ -91,7 +85,8 @@ function Utils() {
       }
 
       if (!response.ok) {
-        throw new Error("Failed to calculate relay");
+        console.error("Nepodařilo se vypočítat štafetu", response.status);
+        return;
       }
 
       const data = await response.json();
@@ -143,8 +138,7 @@ function Utils() {
       if (response.status === 429) {
         notifications.show({
           title: "Příliš mnoho požadavků",
-          message:
-            "Překročili jste limit 20 výpočtů za minutu. Zkuste to prosím za chvíli.",
+          message: "Překročili jste limit 20 výpočtů za minutu. Zkuste to prosím za chvíli.",
           color: "orange",
           autoClose: 5000,
         });
@@ -152,7 +146,8 @@ function Utils() {
       }
 
       if (!response.ok) {
-        throw new Error("Failed to calculate equal fun relays");
+        console.error("Nepodařilo se vypočítat štafety", response.status);
+        return;
       }
 
       const data = await response.json();
@@ -161,8 +156,7 @@ function Utils() {
       console.error("Error calculating equal fun relays:", error);
       notifications.show({
         title: "Chyba",
-        message:
-          "Nepodařilo se vypočítat vyrovnané štafety. Zkuste to prosím znovu.",
+        message: "Nepodařilo se vypočítat vyrovnané štafety. Zkuste to prosím znovu.",
         color: "red",
       });
     } finally {
@@ -178,13 +172,7 @@ function Utils() {
       </Box>
 
       {/* Tabbed Interface */}
-      <Paper
-        withBorder
-        shadow="sm"
-        radius="lg"
-        p={0}
-        style={{ overflow: "hidden" }}
-      >
+      <Paper withBorder shadow="sm" radius="lg" p={0} style={{ overflow: "hidden" }}>
         <Tabs value={activeTab} onChange={setActiveTab} variant="default">
           <Tabs.List grow>
             <Tabs.Tab value="fastest" leftSection={<IconTrophy size={16} />}>
@@ -211,11 +199,7 @@ function Utils() {
 
               <FastestRelayResults
                 results={results}
-                relayType={
-                  lastFetchedRelayHash
-                    ? lastFetchedRelayHash.split("|")[1]
-                    : relayType
-                }
+                relayType={lastFetchedRelayHash ? lastFetchedRelayHash.split("|")[1] : relayType}
                 isLoading={isLoading}
               />
             </Stack>
@@ -234,10 +218,7 @@ function Utils() {
                 isLoading={isLoadingEqualRelay}
               />
 
-              <EqualRelayResults
-                results={equalRelayResults}
-                isLoading={isLoadingEqualRelay}
-              />
+              <EqualRelayResults results={equalRelayResults} isLoading={isLoadingEqualRelay} />
             </Stack>
           </Tabs.Panel>
         </Tabs>

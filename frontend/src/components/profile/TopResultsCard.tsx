@@ -1,16 +1,16 @@
 import {
-  Paper,
-  Title,
+  Button,
   Group,
-  ThemeIcon,
+  Paper,
   Stack,
   Text,
-  Button,
+  ThemeIcon,
+  Title,
   useMantineColorScheme,
 } from "@mantine/core";
 import { IconMilitaryRank } from "@tabler/icons-react";
-import { parseTimeFromMillis } from "../../utils/timeUtils";
 import type { SwimmerTopResult } from "../../schema/types";
+import { parseTimeFromMillis } from "../../utils/timeUtils";
 
 interface TopResultsCardProps {
   results: SwimmerTopResult[];
@@ -34,7 +34,7 @@ function TopResultsCard({ results }: TopResultsCardProps) {
       <Stack gap="sm">
         {topResults.map((result, index) => (
           <Paper
-            key={`${result.discipline}-${index}`}
+            key={`${result.discipline}-${result.time}`}
             p={{ base: "xs", sm: "md" }}
             radius="md"
             withBorder
@@ -55,12 +55,7 @@ function TopResultsCard({ results }: TopResultsCardProps) {
           >
             <Group justify="space-between" align="flex-start" wrap="nowrap">
               <div>
-                <Text
-                  size="xs"
-                  tt="uppercase"
-                  fw={700}
-                  c={index === 0 ? "yellow.6" : "dimmed"}
-                >
+                <Text size="xs" tt="uppercase" fw={700} c={index === 0 ? "yellow.6" : "dimmed"}>
                   {result.discipline}
                 </Text>
                 <Text size="xl" fw={700} lh={1.2} className="top-results-time">
@@ -71,13 +66,7 @@ function TopResultsCard({ results }: TopResultsCardProps) {
                 <Text size="xs" tt="uppercase" fw={700} c="dimmed">
                   Body
                 </Text>
-                <Text
-                  size="lg"
-                  fw={700}
-                  c="blue"
-                  lh={1.2}
-                  className="top-results-points"
-                >
+                <Text size="lg" fw={700} c="blue" lh={1.2} className="top-results-points">
                   {result.points}
                 </Text>
               </div>
