@@ -9,7 +9,7 @@ const isGroup = (option: ComboboxParsedItem): option is ComboboxParsedItemGroup 
 
 const getLabel = (item: ComboboxParsedItem): string => {
   if (typeof item === "object" && item !== null && "label" in item) {
-    return item.label === "string" ? item.label : "";
+    return item.label;
   }
   return "";
 };
