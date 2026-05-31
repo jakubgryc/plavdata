@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from app.crud.competition import get_competition_detail, list_competitions
 from app.db import get_db
 
-competitions_router = APIRouter(
+router = APIRouter(
     prefix="/competitions",
     tags=["competitions"],
 )
@@ -90,7 +90,7 @@ class CompetitionListItemOut(BaseModel):
 # ── Endpoints ──────────────────────────────────────────────────────────────────
 
 
-@competitions_router.get(
+@router.get(
     "",
     summary="List competitions with club swimmer results for a given year",
     response_model=List[CompetitionListItemOut],
@@ -107,7 +107,7 @@ async def get_competitions(
     return list_competitions(db, year)
 
 
-@competitions_router.get(
+@router.get(
     "/{competition_id}",
     summary="Get competition detail",
     response_model=CompetitionDetailResponse,

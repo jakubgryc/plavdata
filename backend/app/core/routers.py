@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.api import (
     dashboard_stats,
+    competitions,
     personal_bests,
     swimmers,
     utils,
@@ -13,6 +14,7 @@ from app.api import (
 _routers = [
     auth,
     admin,
+    competitions,
     groups,
     personal_bests,
     swimmers,
