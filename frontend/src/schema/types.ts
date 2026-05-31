@@ -240,6 +240,7 @@ export interface CompetitionResultDetail {
   time: number;
   points: number | null;
   improvement: boolean;
+  comparisonToBest: number;
   performance: number;
   relayPart: boolean;
   clubRecord: boolean;
