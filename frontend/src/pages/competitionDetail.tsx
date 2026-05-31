@@ -1,10 +1,10 @@
+import { Center, Flex, Skeleton, Stack, Text } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import { Flex, Center, Text, Skeleton, Stack } from "@mantine/core";
 import { API_BASE_URL } from "../../config";
-import type { CompetitionDetailResponse } from "../schema/types";
 import CompetitionHeader from "../components/competition/CompetitionHeader";
 import CompetitionSwimmersTable from "../components/competition/CompetitionSwimmersTable";
+import type { CompetitionDetailResponse } from "../schema/types";
 
 function CompetitionDetail() {
   const { id } = useParams<{ id: string }>();
@@ -19,15 +19,10 @@ function CompetitionDetail() {
       setIsFetching(true);
       setError(null);
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/api/competitions/${id}`,
-          { method: "GET" },
-        );
+        const response = await fetch(`${API_BASE_URL}/api/competitions/${id}`, { method: "GET" });
         if (!response.ok) {
           setError(
-            response.status === 404
-              ? "Závod nebyl nalezen"
-              : "Nepodařilo se načíst data závodu",
+            response.status === 404 ? "Závod nebyl nalezen" : "Nepodařilo se načíst data závodu",
           );
           return;
         }
@@ -82,6 +77,3 @@ function CompetitionDetail() {
 }
 
 export default CompetitionDetail;
-
-
-

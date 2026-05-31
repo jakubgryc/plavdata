@@ -1,11 +1,21 @@
-import { Stack, SimpleGrid, Center, ThemeIcon, Text, Divider, Skeleton } from "@mantine/core";
+import { Center, Divider, SimpleGrid, Skeleton, Stack, Text, ThemeIcon } from "@mantine/core";
 import { IconSwimming } from "@tabler/icons-react";
-import CompetitionCard from "./CompetitionCard";
 import type { CompetitionListItem } from "../../schema/types";
+import CompetitionCard from "./CompetitionCard";
 
 const MONTHS_CS = [
-  "Leden", "Únor", "Březen", "Duben", "Květen", "Červen",
-  "Červenec", "Srpen", "Září", "Říjen", "Listopad", "Prosinec",
+  "Leden",
+  "Únor",
+  "Březen",
+  "Duben",
+  "Květen",
+  "Červen",
+  "Červenec",
+  "Srpen",
+  "Září",
+  "Říjen",
+  "Listopad",
+  "Prosinec",
 ];
 
 interface CompetitionListProps {
@@ -14,11 +24,12 @@ interface CompetitionListProps {
 }
 
 function CompetitionList({ competitions, loading }: CompetitionListProps) {
+  const SKELETON_KEYS = Array.from({ length: 6 }, (_, i) => `skeleton-${i}`);
   if (loading) {
     return (
       <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="sm">
-        {[...Array(6)].map((_, i) => (
-          <Skeleton key={i} height={72} radius="md" />
+        {SKELETON_KEYS.map((key) => (
+          <Skeleton key={key} height={72} radius="md" />
         ))}
       </SimpleGrid>
     );
@@ -42,7 +53,7 @@ function CompetitionList({ competitions, loading }: CompetitionListProps) {
   for (const comp of competitions) {
     const month = new Date(comp.startDate).getMonth();
     if (!byMonth.has(month)) byMonth.set(month, []);
-    byMonth.get(month)!.push(comp);
+    byMonth.get(month)?.push(comp);
   }
   const sortedMonths = [...byMonth.keys()].sort((a, b) => b - a);
 
@@ -59,7 +70,7 @@ function CompetitionList({ competitions, loading }: CompetitionListProps) {
             labelPosition="left"
           />
           <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="sm">
-            {byMonth.get(month)!.map((comp) => (
+            {byMonth.get(month)?.map((comp) => (
               <CompetitionCard key={comp.id} comp={comp} />
             ))}
           </SimpleGrid>
@@ -70,4 +81,3 @@ function CompetitionList({ competitions, loading }: CompetitionListProps) {
 }
 
 export default CompetitionList;
-

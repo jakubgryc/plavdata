@@ -1,5 +1,10 @@
-import { Group, Title, Text, TextInput, Stack, ThemeIcon, Button } from "@mantine/core";
-import { IconCalendarEvent, IconSearch, IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
+import { Button, Group, Stack, Text, TextInput, ThemeIcon, Title } from "@mantine/core";
+import {
+  IconCalendarEvent,
+  IconChevronLeft,
+  IconChevronRight,
+  IconSearch,
+} from "@tabler/icons-react";
 
 const MIN_YEAR = 2005;
 const WINDOW = 3; // how many year buttons to show at once
@@ -24,10 +29,16 @@ function CompetitionsPageHeader({
   const half = Math.floor(WINDOW / 2);
   let winStart = selectedYear - half;
   let winEnd = selectedYear + half;
-  if (winStart < MIN_YEAR) { winStart = MIN_YEAR; winEnd = MIN_YEAR + WINDOW - 1; }
-  if (winEnd > maxYear)    { winEnd = maxYear;    winStart = maxYear - WINDOW + 1; }
+  if (winStart < MIN_YEAR) {
+    winStart = MIN_YEAR;
+    winEnd = MIN_YEAR + WINDOW - 1;
+  }
+  if (winEnd > maxYear) {
+    winEnd = maxYear;
+    winStart = maxYear - WINDOW + 1;
+  }
   winStart = Math.max(winStart, MIN_YEAR);
-  winEnd   = Math.min(winEnd, maxYear);
+  winEnd = Math.min(winEnd, maxYear);
   const visibleYears = Array.from({ length: winEnd - winStart + 1 }, (_, i) => winEnd - i);
 
   return (
@@ -94,4 +105,3 @@ function CompetitionsPageHeader({
 }
 
 export default CompetitionsPageHeader;
-

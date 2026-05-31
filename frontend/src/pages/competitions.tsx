@@ -1,17 +1,17 @@
+import { Center, Flex, Text } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
-import { Flex, Center, Text } from "@mantine/core";
 import { API_BASE_URL } from "../../config";
-import type { CompetitionListItem } from "../schema/types";
-import CompetitionsPageHeader from "../components/competition/CompetitionsPageHeader";
 import CompetitionList from "../components/competition/CompetitionList";
+import CompetitionsPageHeader from "../components/competition/CompetitionsPageHeader";
+import type { CompetitionListItem } from "../schema/types";
 
 const MAX_YEAR = new Date().getFullYear();
 
 function Competitions() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const yearParam = parseInt(searchParams.get("year") ?? "");
-  const selectedYear = isNaN(yearParam) ? MAX_YEAR : yearParam;
+  const yearParam = parseInt(searchParams.get("year") ?? "", 10);
+  const selectedYear = Number.isNaN(yearParam) ? MAX_YEAR : yearParam;
 
   const [competitions, setCompetitions] = useState<CompetitionListItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -40,7 +40,7 @@ function Competitions() {
         setLoading(false);
       }
     };
-    fetchYear();
+    void fetchYear();
   }, [selectedYear]);
 
   const filtered = competitions.filter(
@@ -72,4 +72,3 @@ function Competitions() {
 }
 
 export default Competitions;
-

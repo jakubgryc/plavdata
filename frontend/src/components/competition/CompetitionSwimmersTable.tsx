@@ -1,280 +1,270 @@
-import {useState} from "react";
 import {
-    Paper,
-    Title,
-    Group,
-    ThemeIcon,
-    Table,
-    ActionIcon,
-    Collapse,
-    Text,
-    Badge,
-    Stack,
-    Pagination,
-    TextInput,
-    useMantineColorScheme,
+  ActionIcon,
+  Badge,
+  Collapse,
+  Group,
+  Pagination,
+  Paper,
+  Stack,
+  Table,
+  Text,
+  TextInput,
+  ThemeIcon,
+  Title,
+  useMantineColorScheme,
 } from "@mantine/core";
-import {
-    IconUsers,
-    IconChevronDown,
-    IconChevronUp,
-    IconSearch,
-} from "@tabler/icons-react";
-import {parseTimeFromMillis} from "../../utils/timeUtils";
-import {DNF_THRESHOLD} from "../../utils/constants";
-import {getImprovementBadge} from "../shared/ImprovementBadge";
-import {Link} from "react-router";
-import type {CompetitionSwimmerResult} from "../../schema/types";
+import { IconChevronDown, IconChevronUp, IconSearch, IconUsers } from "@tabler/icons-react";
+import { useState } from "react";
+import { Link } from "react-router";
+import type { CompetitionSwimmerResult } from "../../schema/types";
+import { DNF_THRESHOLD } from "../../utils/constants";
+import { parseTimeFromMillis } from "../../utils/timeUtils";
+import { getImprovementBadge } from "../shared/ImprovementBadge";
 
 interface CompetitionSwimmersTableProps {
-    swimmers: CompetitionSwimmerResult[];
+  swimmers: CompetitionSwimmerResult[];
 }
 
 const ITEMS_PER_PAGE = 15;
 
-function CompetitionSwimmersTable({swimmers}: CompetitionSwimmersTableProps) {
-    const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
-    const [activePage, setActivePage] = useState(1);
-    const [search, setSearch] = useState("");
-    const {colorScheme} = useMantineColorScheme();
-    const isDark = colorScheme === "dark";
+function CompetitionSwimmersTable({ swimmers }: CompetitionSwimmersTableProps) {
+  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
+  const [activePage, setActivePage] = useState(1);
+  const [search, setSearch] = useState("");
+  const { colorScheme } = useMantineColorScheme();
+  const isDark = colorScheme === "dark";
 
-    const filtered = swimmers.filter((s) =>
-        `${s.name} ${s.surname}`.toLowerCase().includes(search.toLowerCase()),
-    );
+  const filtered = swimmers.filter((s) =>
+    `${s.name} ${s.surname}`.toLowerCase().includes(search.toLowerCase()),
+  );
 
-    const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
-    const startIndex = (activePage - 1) * ITEMS_PER_PAGE;
-    const paginated = filtered.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const startIndex = (activePage - 1) * ITEMS_PER_PAGE;
+  const paginated = filtered.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-    const toggleRow = (swimmerId: number) => {
-        setExpandedRows((prev) => {
-            const next = new Set(prev);
-            if (next.has(swimmerId)) next.delete(swimmerId);
-            else next.add(swimmerId);
-            return next;
-        });
-    };
+  const toggleRow = (swimmerId: number) => {
+    setExpandedRows((prev) => {
+      const next = new Set(prev);
+      if (next.has(swimmerId)) next.delete(swimmerId);
+      else next.add(swimmerId);
+      return next;
+    });
+  };
 
-    const handleSearch = (value: string) => {
-        setSearch(value);
-        setActivePage(1);
-    };
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    setActivePage(1);
+  };
 
-    return (
-        <Paper radius="lg" withBorder>
-            <Group
-                justify="space-between"
-                p={{base: "sm", sm: "lg"}}
-                pb={{base: "xs", sm: "md"}}
-                wrap="wrap"
-                gap="sm"
-            >
-                <Group gap="xs">
-                    <ThemeIcon variant="transparent" color="blue">
-                        <IconUsers/>
-                    </ThemeIcon>
-                    <Stack gap={0}>
-                        <Title order={3}>Výsledky plavců</Title>
-                        <Text size="xs" c="dimmed">
-                            {swimmers.length === 1
-                                ? "1 plavec"
-                                : swimmers.length >= 2 && swimmers.length <= 4
-                                    ? `${swimmers.length} plavci`
-                                    : `${swimmers.length} plavců`}
-                        </Text>
-                    </Stack>
-                </Group>
-                <TextInput
-                    placeholder="Hledat plavce..."
-                    leftSection={<IconSearch size={14}/>}
-                    value={search}
-                    onChange={(e) => handleSearch(e.currentTarget.value)}
-                    size="sm"
-                    w={{base: "100%", xs: 220}}
-                />
-            </Group>
+  return (
+    <Paper radius="lg" withBorder>
+      <Group
+        justify="space-between"
+        p={{ base: "sm", sm: "lg" }}
+        pb={{ base: "xs", sm: "md" }}
+        wrap="wrap"
+        gap="sm"
+      >
+        <Group gap="xs">
+          <ThemeIcon variant="transparent" color="blue">
+            <IconUsers />
+          </ThemeIcon>
+          <Stack gap={0}>
+            <Title order={3}>Výsledky plavců</Title>
+            <Text size="xs" c="dimmed">
+              {swimmers.length === 1
+                ? "1 plavec"
+                : swimmers.length >= 2 && swimmers.length <= 4
+                  ? `${swimmers.length} plavci`
+                  : `${swimmers.length} plavců`}
+            </Text>
+          </Stack>
+        </Group>
+        <TextInput
+          placeholder="Hledat plavce..."
+          leftSection={<IconSearch size={14} />}
+          value={search}
+          onChange={(e) => handleSearch(e.currentTarget.value)}
+          size="sm"
+          w={{ base: "100%", xs: 220 }}
+        />
+      </Group>
 
-            <Table.ScrollContainer minWidth={320}>
-                <Table
-                    highlightOnHover
-                    verticalSpacing="xs"
-                    className="competitions-table"
-                >
-                    <Table.Thead>
-                        <Table.Tr>
-                            <Table.Th w="34%"> Plavec</Table.Th>
-                            <Table.Th w="12%">Ročník</Table.Th>
-                            <Table.Th w="12%" style={{textAlign: "center"}}>Starty</Table.Th>
-                            <Table.Th w="12%" style={{textAlign: "center"}}>Osobní rekordy</Table.Th>
-                            <Table.Th w="10%"/>
-                        </Table.Tr>
-                    </Table.Thead>
-                    <Table.Tbody>
-                        {paginated.length === 0 && (
-                            <Table.Tr>
-                                <Table.Td colSpan={5}>
-                                    <Text ta="center" c="dimmed" py="xl">
-                                        Žádní plavci nenalezeni
-                                    </Text>
-                                </Table.Td>
-                            </Table.Tr>
-                        )}
-                        {paginated.map((swimmer) => {
-                            const isExpanded = expandedRows.has(swimmer.swimmerId);
-                            const pbCount = swimmer.results.filter(
-                                (r) => r.improvement && r.time < DNF_THRESHOLD,
-                            ).length;
+      <Table.ScrollContainer minWidth={320}>
+        <Table highlightOnHover verticalSpacing="xs" className="competitions-table">
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th w="34%"> Plavec</Table.Th>
+              <Table.Th w="12%">Ročník</Table.Th>
+              <Table.Th w="12%" style={{ textAlign: "center" }}>
+                Starty
+              </Table.Th>
+              <Table.Th w="12%" style={{ textAlign: "center" }}>
+                Osobní rekordy
+              </Table.Th>
+              <Table.Th w="10%" />
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {paginated.length === 0 && (
+              <Table.Tr>
+                <Table.Td colSpan={5}>
+                  <Text ta="center" c="dimmed" py="xl">
+                    Žádní plavci nenalezeni
+                  </Text>
+                </Table.Td>
+              </Table.Tr>
+            )}
+            {paginated.map((swimmer) => {
+              const isExpanded = expandedRows.has(swimmer.swimmerId);
+              const pbCount = swimmer.results.filter(
+                (r) => r.improvement && r.time < DNF_THRESHOLD,
+              ).length;
 
-                            return (
-                                <>
-                                    <Table.Tr
-                                        key={swimmer.swimmerId}
-                                        style={{cursor: "pointer"}}
-                                        onClick={() => toggleRow(swimmer.swimmerId)}
-                                    >
-                                        <Table.Td fw={600}>
-                                            <Text
-                                                component={Link}
-                                                to={`/swimmer/${swimmer.swimmerId}`}
-                                                fw={600}
-                                                style={{color: "inherit", textDecoration: "none"}}
-                                                onClick={(e) => e.stopPropagation()}
-                                            >
-                                                {swimmer.surname} {swimmer.name}
-                                            </Text>
-                                        </Table.Td>
-                                        <Table.Td fw={500} style={{fontVariantNumeric: "tabular-nums"}}>
-                                            {swimmer.birthYear}
-                                        </Table.Td>
-                                        <Table.Td style={{textAlign: "center"}}>
-                                            <Badge variant="light" color="blue">
-                                                {swimmer.results.length}
-                                            </Badge>
-                                        </Table.Td>
-                                        <Table.Td style={{textAlign: "center"}}>
-                                            {pbCount > 0 ? (
-                                                <Badge variant="light" color="green">
-                                                    {pbCount}
-                                                </Badge>
-                                            ) : (
-                                                <Text c="dimmed">–</Text>
-                                            )}
-                                        </Table.Td>
-                                        <Table.Td>
-                                            <ActionIcon
-                                                variant="subtle"
-                                                size="sm"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    toggleRow(swimmer.swimmerId);
-                                                }}
-                                            >
-                                                {isExpanded ? <IconChevronUp size={16}/> : <IconChevronDown size={16}/>}
-                                            </ActionIcon>
-                                        </Table.Td>
-                                    </Table.Tr>
-
-                                    {isExpanded && (
-                                        <Table.Tr key={`${swimmer.swimmerId}-detail`}>
-                                            <Table.Td colSpan={5} p={0}>
-                                                <Collapse in={isExpanded}>
-                                                    <Table
-                                                        withTableBorder={false}
-                                                        style={{
-                                                            backgroundColor: isDark
-                                                                ? "var(--mantine-color-dark-6)"
-                                                                : "var(--mantine-color-gray-0)",
-                                                        }}
-                                                        verticalSpacing="xs"
-                                                    >
-                                                        <Table.Thead>
-                                                            <Table.Tr>
-                                                                <Table.Th>Disciplína</Table.Th>
-                                                                <Table.Th>Čas</Table.Th>
-                                                                <Table.Th>Výkonnost</Table.Th>
-                                                                <Table.Th>Body</Table.Th>
-                                                            </Table.Tr>
-                                                        </Table.Thead>
-                                                        <Table.Tbody>
-                                                            {swimmer.results.map((result, idx) => (
-                                                                <Table.Tr key={idx}>
-                                                                    <Table.Td>
-                                                                        <Group gap="xs">
-                                                                            <Text>{result.disciplineCode}</Text>
-                                                                            {result.relayPart && (
-                                                                                <Badge size="xs" color="grape"
-                                                                                       variant="outline">
-                                                                                    štafeta
-                                                                                </Badge>
-                                                                            )}
-                                                                            {result.clubRecord && (
-                                                                                <Badge size="xs" color="orange"
-                                                                                       variant="outline">
-                                                                                    Rekord
-                                                                                </Badge>
-                                                                            )}
-                                                                        </Group>
-                                                                    </Table.Td>
-                                                                    <Table.Td ff="monospace">
-                                                                        {result.time >= DNF_THRESHOLD ? (
-                                                                            <Badge color="gray" variant="light"
-                                                                                   size="sm">DNF</Badge>
-                                                                        ) : (
-                                                                            parseTimeFromMillis(result.time)
-                                                                        )}
-                                                                    </Table.Td>
-                                                                    <Table.Td>
-                                                                        {result.time >= DNF_THRESHOLD ? (
-                                                                            <Badge color="gray" variant="light"
-                                                                                   size="sm">–</Badge>
-                                                                        ) : (
-                                                                            getImprovementBadge(result)
-                                                                        )}
-                                                                    </Table.Td>
-                                                                    <Table.Td>
-                                                                        {result.points != null ? (
-                                                                            <Text fw={500}
-                                                                                  c="blue">{result.points}</Text>
-                                                                        ) : (
-                                                                            <Text c="dimmed">–</Text>
-                                                                        )}
-                                                                    </Table.Td>
-                                                                </Table.Tr>
-                                                            ))}
-                                                        </Table.Tbody>
-                                                    </Table>
-                                                </Collapse>
-                                            </Table.Td>
-                                        </Table.Tr>
-                                    )}
-                                </>
-                            );
-                        })}
-                    </Table.Tbody>
-                </Table>
-            </Table.ScrollContainer>
-
-            {totalPages > 1 && (
-                <Group justify="center" p="md">
-                    <Pagination
-                        total={totalPages}
-                        value={activePage}
-                        onChange={setActivePage}
+              return (
+                <>
+                  <Table.Tr
+                    key={swimmer.swimmerId}
+                    style={{ cursor: "pointer" }}
+                    onClick={() => toggleRow(swimmer.swimmerId)}
+                  >
+                    <Table.Td fw={600}>
+                      <Text
+                        component={Link}
+                        to={`/swimmer/${swimmer.swimmerId}`}
+                        fw={600}
+                        style={{ color: "inherit", textDecoration: "none" }}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {swimmer.surname} {swimmer.name}
+                      </Text>
+                    </Table.Td>
+                    <Table.Td fw={500} style={{ fontVariantNumeric: "tabular-nums" }}>
+                      {swimmer.birthYear}
+                    </Table.Td>
+                    <Table.Td style={{ textAlign: "center" }}>
+                      <Badge variant="light" color="blue">
+                        {swimmer.results.length}
+                      </Badge>
+                    </Table.Td>
+                    <Table.Td style={{ textAlign: "center" }}>
+                      {pbCount > 0 ? (
+                        <Badge variant="light" color="green">
+                          {pbCount}
+                        </Badge>
+                      ) : (
+                        <Text c="dimmed">–</Text>
+                      )}
+                    </Table.Td>
+                    <Table.Td>
+                      <ActionIcon
+                        variant="subtle"
                         size="sm"
-                    />
-                </Group>
-            )}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleRow(swimmer.swimmerId);
+                        }}
+                      >
+                        {isExpanded ? <IconChevronUp size={16} /> : <IconChevronDown size={16} />}
+                      </ActionIcon>
+                    </Table.Td>
+                  </Table.Tr>
 
-            {filtered.length > 0 && (
-                <Text size="xs" c="dimmed" ta="center" pb="sm">
-                    Zobrazeno {Math.min(startIndex + ITEMS_PER_PAGE, filtered.length)} z{" "}
-                    {filtered.length} plavců
-                </Text>
-            )}
-        </Paper>
-    );
+                  {isExpanded && (
+                    <Table.Tr key={`${swimmer.swimmerId}-detail`}>
+                      <Table.Td colSpan={5} p={0}>
+                        <Collapse in={isExpanded}>
+                          <Table
+                            withTableBorder={false}
+                            style={{
+                              backgroundColor: isDark
+                                ? "var(--mantine-color-dark-6)"
+                                : "var(--mantine-color-gray-0)",
+                            }}
+                            verticalSpacing="xs"
+                          >
+                            <Table.Thead>
+                              <Table.Tr>
+                                <Table.Th>Disciplína</Table.Th>
+                                <Table.Th>Čas</Table.Th>
+                                <Table.Th>Výkonnost</Table.Th>
+                                <Table.Th>Body</Table.Th>
+                              </Table.Tr>
+                            </Table.Thead>
+                            <Table.Tbody>
+                              {swimmer.results.map((result) => (
+                                <Table.Tr key={`${result.disciplineCode}-${result.time}`}>
+                                  <Table.Td>
+                                    <Group gap="xs">
+                                      <Text>{result.disciplineCode}</Text>
+                                      {result.relayPart && (
+                                        <Badge size="xs" color="grape" variant="outline">
+                                          štafeta
+                                        </Badge>
+                                      )}
+                                      {result.clubRecord && (
+                                        <Badge size="xs" color="orange" variant="outline">
+                                          Rekord
+                                        </Badge>
+                                      )}
+                                    </Group>
+                                  </Table.Td>
+                                  <Table.Td ff="monospace">
+                                    {result.time >= DNF_THRESHOLD ? (
+                                      <Badge color="gray" variant="light" size="sm">
+                                        DNF
+                                      </Badge>
+                                    ) : (
+                                      parseTimeFromMillis(result.time)
+                                    )}
+                                  </Table.Td>
+                                  <Table.Td>
+                                    {result.time >= DNF_THRESHOLD ? (
+                                      <Badge color="gray" variant="light" size="sm">
+                                        –
+                                      </Badge>
+                                    ) : (
+                                      getImprovementBadge(result)
+                                    )}
+                                  </Table.Td>
+                                  <Table.Td>
+                                    {result.points != null ? (
+                                      <Text fw={500} c="blue">
+                                        {result.points}
+                                      </Text>
+                                    ) : (
+                                      <Text c="dimmed">–</Text>
+                                    )}
+                                  </Table.Td>
+                                </Table.Tr>
+                              ))}
+                            </Table.Tbody>
+                          </Table>
+                        </Collapse>
+                      </Table.Td>
+                    </Table.Tr>
+                  )}
+                </>
+              );
+            })}
+          </Table.Tbody>
+        </Table>
+      </Table.ScrollContainer>
+
+      {totalPages > 1 && (
+        <Group justify="center" p="md">
+          <Pagination total={totalPages} value={activePage} onChange={setActivePage} size="sm" />
+        </Group>
+      )}
+
+      {filtered.length > 0 && (
+        <Text size="xs" c="dimmed" ta="center" pb="sm">
+          Zobrazeno {Math.min(startIndex + ITEMS_PER_PAGE, filtered.length)} z {filtered.length}{" "}
+          plavců
+        </Text>
+      )}
+    </Paper>
+  );
 }
 
 export default CompetitionSwimmersTable;
-

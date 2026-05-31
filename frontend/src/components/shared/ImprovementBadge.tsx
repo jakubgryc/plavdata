@@ -1,10 +1,7 @@
 import { Badge } from "@mantine/core";
-import { IconArrowUp, IconArrowDown, IconMinus } from "@tabler/icons-react";
+import { IconArrowDown, IconArrowUp, IconMinus } from "@tabler/icons-react";
 
-export function getImprovementBadge(result: {
-  improvement: boolean;
-  performance: number;
-}) {
+export function getImprovementBadge(result: { improvement: boolean; performance: number }) {
   const pct = (result.performance * 100).toFixed(2);
   if (result.improvement) {
     return (
@@ -26,4 +23,3 @@ export function getImprovementBadge(result: {
     </Badge>
   );
 }
-

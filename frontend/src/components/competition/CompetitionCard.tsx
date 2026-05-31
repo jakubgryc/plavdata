@@ -1,8 +1,8 @@
+import { Badge, Group, Paper, Stack, Text, ThemeIcon } from "@mantine/core";
+import { IconCalendarEvent, IconChevronRight, IconMapPin } from "@tabler/icons-react";
 import { Link } from "react-router";
-import { Paper, Group, Stack, Text, Badge, ThemeIcon } from "@mantine/core";
-import { IconCalendarEvent, IconMapPin, IconChevronRight } from "@tabler/icons-react";
-import { formatDate } from "../../utils/timeUtils";
 import type { CompetitionListItem } from "../../schema/types";
+import { formatDate } from "../../utils/timeUtils";
 
 function CompetitionCard({ comp }: { comp: CompetitionListItem }) {
   const startDate = formatDate(comp.startDate);
@@ -60,4 +60,3 @@ function CompetitionCard({ comp }: { comp: CompetitionListItem }) {
 }
 
 export default CompetitionCard;
-

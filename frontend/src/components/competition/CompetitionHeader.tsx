@@ -1,25 +1,25 @@
 import {
-  Paper,
-  Group,
-  Stack,
-  Title,
-  Text,
   Button,
   Grid,
+  Group,
+  Paper,
+  Stack,
+  Text,
   ThemeIcon,
+  Title,
   useMantineColorScheme,
 } from "@mantine/core";
 import {
   IconCalendar,
+  IconChartBar,
+  IconExternalLink,
+  IconFlame,
   IconMapPin,
   IconSwimming,
   IconTrophy,
-  IconFlame,
-  IconExternalLink,
-  IconChartBar,
 } from "@tabler/icons-react";
-import { formatDate } from "../../utils/timeUtils";
 import type { CompetitionInfo } from "../../schema/types";
+import { formatDate } from "../../utils/timeUtils";
 
 interface CompetitionHeaderProps {
   competition: CompetitionInfo;
@@ -41,10 +41,7 @@ function CompetitionHeader({
   const isSingleDay = competition.startDate === competition.endDate;
   const dateLabel = isSingleDay ? startDate : `${startDate} – ${endDate}`;
 
-  const pbRate =
-    totalStarts > 0
-      ? Math.round((totalPersonalBests / totalStarts) * 100)
-      : 0;
+  const pbRate = totalStarts > 0 ? Math.round((totalPersonalBests / totalStarts) * 100) : 0;
 
   const cspsResultsUrl = `https://vysledky.czechswimming.cz/souteze/${competition.cspsCompetitionId}`;
 
@@ -127,9 +124,7 @@ function CompetitionHeader({
           mt="xs"
           pt="md"
           style={{
-            borderTop: `1px solid ${
-              colorScheme === "dark" ? "#373A40" : "#dee2e6"
-            }`,
+            borderTop: `1px solid ${colorScheme === "dark" ? "#373A40" : "#dee2e6"}`,
           }}
         >
           <Grid grow>
