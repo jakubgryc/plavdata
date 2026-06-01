@@ -199,8 +199,7 @@ function CompetitionSwimmersTable({ swimmers }: CompetitionSwimmersTableProps) {
                                   result.comparisonToBest >= FIRST_TIME_TRESHOLD ||
                                   (result.comparisonToBest === 0 && !result.improvement)
                                     ? null
-                                    : // : result.time + Math.abs(result.comparisonToBest);
-                                      result.time + result.comparisonToBest;
+                                    : result.time + result.comparisonToBest;
                                 return (
                                   <Table.Tr key={`${result.disciplineCode}-${result.time}`}>
                                     <Table.Td>
