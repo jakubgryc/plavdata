@@ -195,7 +195,6 @@ function CompetitionSwimmersTable({ swimmers }: CompetitionSwimmersTableProps) {
                             <Table.Tbody>
                               {swimmer.results.map((result) => {
                                 const previousPB =
-                                  result.time >= DNF_THRESHOLD ||
                                   result.comparisonToBest >= FIRST_TIME_TRESHOLD ||
                                   (result.comparisonToBest === 0 && !result.improvement)
                                     ? null
@@ -218,25 +217,22 @@ function CompetitionSwimmersTable({ swimmers }: CompetitionSwimmersTableProps) {
                                       </Group>
                                     </Table.Td>
                                     <Table.Td ff="monospace">
-                                      {result.time >= DNF_THRESHOLD ? (
-                                        <Badge color="gray" variant="light" size="sm">
-                                          DNF
-                                        </Badge>
-                                      ) : (
-                                        parseTimeFromMillis(result.time)
-                                      )}
+                                      {result.time >= DNF_THRESHOLD
+                                        ? getImprovementBadge(result, {
+                                            isDnf: true,
+                                          })
+                                        : parseTimeFromMillis(result.time)}
                                     </Table.Td>
                                     <Table.Td ff="monospace" c="dimmed">
                                       {previousPB != null ? parseTimeFromMillis(previousPB) : "–"}
                                     </Table.Td>
-                                    <Table.Td>
-                                      {result.time >= DNF_THRESHOLD ? (
-                                        <Badge color="gray" variant="light" size="sm">
-                                          –
-                                        </Badge>
-                                      ) : (
-                                        getImprovementBadge(result)
-                                      )}
+                                    <Table.Td ff="monospace">
+                                      {getImprovementBadge(result, {
+                                        isDnf: result.time >= DNF_THRESHOLD,
+                                        isFirstTime:
+                                          result.comparisonToBest >= FIRST_TIME_TRESHOLD &&
+                                          !result.improvement,
+                                      })}
                                     </Table.Td>
                                     <Table.Td>
                                       {result.points != null ? (
