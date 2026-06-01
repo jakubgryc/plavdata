@@ -1,9 +1,12 @@
-import { Center, Flex, Skeleton, Stack, Text } from "@mantine/core";
+import { Center, Flex, Skeleton, Stack, Tabs, Text } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { API_BASE_URL } from "../../config";
+import CompetitionDisciplineStats from "../components/competition/CompetitionDisciplineStats";
 import CompetitionHeader from "../components/competition/CompetitionHeader";
+import CompetitionStrokeChart from "../components/competition/CompetitionStrokeChart";
 import CompetitionSwimmersTable from "../components/competition/CompetitionSwimmersTable";
+import CompetitionTopResults from "../components/competition/CompetitionTopResults";
 import type { CompetitionDetailResponse } from "../schema/types";
 
 function CompetitionDetail() {
@@ -71,7 +74,25 @@ function CompetitionDetail() {
         totalPersonalBests={data.totalPersonalBests}
         clubRecordsCount={data.clubRecordsCount}
       />
-      <CompetitionSwimmersTable swimmers={data.swimmers} />
+
+      <Tabs defaultValue="results" mt="sm">
+        <Tabs.List>
+          <Tabs.Tab value="results">Výsledky plavců</Tabs.Tab>
+          <Tabs.Tab value="stats">Statistiky</Tabs.Tab>
+        </Tabs.List>
+
+        <Tabs.Panel value="results" pt="md">
+          <CompetitionSwimmersTable swimmers={data.swimmers} />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="stats" pt="md">
+          <Flex direction="column" gap="md">
+            <CompetitionDisciplineStats swimmers={data.swimmers} />
+            <CompetitionStrokeChart swimmers={data.swimmers} />
+            <CompetitionTopResults swimmers={data.swimmers} />
+          </Flex>
+        </Tabs.Panel>
+      </Tabs>
     </Flex>
   );
 }

@@ -17,7 +17,7 @@ import { IconChevronDown, IconChevronUp, IconSearch, IconUsers } from "@tabler/i
 import { useState } from "react";
 import { Link } from "react-router";
 import type { CompetitionSwimmerResult } from "../../schema/types";
-import { DNF_THRESHOLD } from "../../utils/constants";
+import { DNF_THRESHOLD, FIRST_TIME_TRESHOLD } from "../../utils/constants";
 import { parseTimeFromMillis } from "../../utils/timeUtils";
 import { getImprovementBadge } from "../shared/ImprovementBadge";
 
@@ -187,57 +187,70 @@ function CompetitionSwimmersTable({ swimmers }: CompetitionSwimmersTableProps) {
                               <Table.Tr>
                                 <Table.Th>Disciplína</Table.Th>
                                 <Table.Th>Čas</Table.Th>
+                                <Table.Th>Před. OR</Table.Th>
                                 <Table.Th>Výkonnost</Table.Th>
                                 <Table.Th>Body</Table.Th>
                               </Table.Tr>
                             </Table.Thead>
                             <Table.Tbody>
-                              {swimmer.results.map((result) => (
-                                <Table.Tr key={`${result.disciplineCode}-${result.time}`}>
-                                  <Table.Td>
-                                    <Group gap="xs">
-                                      <Text>{result.disciplineCode}</Text>
-                                      {result.relayPart && (
-                                        <Badge size="xs" color="grape" variant="outline">
-                                          štafeta
+                              {swimmer.results.map((result) => {
+                                const previousPB =
+                                  result.time >= DNF_THRESHOLD ||
+                                  result.comparisonToBest >= FIRST_TIME_TRESHOLD ||
+                                  (result.comparisonToBest === 0 && !result.improvement)
+                                    ? null
+                                    : // : result.time + Math.abs(result.comparisonToBest);
+                                      result.time + result.comparisonToBest;
+                                return (
+                                  <Table.Tr key={`${result.disciplineCode}-${result.time}`}>
+                                    <Table.Td>
+                                      <Group gap="xs">
+                                        <Text>{result.disciplineCode}</Text>
+                                        {result.relayPart && (
+                                          <Badge size="xs" color="grape" variant="outline">
+                                            štafeta
+                                          </Badge>
+                                        )}
+                                        {result.clubRecord && (
+                                          <Badge size="xs" color="orange" variant="outline">
+                                            KR
+                                          </Badge>
+                                        )}
+                                      </Group>
+                                    </Table.Td>
+                                    <Table.Td ff="monospace">
+                                      {result.time >= DNF_THRESHOLD ? (
+                                        <Badge color="gray" variant="light" size="sm">
+                                          DNF
                                         </Badge>
+                                      ) : (
+                                        parseTimeFromMillis(result.time)
                                       )}
-                                      {result.clubRecord && (
-                                        <Badge size="xs" color="orange" variant="outline">
-                                          Rekord
+                                    </Table.Td>
+                                    <Table.Td ff="monospace" c="dimmed">
+                                      {previousPB != null ? parseTimeFromMillis(previousPB) : "–"}
+                                    </Table.Td>
+                                    <Table.Td>
+                                      {result.time >= DNF_THRESHOLD ? (
+                                        <Badge color="gray" variant="light" size="sm">
+                                          –
                                         </Badge>
+                                      ) : (
+                                        getImprovementBadge(result)
                                       )}
-                                    </Group>
-                                  </Table.Td>
-                                  <Table.Td ff="monospace">
-                                    {result.time >= DNF_THRESHOLD ? (
-                                      <Badge color="gray" variant="light" size="sm">
-                                        DNF
-                                      </Badge>
-                                    ) : (
-                                      parseTimeFromMillis(result.time)
-                                    )}
-                                  </Table.Td>
-                                  <Table.Td>
-                                    {result.time >= DNF_THRESHOLD ? (
-                                      <Badge color="gray" variant="light" size="sm">
-                                        –
-                                      </Badge>
-                                    ) : (
-                                      getImprovementBadge(result)
-                                    )}
-                                  </Table.Td>
-                                  <Table.Td>
-                                    {result.points != null ? (
-                                      <Text fw={500} c="blue">
-                                        {result.points}
-                                      </Text>
-                                    ) : (
-                                      <Text c="dimmed">–</Text>
-                                    )}
-                                  </Table.Td>
-                                </Table.Tr>
-                              ))}
+                                    </Table.Td>
+                                    <Table.Td>
+                                      {result.points != null ? (
+                                        <Text fw={500} c="blue">
+                                          {result.points}
+                                        </Text>
+                                      ) : (
+                                        <Text c="dimmed">–</Text>
+                                      )}
+                                    </Table.Td>
+                                  </Table.Tr>
+                                );
+                              })}
                             </Table.Tbody>
                           </Table>
                         </Collapse>
