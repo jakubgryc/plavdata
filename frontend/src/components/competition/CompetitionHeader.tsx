@@ -11,10 +11,10 @@ import {
 } from "@mantine/core";
 import {
   IconCalendar,
-  IconChartBar,
   IconExternalLink,
   IconFlame,
   IconMapPin,
+  IconRipple,
   IconSwimming,
   IconTrophy,
 } from "@tabler/icons-react";
@@ -75,8 +75,8 @@ function CompetitionHeader({
     <Paper p={{ base: "sm", sm: "lg" }} radius="lg" withBorder>
       <Stack gap="md">
         {/* Title row */}
-        <Group justify="space-between" align="flex-start" wrap="wrap" gap="sm">
-          <Title order={1} className="card-header-title">
+        <Group justify="space-between" align="center" wrap="wrap" gap="sm">
+          <Title order={1} className="profile-header-title">
             {competition.title}
           </Title>
           <Button
@@ -96,22 +96,22 @@ function CompetitionHeader({
         <Group gap="xl" wrap="wrap">
           <Group gap="xs">
             <IconCalendar size={16} stroke={1.5} />
-            <Text size="sm" c="dimmed">
+            <Text size="sm" c="dimmed" className="profile-info-text">
               {dateLabel}
             </Text>
           </Group>
           {competition.location && (
             <Group gap="xs">
               <IconMapPin size={16} stroke={1.5} />
-              <Text size="sm" c="dimmed">
+              <Text size="sm" c="dimmed" className="profile-info-text">
                 {competition.location}
               </Text>
             </Group>
           )}
           {competition.poolLength && (
             <Group gap="xs">
-              <IconChartBar size={16} stroke={1.5} />
-              <Text size="sm" c="dimmed">
+              <IconRipple size={16} stroke={1.5} />
+              <Text size="sm" c="dimmed" className="profile-info-text">
                 Bazén: {competition.poolLength}m
               </Text>
             </Group>

@@ -71,11 +71,11 @@ function ProfileHeader({ basicInfo, stats }: ProfileHeaderProps) {
   return (
     <Paper p={{ base: "sm", sm: "lg" }} radius="lg" withBorder>
       <Stack gap="md">
-        <Group justify="space-between" align="flex-start" wrap="wrap">
+        <Group justify="space-between" align="center" wrap="wrap">
           <Group gap="sm">
             <Title
               order={1}
-              className="card-header-title"
+              className="profile-header-title"
             >{`${basicInfo.name} ${basicInfo.surname}`}</Title>
           </Group>
           {basicInfo.cspsId && (
