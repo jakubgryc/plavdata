@@ -212,6 +212,56 @@ export interface SwimmerPersonalBests {
   pb50M: SwimmerPersonalBestRecord[];
 }
 
+// Competition Detail Types
+export interface CompetitionListItem {
+  id: number;
+  title: string;
+  startDate: string;
+  endDate: string;
+  location: string | null;
+  poolLength: number | null;
+  cspsCompetitionId: number;
+  hasResults: boolean;
+}
+
+export interface CompetitionInfo {
+  id: number;
+  title: string;
+  startDate: string;
+  endDate: string;
+  location: string | null;
+  poolLength: number | null;
+  cspsCompetitionId: number;
+}
+
+export interface CompetitionResultDetail {
+  discipline: string;
+  disciplineCode: string;
+  time: number;
+  points: number | null;
+  improvement: boolean;
+  comparisonToBest: number;
+  performance: number;
+  relayPart: boolean;
+  clubRecord: boolean;
+}
+
+export interface CompetitionSwimmerResult {
+  swimmerId: number;
+  name: string;
+  surname: string;
+  birthYear: number;
+  results: CompetitionResultDetail[];
+}
+
+export interface CompetitionDetailResponse {
+  competition: CompetitionInfo;
+  swimmers: CompetitionSwimmerResult[];
+  totalStarts: number;
+  totalPersonalBests: number;
+  clubRecordsCount: number;
+}
+
 export interface StartsByStroke {
   z: number;
   p: number;

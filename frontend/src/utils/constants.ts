@@ -37,6 +37,7 @@ export const DISCIPLINES = [
 
 export const DNF_TIME = 6039990; // magic number representing DNF in milliseconds
 export const DNF_THRESHOLD = 6000000; // 100 minutes in milliseconds
+export const FIRST_TIME_TRESHOLD = 4500000; // 75 minutes in milliseconds, used to identify if comparison to best is likely first time ever
 
 // Age category display name mapping
 export const AGE_CATEGORY_LABELS: Record<string, string> = {

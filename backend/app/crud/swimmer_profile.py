@@ -183,7 +183,6 @@ def get_swimmer_competitions(db: Session, swimmer_id: int) -> list:
     # Single query to get all results with competition and discipline info
     results_data = (
         db.query(
-            Competition.csps_competition_id,
             Competition.title.label("comp_name"),
             Competition.start_date,
             Competition.location,
@@ -212,7 +211,7 @@ def get_swimmer_competitions(db: Session, swimmer_id: int) -> list:
         comp_id = row.competition_id
         if comp_id not in competitions_dict:
             competitions_dict[comp_id] = {
-                "competitionId": row.csps_competition_id,
+                "competitionId": comp_id,
                 "name": row.comp_name,
                 "date": row.start_date.isoformat() if row.start_date else None,
                 "location": row.location,

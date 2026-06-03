@@ -41,6 +41,9 @@ const Navbar = () => {
       <NavLink to="/" style={navLinkStyle} onClick={() => setOpened(false)}>
         Úvod
       </NavLink>
+      <NavLink to="/competitions" style={navLinkStyle} onClick={() => setOpened(false)}>
+        Závody
+      </NavLink>
       <NavLink to="/compare-swimmers" style={navLinkStyle} onClick={() => setOpened(false)}>
         Porovnání plavců
       </NavLink>

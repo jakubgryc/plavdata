@@ -98,6 +98,7 @@ class Result(Base):
         Index(
             "idx_swimmer_pb_lookup", "swimmer_id", "discipline_id", "course_id", "time"
         ),
+        Index("idx_result_competition_id", "competition_id"),
     )
 
 
