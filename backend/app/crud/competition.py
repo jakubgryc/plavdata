@@ -2,7 +2,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 
 from app.constants import EXCLUDED_COMPETITION_LOCATIONS
-from app.models import ClubRecord, Competition, Discipline, Result, Swimmer
+from app.models import Competition, Discipline, Result, Swimmer
+from app.crud.common import fetch_club_record_ids, build_result_entry
 
 
 def _fetch_competition_rows(db: Session, competition_id: int):
@@ -25,48 +26,10 @@ def _fetch_competition_rows(db: Session, competition_id: int):
         .join(Discipline, Result.discipline_id == Discipline.id)
         .filter(Result.competition_id == competition_id)
         .filter(Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS))
-        .filter(Result.split_time.is_(False) | Result.relay_part.is_(True))
+        .filter(Result.split_time.is_(False))
         .order_by(Swimmer.surname, Swimmer.name, Discipline.code)
         .all()
     )
-
-
-def _fetch_club_record_ids(db: Session, result_ids: list[int]) -> set[int]:
-    if not result_ids:
-        return set()
-    rows = (
-        db.query(ClubRecord.result_id)
-        .filter(ClubRecord.result_id.in_(result_ids))
-        .all()
-    )
-    return {r.result_id for r in rows}
-
-
-def _build_result_entry(row, club_records_ids: set[int]) -> dict:
-    previous_best = row.time + abs(row.comparison_to_best)
-    performance = (
-        round(abs(row.comparison_to_best) / previous_best, 4)
-        if previous_best > 0
-        else 0.0
-    )
-    # Rename freestyle code K -> VZ
-    code_parts = row.discipline_code.upper().split()
-    display_code = (
-        f"{code_parts[0]} VZ"
-        if len(code_parts) == 2 and code_parts[1] == "K"
-        else row.discipline_code
-    )
-    return {
-        "discipline": row.discipline,
-        "disciplineCode": display_code,
-        "time": row.time,
-        "points": row.points,
-        "improvement": bool(row.improvement),
-        "comparisonToBest": row.comparison_to_best,
-        "performance": performance,
-        "relayPart": bool(row.relay_part),
-        "clubRecord": row.result_id in club_records_ids,
-    }
 
 
 def _build_swimmers_data(rows, club_record_ids: set[int]) -> tuple[list, int, int, int]:
@@ -86,7 +49,7 @@ def _build_swimmers_data(rows, club_record_ids: set[int]) -> tuple[list, int, in
                 "birthYear": row.birth_year,
                 "results": [],
             }
-        swimmers_dict[sid]["results"].append(_build_result_entry(row, club_record_ids))
+        swimmers_dict[sid]["results"].append(build_result_entry(row, club_record_ids))
 
         total_starts += 1
         if row.improvement:
@@ -111,7 +74,7 @@ def get_competition_detail(db: Session, competition_id: int) -> dict | None:
     if not rows:
         return None
 
-    club_record_ids = _fetch_club_record_ids(db, [row.result_id for row in rows])
+    club_record_ids = fetch_club_record_ids(db, [row.result_id for row in rows])
     swimmers, total_starts, total_personal_bests, club_records_count = (
         _build_swimmers_data(rows, club_record_ids)
     )

@@ -178,22 +178,13 @@ export interface SwimmerStartsByYear {
   starts: number;
 }
 
-export interface CompetitionResult {
-  discipline: string;
-  code: string;
-  time: number;
-  points: number | null;
-  improvement: boolean;
-  performance: number;
-}
-
 export interface SwimmerCompetition {
   competitionId: number;
   name: string;
   date: string;
   location: string;
   poolLength: number;
-  results: CompetitionResult[];
+  results: CompetitionResultDetail[];
 }
 
 export interface SwimmerPersonalBestRecord {

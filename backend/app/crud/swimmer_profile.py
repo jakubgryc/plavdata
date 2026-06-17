@@ -14,6 +14,7 @@ from app.models import (
     Result,
     Swimmer,
 )
+from app.crud.common import build_result_entry, fetch_club_record_ids
 
 
 def get_swimmer_basic_info(db: Session, swimmer_id: int) -> dict | None:
@@ -188,10 +189,12 @@ def get_swimmer_competitions(db: Session, swimmer_id: int) -> list:
             Competition.location,
             Competition.pool_length,
             Discipline.title.label("discipline"),
-            Discipline.code.label("code"),
+            Discipline.code.label("discipline_code"),
+            Result.id.label("result_id"),
             Result.time,
             Result.improvement,
             Result.comparison_to_best,
+            Result.relay_part,
             Result.points,
             Result.competition_id,
         )
@@ -204,6 +207,8 @@ def get_swimmer_competitions(db: Session, swimmer_id: int) -> list:
         .order_by(Competition.start_date.desc())
         .all()
     )
+
+    club_record_ids = fetch_club_record_ids(db, [row.result_id for row in results_data])
 
     # Group results by competition
     competitions_dict = {}
@@ -219,17 +224,8 @@ def get_swimmer_competitions(db: Session, swimmer_id: int) -> list:
                 "results": [],
             }
 
-        previous_best_time = row.time + abs(row.comparison_to_best)
-        calculated_performance = round(row.comparison_to_best / previous_best_time, 4)
         competitions_dict[comp_id]["results"].append(
-            {
-                "discipline": row.discipline,
-                "code": row.code,
-                "time": row.time,
-                "points": row.points,
-                "improvement": row.improvement,
-                "performance": calculated_performance,
-            }
+            build_result_entry(row, club_record_ids)
         )
 
     result = list(competitions_dict.values())
