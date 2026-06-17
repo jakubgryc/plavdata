@@ -11,7 +11,7 @@ import {
   Title,
 } from "@mantine/core";
 import { IconCalendarMonth, IconChevronDown, IconChevronUp } from "@tabler/icons-react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { Link } from "react-router";
 import type { SwimmerCompetition } from "../../schema/types";
 import DropdownResults from "../shared/DropdownResults";
@@ -90,9 +90,8 @@ function CompetitionsTable({ competitions }: CompetitionsTableProps) {
             {paginatedCompetitions.map((comp) => {
               const isExpanded = expandedRows.has(comp.competitionId);
               return (
-                <>
+                <Fragment key={comp.competitionId}>
                   <Table.Tr
-                    key={comp.competitionId}
                     style={{ cursor: "pointer" }}
                     onClick={() => toggleRow(comp.competitionId)}
                   >
@@ -160,7 +159,7 @@ function CompetitionsTable({ competitions }: CompetitionsTableProps) {
                       isExpanded={isExpanded}
                     />
                   ) : null}
-                </>
+                </Fragment>
               );
             })}
           </Table.Tbody>

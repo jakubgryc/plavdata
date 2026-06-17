@@ -12,7 +12,7 @@ import {
   Title,
 } from "@mantine/core";
 import { IconChevronDown, IconChevronUp, IconSearch, IconUsers } from "@tabler/icons-react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { Link } from "react-router";
 import type { CompetitionSwimmerResult } from "../../schema/types";
 import { DNF_TRESHOLD } from "../../utils/constants";
@@ -117,9 +117,8 @@ function CompetitionSwimmersTable({ swimmers }: CompetitionSwimmersTableProps) {
               ).length;
 
               return (
-                <>
+                <Fragment key={swimmer.swimmerId}>
                   <Table.Tr
-                    key={swimmer.swimmerId}
                     style={{ cursor: "pointer" }}
                     onClick={() => toggleRow(swimmer.swimmerId)}
                   >
@@ -172,7 +171,7 @@ function CompetitionSwimmersTable({ swimmers }: CompetitionSwimmersTableProps) {
                       isExpanded={isExpanded}
                     />
                   ) : null}
-                </>
+                </Fragment>
               );
             })}
           </Table.Tbody>
