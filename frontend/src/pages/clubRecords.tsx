@@ -1,7 +1,7 @@
-import { Flex, Modal, SegmentedControl, Stack, Text, Title } from "@mantine/core";
+import { Box, Flex, Modal, SegmentedControl, Stack, Text, Title } from "@mantine/core";
 import { DataTable } from "mantine-datatable";
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router";
+import { Link } from "react-router";
 
 import { API_BASE_URL } from "../../config";
 import { useTheme } from "../hooks/useTheme";
@@ -55,7 +55,6 @@ type ClubRecordRow = {
 } & Partial<Record<AgeCategory, ClubRecord | null>>;
 
 function ClubRecords() {
-  const navigate = useNavigate();
   const [selectedCourse, setSelectedCourse] = useState<string>("25");
   const [clubRecords, setClubRecords] = useState<ClubRecordsData>({});
   const [isFetching, setIsFetching] = useState<boolean>(false);
@@ -298,44 +297,53 @@ function ClubRecords() {
                       padding: "10px",
                     }}
                   >
-                    <Text
-                      size="xs"
+                    <Box
                       style={{
                         flex: 3,
                         textAlign: "left",
-                        cursor: "pointer",
+                        //   cursor: "pointer",
                         whiteSpace: "nowrap",
                         overflow: "hidden",
                       }}
-                      onClick={() => navigate(`/swimmer/${data.swimmerId}`)}
                     >
-                      {data.surname} {data.name}
-                    </Text>
-                    <Text
-                      size="xs"
+                      <Text
+                        component={Link}
+                        to={`/swimmer/${data.swimmerId}`}
+                        className="swimmerLink"
+                        size="xs"
+                      >
+                        {data.surname} {data.name}
+                      </Text>
+                    </Box>
+                    <Box
                       style={{
                         flex: 1.5,
                         textAlign: "left",
                         cursor: "pointer",
                       }}
-                      onClick={() => {
-                        setModalData({
-                          time: parseTimeFromMillis(data.time),
-                          name: data.name,
-                          surname: data.surname,
-                          age: data.ageAtResult,
-                          location: data.competitionLocation,
-                          isSplit: data.splitTime,
-                          isRelayPart: data.relayPart,
-                          date: data.date,
-                          discipline: record.discipline,
-                          ageCategory: category,
-                        });
-                        setModalOpen(true);
-                      }}
                     >
-                      {parseTimeFromMillis(data.time)}
-                    </Text>
+                      <Text
+                        className="swimmerLink"
+                        size="xs"
+                        onClick={() => {
+                          setModalData({
+                            time: parseTimeFromMillis(data.time),
+                            name: data.name,
+                            surname: data.surname,
+                            age: data.ageAtResult,
+                            location: data.competitionLocation,
+                            isSplit: data.splitTime,
+                            isRelayPart: data.relayPart,
+                            date: data.date,
+                            discipline: record.discipline,
+                            ageCategory: category,
+                          });
+                          setModalOpen(true);
+                        }}
+                      >
+                        {parseTimeFromMillis(data.time)}
+                      </Text>
+                    </Box>
                     <Text size="xs" style={{ flex: 1.5, textAlign: "left" }} truncate>
                       {data.date || "-"}
                     </Text>

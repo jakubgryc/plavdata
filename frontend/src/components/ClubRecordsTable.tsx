@@ -1,6 +1,6 @@
 import { Anchor, Badge, Box, Group, Paper, Table, Text, ThemeIcon, Title } from "@mantine/core";
 import { IconArrowRight, IconMedal } from "@tabler/icons-react";
-import { useNavigate } from "react-router";
+import { Link } from "react-router";
 import type { RecentClubRecord } from "../schema/types";
 import { getAgeCategoryLabel } from "../utils/constants";
 import { formatDate, parseTimeFromMillis } from "../utils/timeUtils";
@@ -13,7 +13,6 @@ interface ClubRecordsTableProps {
 }
 
 function ClubRecordsTable({ records, title, subtitle, variant }: ClubRecordsTableProps) {
-  const navigate = useNavigate();
   const color = variant === "recent" ? "green" : "orange";
   const iconColor = variant === "recent" ? "yellow" : "orange";
 
@@ -55,11 +54,13 @@ function ClubRecordsTable({ records, title, subtitle, variant }: ClubRecordsTabl
             {records.map((record) => (
               <Table.Tr key={record.resultId}>
                 <Table.Td fw={500}>{record.discipline}</Table.Td>
-                <Table.Td
-                  style={{ cursor: "pointer" }}
-                  onClick={() => navigate(`/swimmer/${record.swimmerId}`)}
-                >
-                  <Text fw={500}>
+                <Table.Td>
+                  <Text
+                    className="swimmerLink"
+                    component={Link}
+                    to={`/swimmer/${record.swimmerId}`}
+                    fw={500}
+                  >
                     {record.surname} {record.name}
                   </Text>
                 </Table.Td>

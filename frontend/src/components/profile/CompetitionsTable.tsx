@@ -119,6 +119,7 @@ function CompetitionsTable({ competitions }: CompetitionsTableProps) {
                         fw={600}
                         style={{ color: "inherit", textDecoration: "none" }}
                         onClick={(e) => e.stopPropagation()}
+                        className="swimmerLink"
                       >
                         {comp.name}
                       </Text>

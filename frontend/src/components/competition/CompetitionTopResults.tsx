@@ -98,7 +98,7 @@ function CompetitionTopResults({ swimmers }: CompetitionTopResultsProps) {
                       component={Link}
                       to={`/swimmer/${entry.swimmerId}`}
                       fw={600}
-                      style={{ color: "inherit", textDecoration: "none" }}
+                      className="swimmerLink"
                     >
                       {entry.surname} {entry.name}
                     </Text>

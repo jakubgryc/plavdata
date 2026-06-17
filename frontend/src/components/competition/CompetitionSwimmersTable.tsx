@@ -127,8 +127,8 @@ function CompetitionSwimmersTable({ swimmers }: CompetitionSwimmersTableProps) {
                         component={Link}
                         to={`/swimmer/${swimmer.swimmerId}`}
                         fw={600}
-                        style={{ color: "inherit", textDecoration: "none" }}
                         onClick={(e) => e.stopPropagation()}
+                        className="swimmerLink"
                       >
                         {swimmer.surname} {swimmer.name}
                       </Text>
