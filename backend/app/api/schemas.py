@@ -324,13 +324,16 @@ class StartsByYear(BaseModel):
         populate_by_name = True
 
 
-class CompetitionResult(BaseModel):
+class CompetitionResultDetailOut(BaseModel):
     discipline: str
-    code: str
+    discipline_code: str
     time: int
-    improvement: bool
-    performance: float
     points: Optional[int]
+    improvement: bool
+    comparison_to_best: int
+    performance: float
+    relay_part: bool
+    club_record: bool
 
     class Config:
         alias_generator = to_camel
@@ -343,7 +346,7 @@ class CompetitionDetail(BaseModel):
     date: Optional[str]
     location: str
     pool_length: Optional[int] = None
-    results: List[CompetitionResult]
+    results: List[CompetitionResultDetailOut]
 
     class Config:
         alias_generator = to_camel

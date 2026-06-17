@@ -11,58 +11,61 @@ import {
 } from "@mantine/core";
 import {
   IconCalendar,
-  IconCalendarEvent,
   IconExternalLink,
   IconFlame,
+  IconMapPin,
+  IconRipple,
   IconSwimming,
   IconTrophy,
-  IconUsers,
 } from "@tabler/icons-react";
-import type { SwimmerBasicInfo, SwimmerStats } from "../../schema/types";
-import { ACTIVE_GROUPS } from "../../utils/constants.ts";
-import { getGroupLabel } from "../../utils/profileUtils";
+import type { CompetitionInfo } from "../../schema/types";
+import { formatDate } from "../../utils/timeUtils";
 
-interface ProfileHeaderProps {
-  basicInfo: SwimmerBasicInfo;
-  stats: SwimmerStats;
+interface CompetitionHeaderProps {
+  competition: CompetitionInfo;
+  totalStarts: number;
+  totalPersonalBests: number;
+  clubRecordsCount: number;
 }
 
-function ProfileHeader({ basicInfo, stats }: ProfileHeaderProps) {
+function CompetitionHeader({
+  competition,
+  totalStarts,
+  totalPersonalBests,
+  clubRecordsCount,
+}: CompetitionHeaderProps) {
   const { colorScheme } = useMantineColorScheme();
-  const currentYear = new Date().getFullYear();
-  const age = currentYear - basicInfo.birthYear;
+
+  const startDate = formatDate(competition.startDate);
+  const endDate = formatDate(competition.endDate);
+  const isSingleDay = competition.startDate === competition.endDate;
+  const dateLabel = isSingleDay ? startDate : `${startDate} – ${endDate}`;
+
+  const pbRate = totalStarts > 0 ? Math.round((totalPersonalBests / totalStarts) * 100) : 0;
+
+  const cspsResultsUrl = `https://vysledky.czechswimming.cz/souteze/${competition.cspsCompetitionId}`;
 
   const statCards = [
     {
       icon: IconSwimming,
       color: "blue",
-      label: "Starty",
-      value: stats.totalStarts,
-      subtitle: `${stats.yearStarts} tento rok`,
-      secondaryLabel: "celkem",
-    },
-    {
-      icon: IconCalendarEvent,
-      color: "teal",
-      label: "Závody",
-      value: stats.totalCompetitions,
-      subtitle: `${stats.yearCompetitions} tento rok`,
-      secondaryLabel: "celkem",
+      label: "Celkem startů",
+      value: totalStarts,
     },
     {
       icon: IconFlame,
-      color: "violet",
+      color: "green",
       label: "Osobní rekordy",
-      value: stats.yearPersonalBests,
-      secondaryLabel: "tento rok",
+      value: `${pbRate} %`,
+      subtitle: `${totalPersonalBests} z ${totalStarts} startů`,
     },
-    ...(stats.clubRecords > 0
+    ...(clubRecordsCount > 0
       ? [
           {
             icon: IconTrophy,
             color: "yellow" as const,
             label: "Klubové rekordy",
-            value: stats.clubRecords,
+            value: clubRecordsCount,
           },
         ]
       : []),
@@ -71,45 +74,51 @@ function ProfileHeader({ basicInfo, stats }: ProfileHeaderProps) {
   return (
     <Paper p={{ base: "sm", sm: "lg" }} radius="lg" withBorder>
       <Stack gap="md">
-        <Group justify="space-between" align="center" wrap="wrap">
-          <Group gap="sm">
-            <Title
-              order={1}
-              className="profile-header-title"
-            >{`${basicInfo.name} ${basicInfo.surname}`}</Title>
-          </Group>
-          {basicInfo.cspsId && (
-            <Button
-              component="a"
-              href={`https://vysledky.czechswimming.cz/lide/${basicInfo.cspsId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              leftSection={<IconExternalLink size={16} />}
-              variant="default"
-              size="sm"
-            >
-              ČSPS Profil
-            </Button>
-          )}
+        {/* Title row */}
+        <Group justify="space-between" align="center" wrap="wrap" gap="sm">
+          <Title order={1} className="profile-header-title">
+            {competition.title}
+          </Title>
+          <Button
+            component="a"
+            href={cspsResultsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            leftSection={<IconExternalLink size={16} />}
+            variant="default"
+            size="sm"
+          >
+            Oficiální výsledky
+          </Button>
         </Group>
 
+        {/* Meta info row */}
         <Group gap="xl" wrap="wrap">
           <Group gap="xs">
             <IconCalendar size={16} stroke={1.5} />
             <Text size="sm" c="dimmed" className="profile-info-text">
-              Ročník: <strong>{basicInfo.birthYear}</strong> ({age} let)
+              {dateLabel}
             </Text>
           </Group>
-          {ACTIVE_GROUPS.includes(basicInfo.group) && (
+          {competition.location && (
             <Group gap="xs">
-              <IconUsers size={16} stroke={1.5} />
+              <IconMapPin size={16} stroke={1.5} />
               <Text size="sm" c="dimmed" className="profile-info-text">
-                Skupina: <strong>{getGroupLabel(basicInfo.group)}</strong>
+                {competition.location}
+              </Text>
+            </Group>
+          )}
+          {competition.poolLength && (
+            <Group gap="xs">
+              <IconRipple size={16} stroke={1.5} />
+              <Text size="sm" c="dimmed" className="profile-info-text">
+                Bazén: {competition.poolLength}m
               </Text>
             </Group>
           )}
         </Group>
 
+        {/* Stats row */}
         <Stack
           gap="md"
           mt="xs"
@@ -140,13 +149,8 @@ function ProfileHeader({ basicInfo, stats }: ProfileHeaderProps) {
                     <Text size="xl" fw={700} className="profile-stat-value">
                       {stat.value}
                     </Text>
-                    {stat.secondaryLabel && (
-                      <Text size="sm" c="dimmed">
-                        {stat.secondaryLabel}
-                      </Text>
-                    )}
                   </Group>
-                  {stat.subtitle && (
+                  {"subtitle" in stat && stat.subtitle && (
                     <Text size="xs" c="dimmed">
                       {stat.subtitle}
                     </Text>
@@ -161,4 +165,4 @@ function ProfileHeader({ basicInfo, stats }: ProfileHeaderProps) {
   );
 }
 
-export default ProfileHeader;
+export default CompetitionHeader;

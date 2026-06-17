@@ -13,6 +13,8 @@ import { AdminGroupsPage } from "./pages/admin/groups";
 import { AdminSwimmersPage } from "./pages/admin/SwimmersAdmin.tsx";
 import ClubRecords from "./pages/clubRecords";
 import CompareSwimmers from "./pages/compareSwimmers";
+import CompetitionDetail from "./pages/competitionDetail";
+import Competitions from "./pages/competitions";
 import Home from "./pages/home";
 import Login from "./pages/login";
 import NotFound from "./pages/notFound";
@@ -49,6 +51,14 @@ const router = createBrowserRouter([
       {
         path: "swimmer/:id",
         element: <SwimmerProfile />,
+      },
+      {
+        path: "competitions",
+        element: <Competitions />,
+      },
+      {
+        path: "competitions/:id",
+        element: <CompetitionDetail />,
       },
       {
         path: "admin",

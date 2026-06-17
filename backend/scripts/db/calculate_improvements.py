@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 from app.db import SessionLocal
 from app.models import Result
 
+FIRST_TIME_SENTINEL_MS = 4_500_000
+
 
 def calculate_improvements():
     db: Session = SessionLocal()
@@ -27,16 +29,15 @@ def calculate_improvements():
             for result in res_list:
                 if current_best is None:
                     result.improvement = False
-                    result.comparison_to_best = 0
+                    result.comparison_to_best = FIRST_TIME_SENTINEL_MS
                     current_best = result.time
                 else:
+                    result.comparison_to_best = current_best - result.time
                     if result.time < current_best:
                         result.improvement = True
-                        result.comparison_to_best = current_best - result.time
                         current_best = result.time
                     else:
                         result.improvement = False
-                        result.comparison_to_best = result.time - current_best
 
         db.commit()
         print("Improvements calculated and updated successfully.")

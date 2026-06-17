@@ -1,4 +1,8 @@
+import { DNF_TRESHOLD } from "./constants";
+
 export const parseTimeFromMillis = (ms: number): string => {
+  if (ms >= DNF_TRESHOLD) return "DNF";
+
   const minutes = Math.floor(ms / 60000); // 1 min = 60000 ms
   const seconds = Math.floor((ms % 60000) / 1000); // get remaining seconds
   const milliseconds = Math.floor((ms % 1000) / 10); // first 2 digits of ms

@@ -178,22 +178,13 @@ export interface SwimmerStartsByYear {
   starts: number;
 }
 
-export interface CompetitionResult {
-  discipline: string;
-  code: string;
-  time: number;
-  points: number | null;
-  improvement: boolean;
-  performance: number;
-}
-
 export interface SwimmerCompetition {
   competitionId: number;
   name: string;
   date: string;
   location: string;
   poolLength: number;
-  results: CompetitionResult[];
+  results: CompetitionResultDetail[];
 }
 
 export interface SwimmerPersonalBestRecord {
@@ -210,6 +201,56 @@ export interface SwimmerPersonalBestRecord {
 export interface SwimmerPersonalBests {
   pb25M: SwimmerPersonalBestRecord[];
   pb50M: SwimmerPersonalBestRecord[];
+}
+
+// Competition Detail Types
+export interface CompetitionListItem {
+  id: number;
+  title: string;
+  startDate: string;
+  endDate: string;
+  location: string | null;
+  poolLength: number | null;
+  cspsCompetitionId: number;
+  hasResults: boolean;
+}
+
+export interface CompetitionInfo {
+  id: number;
+  title: string;
+  startDate: string;
+  endDate: string;
+  location: string | null;
+  poolLength: number | null;
+  cspsCompetitionId: number;
+}
+
+export interface CompetitionResultDetail {
+  discipline: string;
+  disciplineCode: string;
+  time: number;
+  points: number | null;
+  improvement: boolean;
+  comparisonToBest: number;
+  performance: number;
+  relayPart: boolean;
+  clubRecord: boolean;
+}
+
+export interface CompetitionSwimmerResult {
+  swimmerId: number;
+  name: string;
+  surname: string;
+  birthYear: number;
+  results: CompetitionResultDetail[];
+}
+
+export interface CompetitionDetailResponse {
+  competition: CompetitionInfo;
+  swimmers: CompetitionSwimmerResult[];
+  totalStarts: number;
+  totalPersonalBests: number;
+  clubRecordsCount: number;
 }
 
 export interface StartsByStroke {

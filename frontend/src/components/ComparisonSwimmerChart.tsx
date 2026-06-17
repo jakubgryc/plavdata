@@ -12,7 +12,7 @@ import {
   findMinMaxTimes,
   findOldestBirthYear,
 } from "../utils/chartUtils.ts";
-import { DNF_THRESHOLD, getGraphColor } from "../utils/constants";
+import { DNF_TRESHOLD, getGraphColor } from "../utils/constants";
 import { formatDateFromMs, parseTimeFromMillis } from "../utils/timeUtils";
 
 interface ComparisonSwimmerChartProps {
@@ -126,7 +126,7 @@ function ComparisonSwimmerChart({
                 dataKey="time"
                 data={swimmerData.results
                   .filter((result, index) => {
-                    if (result.time > DNF_THRESHOLD) return false;
+                    if (result.time > DNF_TRESHOLD) return false;
                     if (intermediateTimes === "onlyFinal" && result.split_time && index !== 0) {
                       return false;
                     }
