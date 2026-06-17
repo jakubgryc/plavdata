@@ -30,7 +30,7 @@ export const theme = createTheme({
   defaultRadius: "md",
   other: {
     appBg: {
-      light: "#c3d5ed",
+      light: "#d0d0d0",
       dark: "#1a1b1e",
     },
   },

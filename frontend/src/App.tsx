@@ -1,10 +1,14 @@
-import { Box } from "@mantine/core";
+import { Box, useMantineColorScheme } from "@mantine/core";
+import { useHotkeys } from "@mantine/hooks";
 import { Outlet } from "react-router";
 import Navbar from "./components/Navbar";
 import { useTheme } from "./hooks/useTheme";
 
 function App() {
   const { colorScheme, theme } = useTheme();
+  const { toggleColorScheme } = useMantineColorScheme();
+
+  useHotkeys([["mod+J", () => toggleColorScheme()]]);
   const bgColor = colorScheme === "dark" ? theme.other.appBg.dark : theme.other.appBg.light;
 
   return (
