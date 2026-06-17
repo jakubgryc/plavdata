@@ -8,6 +8,7 @@ from app.constants import EXCLUDED_COMPETITION_LOCATIONS
 from app.models import (
     AgeCategory,
     ClubRecord,
+    Course,
     Discipline,
     PersonalBest,
     Result,
@@ -200,12 +201,14 @@ def get_club_records(db: Session, limit: int = 5, oldest: bool = False) -> list:
             Discipline.title.label("discipline"),
             Result.time,
             Result.date,
+            Course.length.label("pool_length"),
             AgeCategory.code.label("age_category"),
         )
         .join(ClubRecord, ClubRecord.result_id == Result.id)
         .join(Swimmer, Result.swimmer_id == Swimmer.id)
         .join(Discipline, Result.discipline_id == Discipline.id)
         .join(AgeCategory, ClubRecord.age_category_id == AgeCategory.id)
+        .join(Course, Result.course_id == Course.id)
         .filter(Result.id.in_(db.query(result_ids_subquery.c.result_id)))
         .order_by(date_order, Result.id, AgeCategory.max_age)
         .all()
@@ -222,6 +225,7 @@ def get_club_records(db: Session, limit: int = 5, oldest: bool = False) -> list:
                 "discipline": row.discipline,
                 "time": row.time,
                 "date": row.date.isoformat() if row.date else None,
+                "poolLength": row.pool_length,
                 "ageCategories": [],
             }
         grouped[row.result_id]["ageCategories"].append(row.age_category)

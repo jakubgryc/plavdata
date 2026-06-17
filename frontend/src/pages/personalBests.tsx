@@ -1,7 +1,7 @@
 import { Chip, Flex, Modal, SegmentedControl, Stack, Text, Title } from "@mantine/core";
 import { DataTable } from "mantine-datatable";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { Link } from "react-router";
 
 import { API_BASE_URL } from "../../config";
 import { useTheme } from "../hooks/useTheme";
@@ -17,7 +17,6 @@ function isDisciplineDescription(value: unknown): value is DisciplineDescription
 
 function PersonalBests() {
   const { colorScheme } = useTheme();
-  const navigate = useNavigate();
   const [selectedGroup, setSelectedGroup] = useState<string | null>("Z1");
   const [selectedCourse, setSelectedCourse] = useState<string>("25");
   const [personalBests, setPersonalBests] = useState<Array<SwimmerPersonalBest>>([]);
@@ -120,7 +119,7 @@ function PersonalBests() {
       </Flex>
       <Flex direction="column" mah="80vh" pt="sm" style={{ overflowY: "auto" }}>
         <DataTable<PersonalBestRow>
-          className="shadow-xl responsive-table"
+          className="shadow-xl responsive-generic-table"
           withTableBorder
           borderRadius="lg"
           horizontalSpacing="0"
@@ -137,9 +136,7 @@ function PersonalBests() {
               noWrap: true,
               title: "",
               render: (record: PersonalBestRow) => (
-                <button
-                  type="button"
-                  onClick={() => navigate(`/swimmer/${record.swimmerId}`)}
+                <div
                   style={{
                     background: "transparent",
                     border: "none",
@@ -153,8 +150,14 @@ function PersonalBests() {
                     fontWeight: 500,
                   }}
                 >
-                  {record.name}
-                </button>
+                  <Text
+                    component={Link}
+                    to={`/swimmers/${record.swimmerId}`}
+                    className="swimmerLink"
+                  >
+                    {record.name}
+                  </Text>
+                </div>
               ),
             },
             ...DISCIPLINES.filter((discipline) => {

@@ -1,5 +1,4 @@
 import {
-  Anchor,
   Avatar,
   Badge,
   Box,
@@ -10,7 +9,7 @@ import {
   useMantineColorScheme,
   useMantineTheme,
 } from "@mantine/core";
-import { useNavigate } from "react-router";
+import { Link } from "react-router";
 import type { RelaySwimmer } from "../schema/types";
 import { parseTimeFromMillis } from "../utils/timeUtils";
 
@@ -39,7 +38,6 @@ export function EqualRelayTeamCard({
 }: EqualRelayTeamCardProps) {
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
-  const navigate = useNavigate();
 
   // Count swimmer occurrences
   const swimmerCounts = new Map<number, number>();
@@ -185,16 +183,15 @@ export function EqualRelayTeamCard({
                   </Table.Td>
                   <Table.Td>
                     <Group gap="xs" wrap="wrap">
-                      <Anchor
-                        component="button"
+                      <Text
+                        component={Link}
                         fw={500}
-                        underline="never"
                         c={swimsTwice && !isFirstOccurrence ? "orange" : "inherit"}
-                        onClick={() => navigate(`/swimmer/${swimmer.swimmerId}`)}
-                        style={{ cursor: "pointer" }}
+                        to={`/swimmer/${swimmer.swimmerId}`}
+                        className="swimmerLink"
                       >
                         {swimmer.surname} {swimmer.name}
-                      </Anchor>
+                      </Text>
                       {swimsTwice && !isFirstOccurrence && (
                         <Badge
                           size="xs"

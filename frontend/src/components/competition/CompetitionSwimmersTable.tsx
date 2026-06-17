@@ -86,7 +86,7 @@ function CompetitionSwimmersTable({ swimmers }: CompetitionSwimmersTableProps) {
       </Group>
 
       <Table.ScrollContainer minWidth={320}>
-        <Table highlightOnHover verticalSpacing="xs" className="competitions-table">
+        <Table highlightOnHover verticalSpacing="xs" className="responsive-results-table">
           <Table.Thead>
             <Table.Tr>
               <Table.Th w="34%"> Plavec</Table.Th>
@@ -127,8 +127,8 @@ function CompetitionSwimmersTable({ swimmers }: CompetitionSwimmersTableProps) {
                         component={Link}
                         to={`/swimmer/${swimmer.swimmerId}`}
                         fw={600}
-                        style={{ color: "inherit", textDecoration: "none" }}
                         onClick={(e) => e.stopPropagation()}
+                        className="swimmerLink"
                       >
                         {swimmer.surname} {swimmer.name}
                       </Text>

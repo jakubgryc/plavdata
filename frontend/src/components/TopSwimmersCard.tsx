@@ -1,6 +1,6 @@
 import { Avatar, Box, Button, Collapse, Group, Paper, Stack, Text, Title } from "@mantine/core";
 import { IconChevronDown } from "@tabler/icons-react";
-import { useNavigate } from "react-router";
+import { Link } from "react-router";
 import { useTheme } from "../hooks/useTheme";
 import type { TopSwimmer } from "../schema/types";
 import { parseTimeFromMillis } from "../utils/timeUtils";
@@ -58,7 +58,6 @@ function getRowStyles(rank: number, colorScheme: "light" | "dark" | "auto") {
 
 function SwimmerRow({ rank, name, surname, discipline, points, time, swimmerId }: TopSwimmer) {
   const { colorScheme } = useTheme();
-  const navigate = useNavigate();
   const styles = getRowStyles(rank, colorScheme);
 
   return (
@@ -67,11 +66,7 @@ function SwimmerRow({ rank, name, surname, discipline, points, time, swimmerId }
       radius="md"
       bg={styles.bg}
       withBorder={styles.withBorder}
-      style={{
-        ...(styles.borderColor ? { borderColor: styles.borderColor } : {}),
-        cursor: "pointer",
-      }}
-      onClick={() => navigate(`/swimmer/${swimmerId}`)}
+      style={{ ...(styles.borderColor ? { borderColor: styles.borderColor } : {}) }}
     >
       <Group gap="sm" wrap="nowrap">
         <Avatar
@@ -83,7 +78,14 @@ function SwimmerRow({ rank, name, surname, discipline, points, time, swimmerId }
           {rank}
         </Avatar>
         <Box style={{ flex: 1, minWidth: 0 }}>
-          <Text size="sm" fw={styles.fontWeight} truncate>
+          <Text
+            className="swimmerLink"
+            component={Link}
+            to={`/swimmer/${swimmerId}`}
+            size="sm"
+            fw={styles.fontWeight}
+            truncate
+          >
             {surname} {name}
           </Text>
           <Text size="xs" c="dimmed" truncate>

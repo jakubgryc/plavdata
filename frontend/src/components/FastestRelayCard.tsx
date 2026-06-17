@@ -1,5 +1,4 @@
 import {
-  Anchor,
   Badge,
   Box,
   Card,
@@ -11,7 +10,7 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { IconSwimming } from "@tabler/icons-react";
-import { useNavigate } from "react-router";
+import { Link } from "react-router";
 import type { RelaySwimmer } from "../schema/types";
 import { parseTimeFromMillis } from "../utils/timeUtils";
 
@@ -48,7 +47,6 @@ export function FastestRelayCard({
 }: FastestRelayCard) {
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
-  const navigate = useNavigate();
 
   return (
     <Card
@@ -170,16 +168,15 @@ export function FastestRelayCard({
                   )}
                 </Table.Td>
                 <Table.Td>
-                  <Anchor
-                    component="button"
+                  <Text
+                    component={Link}
                     fw={500}
-                    underline="never"
                     c="inherit"
-                    onClick={() => navigate(`/swimmer/${swimmer.swimmerId}`)}
-                    style={{ cursor: "pointer" }}
+                    to={`/swimmer/${swimmer.swimmerId}`}
+                    className="swimmerLink"
                   >
                     {swimmer.surname} {swimmer.name}
-                  </Anchor>
+                  </Text>
                 </Table.Td>
                 <Table.Td ta="right">
                   <Text

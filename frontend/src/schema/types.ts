@@ -40,6 +40,7 @@ export interface RecentClubRecord {
   discipline: string;
   time: number;
   date: string;
+  poolLength: 25 | 50;
   ageCategories: string[];
 }
 

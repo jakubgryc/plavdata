@@ -73,7 +73,7 @@ function CompetitionsTable({ competitions }: CompetitionsTableProps) {
       </Group>
 
       <Table.ScrollContainer minWidth={480}>
-        <Table highlightOnHover verticalSpacing="xs" className="competitions-table">
+        <Table highlightOnHover verticalSpacing="xs" className="responsive-results-table">
           <Table.Thead>
             <Table.Tr>
               <Table.Th w="10%">Datum</Table.Th>
@@ -119,6 +119,7 @@ function CompetitionsTable({ competitions }: CompetitionsTableProps) {
                         fw={600}
                         style={{ color: "inherit", textDecoration: "none" }}
                         onClick={(e) => e.stopPropagation()}
+                        className="swimmerLink"
                       >
                         {comp.name}
                       </Text>

@@ -62,7 +62,7 @@ function CompetitionTopResults({ swimmers }: CompetitionTopResultsProps) {
       </Group>
 
       <Table.ScrollContainer minWidth={480}>
-        <Table highlightOnHover verticalSpacing="xs" className="competitions-table">
+        <Table highlightOnHover verticalSpacing="xs" className="responsive-results-table">
           <Table.Thead>
             <Table.Tr>
               <Table.Th w={32}>#</Table.Th>
@@ -98,7 +98,7 @@ function CompetitionTopResults({ swimmers }: CompetitionTopResultsProps) {
                       component={Link}
                       to={`/swimmer/${entry.swimmerId}`}
                       fw={600}
-                      style={{ color: "inherit", textDecoration: "none" }}
+                      className="swimmerLink"
                     >
                       {entry.surname} {entry.name}
                     </Text>
