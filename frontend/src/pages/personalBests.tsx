@@ -120,7 +120,7 @@ function PersonalBests() {
       </Flex>
       <Flex direction="column" mah="80vh" pt="sm" style={{ overflowY: "auto" }}>
         <DataTable<PersonalBestRow>
-          className="shadow-xl responsive-table"
+          className="shadow-xl responsive-generic-table"
           withTableBorder
           borderRadius="lg"
           horizontalSpacing="0"

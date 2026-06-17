@@ -86,7 +86,7 @@ function CompetitionSwimmersTable({ swimmers }: CompetitionSwimmersTableProps) {
       </Group>
 
       <Table.ScrollContainer minWidth={320}>
-        <Table highlightOnHover verticalSpacing="xs" className="responsive-table">
+        <Table highlightOnHover verticalSpacing="xs" className="responsive-results-table">
           <Table.Thead>
             <Table.Tr>
               <Table.Th w="34%"> Plavec</Table.Th>

@@ -73,7 +73,7 @@ function CompetitionsTable({ competitions }: CompetitionsTableProps) {
       </Group>
 
       <Table.ScrollContainer minWidth={480}>
-        <Table highlightOnHover verticalSpacing="xs" className="responsive-table">
+        <Table highlightOnHover verticalSpacing="xs" className="responsive-results-table">
           <Table.Thead>
             <Table.Tr>
               <Table.Th w="10%">Datum</Table.Th>

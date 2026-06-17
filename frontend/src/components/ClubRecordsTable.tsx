@@ -40,7 +40,7 @@ function ClubRecordsTable({ records, title, subtitle, variant }: ClubRecordsTabl
       </Group>
 
       <Table.ScrollContainer minWidth={600}>
-        <Table striped highlightOnHover className="responsive-table">
+        <Table striped highlightOnHover className="responsive-results-table">
           <Table.Thead>
             <Table.Tr>
               <Table.Th>Disciplína</Table.Th>
