@@ -49,18 +49,18 @@ button {
 }
 
 /* Responsive table font sizes */
-.responsive-table th,
-.responsive-table td {
+.admin-responsive-table th,
+.admin-responsive-table td {
   font-size: 0.9rem;
 }
 
-.responsive-table th {
+.admin-responsive-table th {
   padding: 8px 4px;
   text-align: center;
 }
 
-.responsive-table th:first-child,
-.responsive-table td:first-child {
+.admin-responsive-table th:first-child,
+.admin-responsive-table td:first-child {
   padding-left: 8px;
 }
 
@@ -97,14 +97,14 @@ button {
     font-size: 1.25rem !important;
   }
 
-  .responsive-table th,
-  .responsive-table td {
+  .admin-responsive-table th,
+  .admin-responsive-table td {
     font-size: 0.7rem;
   }
 
   /* Make first column narrower on mobile */
-  .responsive-table th:first-child,
-  .responsive-table td:first-child {
+  .admin-responsive-table th:first-child,
+  .admin-responsive-table td:first-child {
     width: 120px !important;
     max-width: 120px !important;
     min-width: 110px !important;
@@ -224,50 +224,50 @@ button {
   }
 
   /* Competitions table - smaller text on mobile */
-  .competitions-table th,
-  .competitions-table td {
+  .responsive-table th,
+  .responsive-table td {
     font-size: 0.7rem !important;
     padding: 0.5rem 0.375rem !important;
   }
 
-  .competitions-table td .mantine-Text-root {
+  .responsive-table td .mantine-Text-root {
     font-size: 0.7rem !important;
   }
 
-  .competitions-table .mantine-Table-table {
+  .responsive-table .mantine-Table-table {
     font-size: 0.7rem !important;
   }
 
   /* Nested table in expanded rows */
-  .competitions-table .mantine-Table-table .mantine-Table-table th,
-  .competitions-table .mantine-Table-table .mantine-Table-table td {
+  .responsive-table .mantine-Table-table .mantine-Table-table th,
+  .responsive-table .mantine-Table-table .mantine-Table-table td {
     font-size: 0.65rem !important;
     padding: 0.375rem 0.25rem !important;
   }
 
   /* Admin tables - smaller text on mobile */
-  .responsive-table table th,
-  .responsive-table table td {
+  .admin-responsive-table table th,
+  .admin-responsive-table table td {
     font-size: 0.7rem !important;
     padding: 0.5rem 0.375rem !important;
   }
 
-  .responsive-table table td .mantine-Select-input {
+  .admin-responsive-table table td .mantine-Select-input {
     font-size: 0.7rem !important;
     min-height: 28px !important;
     padding: 0.25rem 0.5rem !important;
   }
 
-  .responsive-table table td .mantine-Checkbox-label {
+  .admin-responsive-table table td .mantine-Checkbox-label {
     font-size: 0.7rem !important;
   }
 
-  .responsive-table table td .mantine-Badge-root {
+  .admin-responsive-table table td .mantine-Badge-root {
     font-size: 0.625rem !important;
     padding: 0.125rem 0.375rem !important;
   }
 
-  .responsive-table table td .mantine-Text-root {
+  .admin-responsive-table table td .mantine-Text-root {
     font-size: 0.7rem !important;
   }
 }

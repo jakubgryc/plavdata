@@ -170,7 +170,7 @@ function HeatmapGrid({ swimmers }: HeatmapGridProps) {
         withRowBorders={false}
         verticalSpacing="xs"
         horizontalSpacing="xs"
-        className="competitions-table"
+        className="responsive-table"
       >
         <Table.Thead>
           <Table.Tr>

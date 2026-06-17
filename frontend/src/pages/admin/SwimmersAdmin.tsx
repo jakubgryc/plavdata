@@ -355,7 +355,7 @@ export function AdminSwimmersPage() {
 
             <Table.ScrollContainer
               minWidth={500}
-              className="responsive-table admin-table-scroll"
+              className="admin-responsive-table admin-table-scroll"
               style={{ flex: 1, minHeight: 0 }}
             >
               <Table striped highlightOnHover stickyHeader withColumnBorders stickyHeaderOffset={0}>

@@ -40,12 +40,13 @@ function ClubRecordsTable({ records, title, subtitle, variant }: ClubRecordsTabl
       </Group>
 
       <Table.ScrollContainer minWidth={600}>
-        <Table striped highlightOnHover>
+        <Table striped highlightOnHover className="responsive-table">
           <Table.Thead>
             <Table.Tr>
               <Table.Th>Disciplína</Table.Th>
               <Table.Th>Plavec</Table.Th>
               <Table.Th>Kategorie</Table.Th>
+              <Table.Th>Bazén</Table.Th>
               <Table.Th>Čas</Table.Th>
               <Table.Th>Datum</Table.Th>
             </Table.Tr>
@@ -71,6 +72,7 @@ function ClubRecordsTable({ records, title, subtitle, variant }: ClubRecordsTabl
                     ))}
                   </Group>
                 </Table.Td>
+                <Table.Td>{record.poolLength} m</Table.Td>
                 <Table.Td>
                   <Text c={color} fw={700}>
                     {parseTimeFromMillis(record.time)}
