@@ -16,7 +16,7 @@ import { IconCalendarMonth, IconChevronDown, IconChevronUp } from "@tabler/icons
 import { useState } from "react";
 import { Link } from "react-router";
 import type { SwimmerCompetition } from "../../schema/types";
-import { DNF_THRESHOLD } from "../../utils/constants";
+import { DNF_TRESHOLD } from "../../utils/constants";
 import { parseTimeFromMillis } from "../../utils/timeUtils";
 import { getImprovementBadge } from "../shared/ImprovementBadge";
 
@@ -188,7 +188,7 @@ function CompetitionsTable({ competitions }: CompetitionsTableProps) {
                                       <Text size="sm">{result.discipline}</Text>
                                     </Table.Td>
                                     <Table.Td ff="monospace">
-                                      {result.time >= DNF_THRESHOLD ? (
+                                      {result.time >= DNF_TRESHOLD ? (
                                         <Badge color="gray" variant="light" size="sm">
                                           DNF
                                         </Badge>
@@ -197,7 +197,7 @@ function CompetitionsTable({ competitions }: CompetitionsTableProps) {
                                       )}
                                     </Table.Td>
                                     <Table.Td>
-                                      {result.time >= DNF_THRESHOLD ? (
+                                      {result.time >= DNF_TRESHOLD ? (
                                         <Badge color="gray" variant="light" size="sm">
                                           –
                                         </Badge>

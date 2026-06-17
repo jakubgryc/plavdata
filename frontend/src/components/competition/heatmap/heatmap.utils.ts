@@ -1,5 +1,5 @@
 import type { CompetitionSwimmerResult } from "../../../schema/types";
-import { DNF_THRESHOLD } from "../../../utils/constants";
+import { DNF_TRESHOLD } from "../../../utils/constants";
 import type { CellData } from "./heatmap.constants";
 
 export const generateHeatmapLookup = (swimmers: CompetitionSwimmerResult[]) => {
@@ -8,7 +8,7 @@ export const generateHeatmapLookup = (swimmers: CompetitionSwimmerResult[]) => {
     const dmap = new Map<string, CellData>();
     for (const result of swimmer.results) {
       if (result.relayPart) continue;
-      const isDnf = result.time >= DNF_THRESHOLD;
+      const isDnf = result.time >= DNF_TRESHOLD;
       dmap.set(result.disciplineCode, {
         state: isDnf ? "dnf" : result.improvement ? "pb" : "swam",
         result,

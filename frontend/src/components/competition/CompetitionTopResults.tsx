@@ -2,7 +2,7 @@ import { Badge, Group, Paper, Table, Text, ThemeIcon, Title } from "@mantine/cor
 import { IconFlame } from "@tabler/icons-react";
 import { Link } from "react-router";
 import type { CompetitionSwimmerResult } from "../../schema/types";
-import { DNF_THRESHOLD, FIRST_TIME_TRESHOLD } from "../../utils/constants";
+import { DNF_TRESHOLD, FIRST_TIME_TRESHOLD } from "../../utils/constants";
 import { parseTimeFromMillis } from "../../utils/timeUtils";
 
 interface CompetitionTopResultsProps {
@@ -25,7 +25,7 @@ function getTopResults(swimmers: CompetitionSwimmerResult[], count = 10): TopEnt
     for (const result of swimmer.results) {
       if (
         result.relayPart ||
-        result.time >= DNF_THRESHOLD ||
+        result.time >= DNF_TRESHOLD ||
         !result.improvement ||
         result.comparisonToBest >= FIRST_TIME_TRESHOLD
       )
@@ -62,7 +62,7 @@ function CompetitionTopResults({ swimmers }: CompetitionTopResultsProps) {
       </Group>
 
       <Table.ScrollContainer minWidth={480}>
-        <Table highlightOnHover verticalSpacing="xs">
+        <Table highlightOnHover verticalSpacing="xs" className="competitions-table">
           <Table.Thead>
             <Table.Tr>
               <Table.Th w={32}>#</Table.Th>

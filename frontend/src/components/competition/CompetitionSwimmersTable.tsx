@@ -17,7 +17,7 @@ import { IconChevronDown, IconChevronUp, IconSearch, IconUsers } from "@tabler/i
 import { useState } from "react";
 import { Link } from "react-router";
 import type { CompetitionSwimmerResult } from "../../schema/types";
-import { DNF_THRESHOLD, FIRST_TIME_TRESHOLD } from "../../utils/constants";
+import { DNF_TRESHOLD, FIRST_TIME_TRESHOLD } from "../../utils/constants";
 import { parseTimeFromMillis } from "../../utils/timeUtils";
 import { getImprovementBadge } from "../shared/ImprovementBadge";
 
@@ -118,7 +118,7 @@ function CompetitionSwimmersTable({ swimmers }: CompetitionSwimmersTableProps) {
             {paginated.map((swimmer) => {
               const isExpanded = expandedRows.has(swimmer.swimmerId);
               const pbCount = swimmer.results.filter(
-                (r) => r.improvement && r.time < DNF_THRESHOLD,
+                (r) => r.improvement && r.time < DNF_TRESHOLD,
               ).length;
 
               return (
@@ -217,7 +217,7 @@ function CompetitionSwimmersTable({ swimmers }: CompetitionSwimmersTableProps) {
                                       </Group>
                                     </Table.Td>
                                     <Table.Td ff="monospace">
-                                      {result.time >= DNF_THRESHOLD
+                                      {result.time >= DNF_TRESHOLD
                                         ? getImprovementBadge(result, {
                                             isDnf: true,
                                           })
@@ -228,7 +228,7 @@ function CompetitionSwimmersTable({ swimmers }: CompetitionSwimmersTableProps) {
                                     </Table.Td>
                                     <Table.Td ff="monospace">
                                       {getImprovementBadge(result, {
-                                        isDnf: result.time >= DNF_THRESHOLD,
+                                        isDnf: result.time >= DNF_TRESHOLD,
                                         isFirstTime:
                                           result.comparisonToBest >= FIRST_TIME_TRESHOLD &&
                                           !result.improvement,
