@@ -82,6 +82,14 @@ button {
   padding: 8px !important;
 }
 
+.swimmerLink {
+  transition: opacity 0.1s ease;
+}
+
+.swimmerLink:hover {
+  opacity: 0.6;
+}
+
 @media (max-width: 768px) {
   /* Make h2 titles (Mantine Title with order 2) smaller on mobile */
   h2,
