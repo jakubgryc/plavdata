@@ -1,7 +1,6 @@
 import {
   ActionIcon,
   Badge,
-  Collapse,
   Group,
   Pagination,
   Paper,
@@ -11,15 +10,13 @@ import {
   TextInput,
   ThemeIcon,
   Title,
-  useMantineColorScheme,
 } from "@mantine/core";
 import { IconChevronDown, IconChevronUp, IconSearch, IconUsers } from "@tabler/icons-react";
 import { useState } from "react";
 import { Link } from "react-router";
 import type { CompetitionSwimmerResult } from "../../schema/types";
-import { DNF_TRESHOLD, FIRST_TIME_TRESHOLD } from "../../utils/constants";
-import { parseTimeFromMillis } from "../../utils/timeUtils";
-import { getImprovementBadge } from "../shared/ImprovementBadge";
+import { DNF_TRESHOLD } from "../../utils/constants";
+import DropdownResults from "../shared/DropdownResults.tsx";
 
 interface CompetitionSwimmersTableProps {
   swimmers: CompetitionSwimmerResult[];
@@ -31,8 +28,6 @@ function CompetitionSwimmersTable({ swimmers }: CompetitionSwimmersTableProps) {
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
   const [activePage, setActivePage] = useState(1);
   const [search, setSearch] = useState("");
-  const { colorScheme } = useMantineColorScheme();
-  const isDark = colorScheme === "dark";
 
   const filtered = swimmers.filter((s) =>
     `${s.name} ${s.surname}`.toLowerCase().includes(search.toLowerCase()),
@@ -170,88 +165,13 @@ function CompetitionSwimmersTable({ swimmers }: CompetitionSwimmersTableProps) {
                     </Table.Td>
                   </Table.Tr>
 
-                  {isExpanded && (
-                    <Table.Tr key={`${swimmer.swimmerId}-detail`}>
-                      <Table.Td colSpan={5} p={0}>
-                        <Collapse in={isExpanded}>
-                          <Table
-                            withTableBorder={false}
-                            style={{
-                              backgroundColor: isDark
-                                ? "var(--mantine-color-dark-6)"
-                                : "var(--mantine-color-gray-0)",
-                            }}
-                            verticalSpacing="xs"
-                          >
-                            <Table.Thead>
-                              <Table.Tr>
-                                <Table.Th>Disciplína</Table.Th>
-                                <Table.Th>Čas</Table.Th>
-                                <Table.Th>Před. OR</Table.Th>
-                                <Table.Th>Výkonnost</Table.Th>
-                                <Table.Th>Body</Table.Th>
-                              </Table.Tr>
-                            </Table.Thead>
-                            <Table.Tbody>
-                              {swimmer.results.map((result) => {
-                                const previousPB =
-                                  result.comparisonToBest >= FIRST_TIME_TRESHOLD ||
-                                  (result.comparisonToBest === 0 && !result.improvement)
-                                    ? null
-                                    : result.time + result.comparisonToBest;
-                                return (
-                                  <Table.Tr key={`${result.disciplineCode}-${result.time}`}>
-                                    <Table.Td>
-                                      <Group gap="xs">
-                                        <Text>{result.disciplineCode}</Text>
-                                        {result.relayPart && (
-                                          <Badge size="xs" color="grape" variant="outline">
-                                            štafeta
-                                          </Badge>
-                                        )}
-                                        {result.clubRecord && (
-                                          <Badge size="xs" color="orange" variant="outline">
-                                            KR
-                                          </Badge>
-                                        )}
-                                      </Group>
-                                    </Table.Td>
-                                    <Table.Td ff="monospace">
-                                      {result.time >= DNF_TRESHOLD
-                                        ? getImprovementBadge(result, {
-                                            isDnf: true,
-                                          })
-                                        : parseTimeFromMillis(result.time)}
-                                    </Table.Td>
-                                    <Table.Td ff="monospace" c="dimmed">
-                                      {previousPB != null ? parseTimeFromMillis(previousPB) : "–"}
-                                    </Table.Td>
-                                    <Table.Td ff="monospace">
-                                      {getImprovementBadge(result, {
-                                        isDnf: result.time >= DNF_TRESHOLD,
-                                        isFirstTime:
-                                          result.comparisonToBest >= FIRST_TIME_TRESHOLD &&
-                                          !result.improvement,
-                                      })}
-                                    </Table.Td>
-                                    <Table.Td>
-                                      {result.points != null ? (
-                                        <Text fw={500} c="blue">
-                                          {result.points}
-                                        </Text>
-                                      ) : (
-                                        <Text c="dimmed">–</Text>
-                                      )}
-                                    </Table.Td>
-                                  </Table.Tr>
-                                );
-                              })}
-                            </Table.Tbody>
-                          </Table>
-                        </Collapse>
-                      </Table.Td>
-                    </Table.Tr>
-                  )}
+                  {isExpanded ? (
+                    <DropdownResults
+                      id={swimmer.swimmerId}
+                      results={swimmer.results}
+                      isExpanded={isExpanded}
+                    />
+                  ) : null}
                 </>
               );
             })}

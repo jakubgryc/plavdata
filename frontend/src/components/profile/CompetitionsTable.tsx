@@ -1,7 +1,6 @@
 import {
   ActionIcon,
   Badge,
-  Collapse,
   Group,
   Pagination,
   Paper,
@@ -10,15 +9,12 @@ import {
   Text,
   ThemeIcon,
   Title,
-  useMantineColorScheme,
 } from "@mantine/core";
 import { IconCalendarMonth, IconChevronDown, IconChevronUp } from "@tabler/icons-react";
 import { useState } from "react";
 import { Link } from "react-router";
 import type { SwimmerCompetition } from "../../schema/types";
-import { DNF_TRESHOLD, FIRST_TIME_TRESHOLD } from "../../utils/constants";
-import { parseTimeFromMillis } from "../../utils/timeUtils";
-import { getImprovementBadge } from "../shared/ImprovementBadge";
+import DropdownResults from "../shared/DropdownResults";
 
 interface CompetitionsTableProps {
   competitions: SwimmerCompetition[];
@@ -29,8 +25,6 @@ const ITEMS_PER_PAGE = 8;
 function CompetitionsTable({ competitions }: CompetitionsTableProps) {
   const [activePage, setActivePage] = useState(1);
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
-  const { colorScheme } = useMantineColorScheme();
-  const isDark = colorScheme === "dark";
 
   const totalPages = Math.ceil(competitions.length / ITEMS_PER_PAGE);
   const startIndex = (activePage - 1) * ITEMS_PER_PAGE;
@@ -159,88 +153,13 @@ function CompetitionsTable({ competitions }: CompetitionsTableProps) {
                       </ActionIcon>
                     </Table.Td>
                   </Table.Tr>
-                  {isExpanded && (
-                    <Table.Tr key={`${comp.competitionId}-detail`}>
-                      <Table.Td colSpan={6} p={0}>
-                        <Collapse in={isExpanded}>
-                          <Table
-                            withTableBorder={false}
-                            style={{
-                              backgroundColor: isDark
-                                ? "var(--mantine-color-dark-6)"
-                                : "var(--mantine-color-gray-0)",
-                            }}
-                            verticalSpacing="xs"
-                          >
-                            <Table.Thead>
-                              <Table.Tr>
-                                <Table.Th>Disciplína</Table.Th>
-                                <Table.Th>Čas</Table.Th>
-                                <Table.Th>Před. OR</Table.Th>
-                                <Table.Th>Výkonnost</Table.Th>
-                                <Table.Th>Body</Table.Th>
-                              </Table.Tr>
-                            </Table.Thead>
-                            <Table.Tbody>
-                              {comp.results.map((result) => {
-                                const previousPB =
-                                  result.comparisonToBest >= FIRST_TIME_TRESHOLD ||
-                                  (result.comparisonToBest === 0 && !result.improvement)
-                                    ? null
-                                    : result.time + result.comparisonToBest;
-                                return (
-                                  <Table.Tr key={`${result.disciplineCode}-${result.time}`}>
-                                    <Table.Td>
-                                      <Group gap="xs">
-                                        <Text>{result.disciplineCode}</Text>
-                                        {result.relayPart && (
-                                          <Badge size="xs" color="grape" variant="outline">
-                                            štafeta
-                                          </Badge>
-                                        )}
-                                        {result.clubRecord && (
-                                          <Badge size="xs" color="orange" variant="outline">
-                                            KR
-                                          </Badge>
-                                        )}
-                                      </Group>
-                                    </Table.Td>
-                                    <Table.Td ff="monospace">
-                                      {result.time >= DNF_TRESHOLD
-                                        ? getImprovementBadge(result, {
-                                            isDnf: true,
-                                          })
-                                        : parseTimeFromMillis(result.time)}
-                                    </Table.Td>
-                                    <Table.Td ff="monospace" c="dimmed">
-                                      {previousPB != null ? parseTimeFromMillis(previousPB) : "–"}
-                                    </Table.Td>
-                                    <Table.Td ff="monospace">
-                                      {getImprovementBadge(result, {
-                                        isDnf: result.time >= DNF_TRESHOLD,
-                                        isFirstTime:
-                                          result.comparisonToBest >= FIRST_TIME_TRESHOLD &&
-                                          !result.improvement,
-                                      })}
-                                    </Table.Td>
-                                    <Table.Td>
-                                      {result.points != null ? (
-                                        <Text fw={500} c="blue">
-                                          {result.points}
-                                        </Text>
-                                      ) : (
-                                        <Text c="dimmed">–</Text>
-                                      )}
-                                    </Table.Td>
-                                  </Table.Tr>
-                                );
-                              })}
-                            </Table.Tbody>
-                          </Table>
-                        </Collapse>
-                      </Table.Td>
-                    </Table.Tr>
-                  )}
+                  {isExpanded ? (
+                    <DropdownResults
+                      id={comp.competitionId}
+                      results={comp.results}
+                      isExpanded={isExpanded}
+                    />
+                  ) : null}
                 </>
               );
             })}
