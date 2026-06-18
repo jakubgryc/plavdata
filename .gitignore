@@ -42,7 +42,8 @@ certbot/
 # ─── Docker ─────────────────────────────────────────
 **/.env                # top-level or any .env file with secrets
 docker-compose.override.yml
-pgdata/                # named volume might not be a folder, but just in case
+pgdata/**
+pgdata
 
 # ─── Misc ───────────────────────────────────────────
 .env
