@@ -48,7 +48,7 @@ def get_results_count(
     return (
         db.query(func.count(Result.id))
         .filter(get_date_filter(period_value, period_type))
-        .filter(Result.split_time == 0)
+        .filter(Result.split_time.is_(False))
         .filter(Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS))
         .scalar()
         or 0
@@ -62,13 +62,13 @@ def get_meets_count(
     Count unique meets in a given period.
     A meet is defined by unique location + week combination.
     """
+    date_week_format = func.to_char(Result.date, "YYYY-WW")
+
     return (
         db.query(
             func.count(
                 func.distinct(
-                    Result.competition_location
-                    + "-"
-                    + func.strftime("%Y-%W", Result.date)
+                    func.concat(Result.competition_location, "-", date_week_format)
                 )
             )
         )

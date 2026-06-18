@@ -117,7 +117,7 @@ def list_competitions(db: Session, year: int) -> list:
     competitions = (
         db.query(Competition)
         .join(club_result_counts, Competition.id == club_result_counts.c.competition_id)
-        .filter(func.strftime("%Y", Competition.start_date) == str(year))
+        .filter(func.extract("year", Competition.start_date) == str(year))
         .order_by(Competition.start_date.desc())
         .all()
     )

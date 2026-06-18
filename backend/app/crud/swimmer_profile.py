@@ -1,7 +1,7 @@
 from datetime import date
 from collections import defaultdict
 
-from sqlalchemy import extract, func, Integer
+from sqlalchemy import extract, func, select, case, Integer
 from sqlalchemy.orm import Session
 
 from app.constants import EXCLUDED_COMPETITION_LOCATIONS
@@ -38,28 +38,25 @@ def get_swimmer_stats(db: Session, swimmer_id: int) -> dict:
     """Get swimmer statistics (starts, competitions, PBs, club records)."""
     current_year = date.today().year
 
-    # Total starts (excluding splits and Bohumín)
     total_starts = (
         db.query(func.count(Result.id))
         .filter(Result.swimmer_id == swimmer_id)
-        .filter(Result.split_time == 0)
+        .filter(Result.split_time.is_(False))
         .filter(Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS))
         .scalar()
         or 0
     )
 
-    # This year starts
     year_starts = (
         db.query(func.count(Result.id))
         .filter(Result.swimmer_id == swimmer_id)
         .filter(extract("year", Result.date) == current_year)
-        .filter(Result.split_time == 0)
+        .filter(Result.split_time.is_(False))
         .filter(Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS))
         .scalar()
         or 0
     )
 
-    # Total competitions (unique competition_id)
     total_competitions = (
         db.query(func.count(func.distinct(Result.competition_id)))
         .filter(Result.swimmer_id == swimmer_id)
@@ -69,7 +66,6 @@ def get_swimmer_stats(db: Session, swimmer_id: int) -> dict:
         or 0
     )
 
-    # This year competitions
     year_competitions = (
         db.query(func.count(func.distinct(Result.competition_id)))
         .filter(Result.swimmer_id == swimmer_id)
@@ -80,7 +76,6 @@ def get_swimmer_stats(db: Session, swimmer_id: int) -> dict:
         or 0
     )
 
-    # Personal bests this year
     year_pbs = (
         db.query(func.count(Result.id))
         .filter(Result.swimmer_id == swimmer_id)
@@ -91,7 +86,6 @@ def get_swimmer_stats(db: Session, swimmer_id: int) -> dict:
         or 0
     )
 
-    # Club records count
     club_records_count = (
         db.query(func.count(ClubRecord.id))
         .join(Result, ClubRecord.result_id == Result.id)
@@ -113,50 +107,43 @@ def get_swimmer_stats(db: Session, swimmer_id: int) -> dict:
 
 def get_swimmer_top_results(db: Session, swimmer_id: int, limit: int = 3) -> list:
     """Get swimmer's top results by FINA points (unique disciplines only)."""
-    results = (
-        db.query(
+
+    ranked_subquery = (
+        select(
             Discipline.title.label("discipline"),
-            func.max(Result.points).label("points"),
             Result.time,
+            Result.points,
             Result.date,
+            func.row_number()
+            .over(partition_by=Discipline.id, order_by=Result.points.desc())
+            .label("rank"),
         )
         .join(Discipline, Result.discipline_id == Discipline.id)
-        .filter(Result.swimmer_id == swimmer_id)
-        .filter(Result.points.isnot(None))
-        .filter(Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS))
-        .group_by(Discipline.title)
-        .order_by(func.max(Result.points).desc())
+        .where(
+            Result.swimmer_id == swimmer_id,
+            Result.points.isnot(None),
+            Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS),
+        )
+    ).subquery()
+
+    query = (
+        select(ranked_subquery)
+        .where(ranked_subquery.c.rank == 1)
+        .order_by(ranked_subquery.c.points.desc())
         .limit(limit)
-        .all()
     )
 
-    # For each discipline, get the actual result with the max points
-    top_results = []
-    for row in results:
-        best_result = (
-            db.query(
-                Discipline.title.label("discipline"),
-                Result.time,
-                Result.points,
-                Result.date,
-            )
-            .join(Discipline, Result.discipline_id == Discipline.id)
-            .filter(Result.swimmer_id == swimmer_id)
-            .filter(Discipline.title == row.discipline)
-            .filter(Result.points == row.points)
-            .filter(Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS))
-            .first()
-        )
+    rows = db.execute(query).all()
 
-        if best_result:
-            top_results.append(
-                {
-                    "discipline": best_result.discipline,
-                    "time": best_result.time,
-                    "points": best_result.points,
-                    "date": best_result.date.isoformat() if best_result.date else None,
-                }
-            )
+    top_results = [
+        {
+            "discipline": row.discipline,
+            "time": row.time,
+            "points": row.points,
+            "date": row.date.isoformat() if row.date else None,
+        }
+        for row in rows
+    ]
 
     return top_results
 
@@ -169,7 +156,7 @@ def get_swimmer_starts_by_year(db: Session, swimmer_id: int) -> list:
             func.count(Result.id).label("starts"),
         )
         .filter(Result.swimmer_id == swimmer_id)
-        .filter(Result.split_time == 0)
+        .filter(Result.split_time.is_(False))
         .filter(Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS))
         .group_by(extract("year", Result.date))
         .order_by(extract("year", Result.date))
@@ -181,7 +168,6 @@ def get_swimmer_starts_by_year(db: Session, swimmer_id: int) -> list:
 
 def get_swimmer_competitions(db: Session, swimmer_id: int) -> list:
     """Get detailed information about competitions the swimmer attended with individual results."""
-    # Single query to get all results with competition and discipline info
     results_data = (
         db.query(
             Competition.title.label("comp_name"),
@@ -201,7 +187,7 @@ def get_swimmer_competitions(db: Session, swimmer_id: int) -> list:
         .join(Competition, Result.competition_id == Competition.id)
         .join(Discipline, Result.discipline_id == Discipline.id)
         .filter(Result.swimmer_id == swimmer_id)
-        .filter(Result.split_time == 0)
+        .filter(Result.split_time.is_(False))
         .filter(Result.competition_id.isnot(None))
         .filter(Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS))
         .order_by(Competition.start_date.desc())
@@ -281,8 +267,8 @@ def get_swimmer_starts_by_stroke(db: Session, swimmer_id: int) -> dict:
         db.query(Discipline.code, func.count(Result.id).label("starts"))
         .join(Discipline, Result.discipline_id == Discipline.id)
         .filter(Result.swimmer_id == swimmer_id)
-        .filter(Result.split_time == 0)
-        .filter(Result.relay_part == 0)
+        .filter(Result.split_time.is_(False))
+        .filter(Result.relay_part.is_(False))
         .filter(Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS))
         .group_by(Discipline.code)
         .all()
@@ -306,23 +292,25 @@ def get_swimmer_starts_by_stroke(db: Session, swimmer_id: int) -> dict:
 
 def get_swimmer_quarterly_improvements(db: Session, swimmer_id: int) -> list:
     """Get quarterly improvement statistics for a swimmer."""
-    # Calculate quarter as (month - 1) / 3 + 1
-    # Month 1-3 -> Q1, 4-6 -> Q2, 7-9 -> Q3, 10-12 -> Q4
-    quarter_calc = ((extract("month", Result.date) - 1) / 3) + 1
+
+    quarter_expr = func.extract("quarter", Result.date)
+    year_expr = func.extract("year", Result.date)
 
     results = (
         db.query(
-            extract("year", Result.date).label("year"),
-            func.cast(quarter_calc, Integer).label("quarter"),
+            year_expr.label("year"),
+            func.cast(quarter_expr, Integer).label("quarter"),
             func.count(Result.id).label("total_starts"),
-            func.sum(func.cast(Result.improvement, Integer)).label("improvements"),
+            func.sum(case((Result.improvement.is_(True), 1), else_=0)).label(
+                "improvements"
+            ),
         )
         .filter(Result.swimmer_id == swimmer_id)
-        .filter(Result.split_time == 0)
-        .filter(Result.relay_part == 0)
+        .filter(Result.split_time.is_(False))
+        .filter(Result.relay_part.is_(False))
         .filter(Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS))
-        .group_by(extract("year", Result.date), func.cast(quarter_calc, Integer))
-        .order_by(extract("year", Result.date), func.cast(quarter_calc, Integer))
+        .group_by(year_expr, quarter_expr)
+        .order_by(year_expr, quarter_expr)
         .all()
     )
 
