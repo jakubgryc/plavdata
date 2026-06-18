@@ -76,7 +76,7 @@ const Navbar = () => {
       }}
     >
       <Flex align="center" gap="xs">
-        <img src="/swimmer-solid.svg" alt="logo" className="h-7 w-7 md:h-8 md:w-8" />
+        <img src="/swimmer-icon.svg" alt="logo" className="h-7 w-7 md:h-8 md:w-8" />
         <NavLink to="/" style={{ textDecoration: "none" }}>
           <Text size="sm" fw={600} c="var(--mantine-color-text)">
             Plavdata
