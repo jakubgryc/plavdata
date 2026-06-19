@@ -82,11 +82,11 @@ button {
   padding: 8px !important;
 }
 
-.swimmerLink {
+.textHoverLink {
   transition: opacity 0.1s ease;
 }
 
-.swimmerLink:hover {
+.textHoverLink:hover {
   opacity: 0.6;
 }
 
@@ -248,7 +248,6 @@ button {
   .responsive-generic-table table th,
   .responsive-generic-table table td {
     font-size: 0.7rem !important;
-    padding: 0.5rem 0.375rem !important;
   }
 
   .responsive-generic-table table td .mantine-Select-input {

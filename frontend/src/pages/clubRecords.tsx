@@ -301,7 +301,6 @@ function ClubRecords() {
                       style={{
                         flex: 3,
                         textAlign: "left",
-                        //   cursor: "pointer",
                         whiteSpace: "nowrap",
                         overflow: "hidden",
                       }}
@@ -309,7 +308,7 @@ function ClubRecords() {
                       <Text
                         component={Link}
                         to={`/swimmer/${data.swimmerId}`}
-                        className="swimmerLink"
+                        className="textHoverLink"
                         size="xs"
                       >
                         {data.surname} {data.name}
@@ -323,7 +322,7 @@ function ClubRecords() {
                       }}
                     >
                       <Text
-                        className="swimmerLink"
+                        className="textHoverLink"
                         size="xs"
                         onClick={() => {
                           setModalData({

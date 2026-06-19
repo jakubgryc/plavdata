@@ -109,7 +109,7 @@ function HeatmapGrid({ swimmers }: HeatmapGridProps) {
             backgroundColor: "var(--mantine-color-body)",
           }}
         >
-          <Text className="swimmerLink" component={Link} to={`/swimmer/${swimmer.swimmerId}`}>
+          <Text className="textHoverLink" component={Link} to={`/swimmer/${swimmer.swimmerId}`}>
             {`${swimmer.surname} ${swimmer.name}`}
           </Text>
         </Table.Td>

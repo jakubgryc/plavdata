@@ -98,7 +98,7 @@ function CompetitionTopResults({ swimmers }: CompetitionTopResultsProps) {
                       component={Link}
                       to={`/swimmer/${entry.swimmerId}`}
                       fw={600}
-                      className="swimmerLink"
+                      className="textHoverLink"
                     >
                       {entry.surname} {entry.name}
                     </Text>

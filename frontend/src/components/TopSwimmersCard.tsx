@@ -79,7 +79,7 @@ function SwimmerRow({ rank, name, surname, discipline, points, time, swimmerId }
         </Avatar>
         <Box style={{ flex: 1, minWidth: 0 }}>
           <Text
-            className="swimmerLink"
+            className="textHoverLink"
             component={Link}
             to={`/swimmer/${swimmerId}`}
             size="sm"

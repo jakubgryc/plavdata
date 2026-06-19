@@ -128,7 +128,7 @@ function CompetitionSwimmersTable({ swimmers }: CompetitionSwimmersTableProps) {
                         to={`/swimmer/${swimmer.swimmerId}`}
                         fw={600}
                         onClick={(e) => e.stopPropagation()}
-                        className="swimmerLink"
+                        className="textHoverLink"
                       >
                         {swimmer.surname} {swimmer.name}
                       </Text>

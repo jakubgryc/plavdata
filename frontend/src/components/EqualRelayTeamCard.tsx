@@ -188,7 +188,7 @@ export function EqualRelayTeamCard({
                         fw={500}
                         c={swimsTwice && !isFirstOccurrence ? "orange" : "inherit"}
                         to={`/swimmer/${swimmer.swimmerId}`}
-                        className="swimmerLink"
+                        className="textHoverLink"
                       >
                         {swimmer.surname} {swimmer.name}
                       </Text>

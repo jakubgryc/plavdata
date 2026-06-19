@@ -56,7 +56,7 @@ function ClubRecordsTable({ records, title, subtitle, variant }: ClubRecordsTabl
                 <Table.Td fw={500}>{record.discipline}</Table.Td>
                 <Table.Td>
                   <Text
-                    className="swimmerLink"
+                    className="textHoverLink"
                     component={Link}
                     to={`/swimmer/${record.swimmerId}`}
                     fw={500}

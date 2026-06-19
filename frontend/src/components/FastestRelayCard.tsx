@@ -173,7 +173,7 @@ export function FastestRelayCard({
                     fw={500}
                     c="inherit"
                     to={`/swimmer/${swimmer.swimmerId}`}
-                    className="swimmerLink"
+                    className="textHoverLink"
                   >
                     {swimmer.surname} {swimmer.name}
                   </Text>

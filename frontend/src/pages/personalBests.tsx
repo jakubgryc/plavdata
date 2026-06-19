@@ -1,4 +1,4 @@
-import { Chip, Flex, Modal, SegmentedControl, Stack, Text, Title } from "@mantine/core";
+import { Box, Chip, Flex, Modal, SegmentedControl, Stack, Text, Title } from "@mantine/core";
 import { DataTable } from "mantine-datatable";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
@@ -136,28 +136,16 @@ function PersonalBests() {
               noWrap: true,
               title: "",
               render: (record: PersonalBestRow) => (
-                <div
-                  style={{
-                    background: "transparent",
-                    border: "none",
-                    cursor: "pointer",
-                    width: "100%",
-                    height: "100%",
-                    boxSizing: "border-box",
-                    textAlign: "left",
-                    display: "block",
-                    color: "inherit",
-                    fontWeight: 500,
-                  }}
-                >
+                <Box>
                   <Text
                     component={Link}
                     to={`/swimmer/${record.swimmerId}`}
-                    className="swimmerLink"
+                    className="textHoverLink"
+                    size="sm"
                   >
                     {record.name}
                   </Text>
-                </div>
+                </Box>
               ),
             },
             ...DISCIPLINES.filter((discipline) => {
@@ -180,30 +168,23 @@ function PersonalBests() {
                       : "#E2E3F1" // dimmer purple in dark
                     : "transparent";
                 return description.time !== "" ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setModalData({
-                        ...description,
-                        name: record.name,
-                        discipline,
-                      });
-                      setModalOpen(true);
-                    }}
+                  <Box
                     style={{
                       background: bgColor,
-                      border: "none",
-                      cursor: "pointer",
-                      width: "100%",
-                      height: "100%",
                       padding: "10px 10px",
-                      boxSizing: "border-box",
-                      textAlign: "left",
-                      display: "block",
                     }}
                   >
-                    {description.time}
-                  </button>
+                    <Text
+                      onClick={() => {
+                        setModalData({ ...description, name: record.name, discipline });
+                        setModalOpen(true);
+                      }}
+                      className="textHoverLink"
+                      style={{ cursor: "pointer" }}
+                    >
+                      {description.time}
+                    </Text>
+                  </Box>
                 ) : null;
               },
             })),
