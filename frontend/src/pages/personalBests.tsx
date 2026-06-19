@@ -152,7 +152,7 @@ function PersonalBests() {
                 >
                   <Text
                     component={Link}
-                    to={`/swimmers/${record.swimmerId}`}
+                    to={`/swimmer/${record.swimmerId}`}
                     className="swimmerLink"
                   >
                     {record.name}
