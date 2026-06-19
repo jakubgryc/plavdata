@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session, joinedload
-from unidecode import unidecode
 
 from app.api.schemas import (
     BaseSwimmerOut,
@@ -104,33 +104,38 @@ async def search_swimmers(
     ),
     db: Session = Depends(get_db),
 ):
-    """Search swimmers by name or surname. Returns matching swimmers for autocomplete.
-    Supports Czech characters - searching 'c' will match 'č', 'r' will match 'ř', etc."""
+    """
+    Search swimmers by name or surname. Returns matching swimmers for autocomplete.
+    Supports flexible space-separated name combining and native accent insensitivity.
+    """
+    search_term = query.strip().lower()
 
-    # Normalize the search query to ASCII (removes diacritics)
-    normalized_query = unidecode(query).lower()
+    # Note: Make sure the 'unaccent' extension is enabled in your Postgres instance!
+    def postgres_unaccent(col):
+        return func.unaccent(func.lower(col))
 
-    # Fetch all swimmers (with reasonable limit for performance)
-    all_swimmers = (
-        db.query(Swimmer).order_by(Swimmer.surname, Swimmer.name).limit(500).all()
+    db_query = postgres_unaccent(search_term)
+
+    fullname_combo_1 = func.concat(Swimmer.surname, " ", Swimmer.name)
+    fullname_combo_2 = func.concat(Swimmer.name, " ", Swimmer.surname)
+
+    matching_swimmers = (
+        db.query(Swimmer)
+        .filter(
+            or_(
+                postgres_unaccent(Swimmer.name).contains(db_query),
+                postgres_unaccent(Swimmer.surname).contains(db_query),
+                postgres_unaccent(fullname_combo_1).contains(db_query),
+                postgres_unaccent(fullname_combo_2).contains(db_query),
+            )
+        )
+        .order_by(Swimmer.surname, Swimmer.name)
+        .limit(20)
+        .all()
     )
 
-    # Filter swimmers where normalized name or surname contains the normalized query
-    matching_swimmers = []
-    for swimmer in all_swimmers:
-        normalized_name = unidecode(swimmer.name).lower()
-        normalized_surname = unidecode(swimmer.surname).lower()
-
-        if (
-            normalized_query in normalized_name
-            or normalized_query in normalized_surname
-        ):
-            if swimmer.group not in GROUPS_TO_LOOKUP or swimmer.group == "veteran":
-                swimmer.group = None
-            matching_swimmers.append(swimmer)
-
-            # Limit results to 20
-            if len(matching_swimmers) >= 20:
-                break
+    for swimmer in matching_swimmers:
+        if swimmer.group not in GROUPS_TO_LOOKUP or swimmer.group == "veteran":
+            swimmer.group = None
 
     return matching_swimmers

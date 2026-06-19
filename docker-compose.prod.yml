@@ -1,4 +1,25 @@
 services:
+  postgres:
+    image: postgres:18
+    container_name: plavdata_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+      POSTGRES_DB: "${DB_NAME}"
+      TZ: "${TIMEZONE}"
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale-provider=icu --icu-locale=cs-CZ"
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - db-network
+
   backend:
     build:
       context: ./backend
@@ -9,6 +30,7 @@ services:
     user: "${UID:-1000}:${GID:-1000}"
     networks:
       - proxy-net
+      - db-network
     expose:
       - "8000"
     volumes:
@@ -23,6 +45,9 @@ services:
       - LOKI_ENABLED=${LOKI_ENABLED:-false}
       - LOKI_URL=${LOKI_URL:-}
     restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   frontend:
     build:
@@ -35,7 +60,13 @@ services:
       - proxy-net
     restart: unless-stopped
 
+volumes:
+  pgdata:
+    
+
 networks:
+  db-network:
+    driver: bridge
   proxy-net:
     external: true
     name: ${PROXY_NETWORK}

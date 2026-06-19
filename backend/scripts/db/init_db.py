@@ -26,7 +26,7 @@ def init_age_categories(db: Session):
     ]
 
     for category in categories:
-        exists = db.query(AgeCategory).filter_by(code=category.code).first()
+        exists = db.query(AgeCategory).filter_by(code=category["code"]).first()
         if not exists:
             db.add(AgeCategory(**category))
 

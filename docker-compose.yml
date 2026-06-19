@@ -1,4 +1,26 @@
 services:
+  postgres:
+    image: postgres:18
+    container_name: plavdata_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
+      POSTGRES_DB: "${DB_NAME}"
+      TZ: "${TIMEZONE}"
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale-provider=icu --icu-locale=cs-CZ"
+    volumes:
+      - ./pgdata:/var/lib/postgresql
+    ports:
+      - "127.0.0.1:5432:5432"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   backend:
     build:
       context: ./backend
@@ -13,12 +35,14 @@ services:
       - "127.0.0.1:8000:8000"
     volumes:
       - "./backend/app:/app/app:ro"
-      - "./backend/data:/app/data"
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - ENV=development
       - TARGET_CLUB=${TARGET_CLUB}
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   frontend:
     build:

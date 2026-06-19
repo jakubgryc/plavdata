@@ -15,7 +15,9 @@ def get_best_times_for_age(
     unique_swimmers: bool = False,
     only_current_age: bool = False,
 ):
-    age_at_result = cast(func.strftime("%Y", Result.date), Integer) - Swimmer.birth_year
+    age_at_result = (
+        cast(func.extract("year", Result.date), Integer) - Swimmer.birth_year
+    )
     if only_current_age and max_age > 18:
         only_current_age = False
 
@@ -74,7 +76,9 @@ def get_club_records(db: Session, course_length: int):
     Get all club records for a given course length.
     Returns club records grouped by discipline and age category.
     """
-    age_at_result = cast(func.strftime("%Y", Result.date), Integer) - Swimmer.birth_year
+    age_at_result = (
+        cast(func.extract("year", Result.date), Integer) - Swimmer.birth_year
+    )
 
     # Replace "K" with "VZ" in discipline code
     discipline_code = case(
