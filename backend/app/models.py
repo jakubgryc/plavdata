@@ -83,6 +83,7 @@ class Result(Base):
     competition_location = Column(String, nullable=True)  # nullable just in case
     date = Column(Date, nullable=False)
     points = Column(Integer, nullable=True)
+    age_at_result = Column(Integer, nullable=True)
 
     discipline = relationship("Discipline")
     course = relationship("Course")
