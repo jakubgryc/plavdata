@@ -64,6 +64,10 @@ def save_fetched_results(
             swimmers.append(new_swimmer)
             swimmer = new_swimmer
 
+        result_date = datetime.fromisoformat(entry.get("date")).date()
+        age_at_result = (
+            result_date.year - swimmer.birth_year if swimmer.birth_year else None
+        )
         exists = (
             db.query(Result)
             .filter_by(
@@ -75,7 +79,7 @@ def save_fetched_results(
                 csps_result_id=entry.get("outputId", None),
                 split_time=entry.get("splitTime"),
                 relay_part=entry.get("relayPart"),
-                date=datetime.fromisoformat(entry.get("date")).date(),
+                date=result_date,
                 points=entry.get("points"),
             )
             .first()
@@ -94,8 +98,9 @@ def save_fetched_results(
                     comparison_to_best=entry.get("comparisonToBest"),
                     split_time=entry.get("splitTime"),
                     relay_part=entry.get("relayPart"),
-                    date=datetime.fromisoformat(entry.get("date")).date(),
+                    date=result_date,
                     points=entry.get("points"),
+                    age_at_result=age_at_result,
                 )
             )
         else:
