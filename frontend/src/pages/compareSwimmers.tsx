@@ -15,7 +15,7 @@ function CompareSwimmers() {
   // Filter bar states
   const [pool, setPool] = useState<string>("25");
   const [timeAxis, setTimeAxis] = useState<string>("absolute");
-  const [intermediateTimes, setIntermediateTimes] = useState<string>("onlyFinal");
+  const [intermediateTimes, setIntermediateTimes] = useState<string>("all");
   const [resultType, setResultType] = useState<string>("all");
 
   /*
