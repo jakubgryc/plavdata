@@ -69,7 +69,7 @@ function PersonalBests() {
   }, [selectedGroup, selectedCourse, cache]);
 
   return (
-    <Flex direction="column" h="100%" w="100%" py="md" pb="xl">
+    <Flex direction="column" h="80vh" w="100%" pb="xl">
       <Flex justify="space-between" align="center" w="100%">
         <Title order={2} mb="md">
           Osobní rekordy
@@ -117,7 +117,7 @@ function PersonalBests() {
           radius="xl"
         />
       </Flex>
-      <Flex direction="column" mah="80vh" pt="sm" style={{ overflowY: "auto" }}>
+      <Box mah="70vh" pt="sm" style={{ overflowY: "auto" }}>
         <DataTable<PersonalBestRow>
           className="shadow-xl responsive-generic-table"
           withTableBorder
@@ -191,27 +191,27 @@ function PersonalBests() {
           ]}
           records={buildTableData(personalBests)}
         />
-        <Modal
-          opened={modalOpen}
-          onClose={() => setModalOpen(false)}
-          title={
-            <Text size="lg" fw={700} c="var(--color-primary)">
-              {modalData?.name} - {modalData?.discipline}
-            </Text>
-          }
-          centered
-        >
-          {modalData && (
-            <Stack>
-              <Text>Čas: {modalData.time}</Text>
-              {modalData.location && <Text>Místo zaplavání: {modalData.location}</Text>}
-              {modalData.date && <Text>Datum: {formatDate(modalData.date)}</Text>}
-              {modalData.isSplit && <Text style={{ color: "green" }}>mezičas</Text>}
-              {modalData.isRelayPart && <Text style={{ color: "purple" }}>štafeta</Text>}
-            </Stack>
-          )}
-        </Modal>
-      </Flex>
+      </Box>
+      <Modal
+        opened={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title={
+          <Text size="lg" fw={700} c="var(--color-primary)">
+            {modalData?.name} - {modalData?.discipline}
+          </Text>
+        }
+        centered
+      >
+        {modalData && (
+          <Stack>
+            <Text>Čas: {modalData.time}</Text>
+            {modalData.location && <Text>Místo zaplavání: {modalData.location}</Text>}
+            {modalData.date && <Text>Datum: {formatDate(modalData.date)}</Text>}
+            {modalData.isSplit && <Text style={{ color: "green" }}>mezičas</Text>}
+            {modalData.isRelayPart && <Text style={{ color: "purple" }}>štafeta</Text>}
+          </Stack>
+        )}
+      </Modal>
     </Flex>
   );
 }

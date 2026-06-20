@@ -67,7 +67,7 @@ function CompetitionDetail() {
   }
 
   return (
-    <Flex direction="column" w="100%" py="md" pb="xl" gap="md">
+    <Flex direction="column" w="100%" pb="xl" gap="md">
       <CompetitionHeader
         competition={data.competition}
         totalStarts={data.totalStarts}

@@ -1,4 +1,4 @@
-import { Box, useMantineColorScheme } from "@mantine/core";
+import { AppShell, Container, useMantineColorScheme } from "@mantine/core";
 import { useHotkeys } from "@mantine/hooks";
 import { Outlet } from "react-router";
 import Navbar from "./components/Navbar";
@@ -12,12 +12,21 @@ function App() {
   const bgColor = colorScheme === "dark" ? theme.other.appBg.dark : theme.other.appBg.light;
 
   return (
-    <Box className="flex flex-col h-screen" style={{ backgroundColor: bgColor }}>
-      <Navbar />
-      <main className="container mx-auto flex-grow overflow-y-auto px-4 md:px-20 pb-32 md:pb-16 pt-12">
-        <Outlet />
-      </main>
-    </Box>
+    <AppShell
+      header={{ height: 48 }}
+      styles={{
+        main: { backgroundColor: bgColor },
+      }}
+    >
+      <AppShell.Header>
+        <Navbar />
+      </AppShell.Header>
+      <AppShell.Main>
+        <Container size="xl" className="md:pb-16 pt-8">
+          <Outlet />
+        </Container>
+      </AppShell.Main>
+    </AppShell>
   );
 }
 

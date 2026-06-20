@@ -50,7 +50,7 @@ function Competitions() {
   );
 
   return (
-    <Flex direction="column" w="100%" py="md" pb="xl" gap="lg">
+    <Flex direction="column" w="100%" pb="xl" gap="lg">
       <CompetitionsPageHeader
         selectedYear={selectedYear}
         maxYear={MAX_YEAR}

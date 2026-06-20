@@ -147,7 +147,7 @@ function Home() {
   ];
 
   return (
-    <Flex direction="column" w="100%" py="md" pb="xl">
+    <Flex direction="column" w="100%" pb="xl">
       {/* Header */}
       <Group justify="space-between" align="center" mb="md" wrap="wrap">
         <Title order={2}>Statistiky PKBoh</Title>

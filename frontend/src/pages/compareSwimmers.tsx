@@ -95,7 +95,7 @@ function CompareSwimmers() {
   };
 
   return (
-    <Flex direction="column" w="100%" py="md" pb="xl">
+    <Flex direction="column" w="100%" pb="xl">
       <Title order={2} mb="4">
         Srovnání výsledků
       </Title>

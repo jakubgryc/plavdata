@@ -165,7 +165,7 @@ function Utils() {
   };
 
   return (
-    <Flex direction="column" w="100%" py="md" pb="xl">
+    <Flex direction="column" w="100%" pb="xl">
       {/* Header */}
       <Box mb="xl">
         <Title order={2}>Sestavování štafet</Title>

@@ -77,7 +77,7 @@ function SwimmerProfile() {
   } = profileData;
 
   return (
-    <Flex direction="column" w="100%" py="md" pb="xl">
+    <Flex direction="column" w="100%" pb="xl">
       <ProfileHeader basicInfo={basicInfo} stats={stats} />
 
       <Tabs defaultValue="overview" mt="xl">

@@ -195,7 +195,7 @@ function ClubRecords() {
   };
 
   return (
-    <Flex direction="column" h="100%" w="100%" py="md" pb="xl">
+    <Flex direction="column" h="90vh" w="100%" pb="xl">
       <Flex
         direction={{ base: "column", sm: "row" }}
         justify={{ sm: "space-between" }}
@@ -215,7 +215,7 @@ function ClubRecords() {
         />
       </Flex>
 
-      <Flex direction="column" mah="80vh" style={{ overflowY: "auto" }}>
+      <Box mah="75vh" pt="sm" style={{ overflowY: "auto" }}>
         <DataTable<ClubRecordRow>
           className="shadow-xl club-records-table"
           withTableBorder
@@ -353,7 +353,7 @@ function ClubRecords() {
           ]}
           records={buildTableData()}
         />
-      </Flex>
+      </Box>
 
       <Modal
         opened={modalOpen}
