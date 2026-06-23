@@ -6,15 +6,15 @@ import ResultsFilterBar from "../components/ResultsFilterBar";
 import ResultsTable from "../components/ResultsTable";
 
 export interface SwimResultRow {
-  id: number;
-  swimmer_id: number;
-  swimmer_name: string;
-  birth_year: number;
-  time_formatted: string;
-  fina_points: number;
-  pool_length: string;
+  resultId: number;
+  swimmerId: number;
+  swimmerName: string;
+  swimmerSurname: string;
+  birthYear: number;
+  time: number;
+  points: number;
+  poolLength: string;
   location: string;
-  competition_name: string;
   date: string;
 }
 
@@ -52,9 +52,12 @@ function ResultsPage() {
         if (dateFrom) queryParams.append("date_from", dateFrom);
         if (dateTo) queryParams.append("date_to", dateTo);
 
-        const response = await fetch(`${API_BASE_URL}/api/results?${queryParams.toString()}`, {
-          method: "GET",
-        });
+        const response = await fetch(
+          `${API_BASE_URL}/api/results/statistics?${queryParams.toString()}`,
+          {
+            method: "GET",
+          },
+        );
 
         if (!response.ok) {
           console.error("Error fetching results dataset", response.status);
@@ -73,12 +76,14 @@ function ResultsPage() {
     void fetchResults();
   }, [pool, discipline, gender, ageCategory, dateFrom, dateTo, timeType, viewMode]);
 
-  const updateFilter = (key: string, value: string) => {
+  const updateFilters = (updates: Record<string, string>) => {
     setSearchParams((prev) => {
-      if (!value) {
-        prev.delete(key);
-      } else {
-        prev.set(key, value);
+      for (const [key, value] of Object.entries(updates)) {
+        if (!value) {
+          prev.delete(key);
+        } else {
+          prev.set(key, value);
+        }
       }
       return prev;
     });
@@ -92,7 +97,7 @@ function ResultsPage() {
 
       <ResultsFilterBar
         filters={{ pool, discipline, gender, ageCategory, dateFrom, dateTo, timeType, viewMode }}
-        onFilterChange={updateFilter}
+        onFilterChange={updateFilters}
       />
 
       <ResultsTable results={results} loading={loading} />

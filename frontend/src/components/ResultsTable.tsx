@@ -1,6 +1,7 @@
 import { Center, Loader, Table, Text } from "@mantine/core";
 import { Link } from "react-router";
 import type { SwimResultRow } from "../pages/results";
+import { parseTimeFromMillis } from "../utils/timeUtils.ts";
 
 interface ResultsTableProps {
   results: SwimResultRow[];
@@ -39,26 +40,24 @@ function ResultsTable({ results, loading }: ResultsTableProps) {
         </Table.Thead>
         <Table.Tbody>
           {results.map((row) => (
-            <Table.Tr key={row.id}>
+            <Table.Tr key={row.resultId}>
               <Table.Td>
-                {/* Dynamically links to the existing swimmer profile component path */}
                 <Text
                   component={Link}
-                  to={`/swimmer/${row.swimmer_id}`}
-                  color="blue"
+                  to={`/swimmer/${row.swimmerId}`}
+                  c="blue"
                   style={{ textDecoration: "none", fontWeight: 500 }}
                 >
-                  {row.swimmer_name}
+                  {row.swimmerSurname} {row.swimmerName}
                 </Text>
               </Table.Td>
-              <Table.Td>{row.birth_year}</Table.Td>
+              <Table.Td>{row.birthYear}</Table.Td>
               <Table.Td style={{ fontFamily: "monospace", fontWeight: 600 }}>
-                {row.time_formatted}
+                {parseTimeFromMillis(row.time)}
               </Table.Td>
-              <Table.Td>{row.fina_points}</Table.Td>
-              <Table.Td>{row.pool_length}m</Table.Td>
+              <Table.Td>{row.points}</Table.Td>
+              <Table.Td>{row.poolLength}m</Table.Td>
               <Table.Td>
-                <Text size="sm">{row.competition_name}</Text>
                 <Text size="xs" c="dimmed">
                   {row.location} ({new Date(row.date).toLocaleDateString("cs-CZ")})
                 </Text>
