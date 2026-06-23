@@ -5,10 +5,11 @@ from pydantic import BaseModel
 from pydantic.alias_generators import to_camel
 
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy import and_
+from sqlalchemy import and_, func
 from sqlalchemy.orm import Session, contains_eager
 
 from app.models import Swimmer, Discipline, Course, Result
+from app.constants import EXCLUDED_COMPETITION_LOCATIONS
 from app.crud.results import get_best_times_for_age, get_club_records
 from app.db import get_db
 from app.api.schemas import (
@@ -250,8 +251,19 @@ class SwimmerResultRowOut(BaseModel):
         populate_by_name = True
 
 
+class PaginatedSwimmerResultRowOut(BaseModel):
+    total: int
+    page: int
+    page_limit: int
+    results: List[SwimmerResultRowOut]
+
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True
+
+
 @router.get(
-    "/statistics", summary="Get results", response_model=List[SwimmerResultRowOut]
+    "/statistics", summary="Get results", response_model=PaginatedSwimmerResultRowOut
 )
 async def get_statistics(
     db: Session = Depends(get_db),
@@ -265,6 +277,8 @@ async def get_statistics(
     view_mode: str = Query("best"),
     date_from: Optional[str] = Query(None),
     date_to: Optional[str] = Query(None),
+    page: int = Query(1, ge=1),
+    page_limit: int = Query(25, ge=1, le=100),
 ):
     query = (
         db.query(
@@ -286,9 +300,9 @@ async def get_statistics(
 
     filters = [Discipline.code == discipline_code]
 
-    sex_map = {"male": "male", "female": "female"}  # adjust if your stored values differ
-    if gender in sex_map:
-        filters.append(Swimmer.sex == sex_map[gender])
+    filters.append(Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS))
+
+    filters.append(Swimmer.sex == gender)
 
     if course:
         try:
@@ -306,25 +320,47 @@ async def get_statistics(
         filters.append(Result.date <= datetime.fromisoformat(date_to).date())
 
     if age_category != "open":
-        try:
-            max_age = int(age_category)
-            filters.append(Result.age_at_result <= max_age)
-        except ValueError:
-            pass  # ignore malformed age_category rather than 500ing
+        if age_category == "junior":
+            filters.append(Result.age_at_result <= 18)
+            filters.append(Result.age_at_result >= 15)
+        else:
+            age = int(age_category)
+            filters.append(Result.age_at_result == age)
 
     query = query.filter(and_(*filters))
 
     if view_mode == "best":
-        query = query.order_by(Swimmer.id, Result.time)
-        rows = query.all()
-        seen_swimmers = set()
-        deduped = []
-        for row in rows:
-            if row.swimmer_id not in seen_swimmers:
-                seen_swimmers.add(row.swimmer_id)
-                deduped.append(row)
-        deduped.sort(key=lambda r: r.time)
-        return deduped[:100]
+        ranked = query.add_columns(
+            func.row_number()
+            .over(partition_by=Swimmer.id, order_by=Result.time)
+            .label("rn")
+        ).subquery()
+        query = db.query(ranked).filter(ranked.c.rn == 1).order_by(ranked.c.time)
+        total = query.count()
     else:
+        total = query.count()
         query = query.order_by(Result.time)
-        return query.limit(100)
+
+    offset = (page - 1) * page_limit
+    rows = query.offset(offset).limit(page_limit).all()
+    rows_out = [
+        SwimmerResultRowOut(
+            result_id=row.result_id,
+            swimmer_id=row.swimmer_id,
+            swimmer_name=row.swimmer_name,
+            swimmer_surname=row.swimmer_surname,
+            birth_year=row.birth_year,
+            time=row.time,
+            points=row.points,
+            pool_length=row.pool_length,
+            location=row.location,
+            date=row.date,
+        )
+        for row in rows
+    ]
+    return PaginatedSwimmerResultRowOut(
+        total=total,
+        page=page,
+        page_limit=page_limit,
+        results=rows_out,
+    )

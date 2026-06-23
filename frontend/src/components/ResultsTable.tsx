@@ -6,9 +6,11 @@ import { formatDate, parseTimeFromMillis } from "../utils/timeUtils.ts";
 interface ResultsTableProps {
   results: SwimResultRow[];
   loading: boolean;
+  page: number;
 }
 
-function ResultsTable({ results, loading }: ResultsTableProps) {
+function ResultsTable({ results, loading, page }: ResultsTableProps) {
+  const perPage = results.length;
   if (loading) {
     return (
       <Center my="xl">
@@ -52,7 +54,7 @@ function ResultsTable({ results, loading }: ResultsTableProps) {
               <Table.Tr key={row.resultId}>
                 <Table.Td>
                   <Text size="sm" c="dimmed">
-                    {index + 1}
+                    {index + 1 + (page - 1) * perPage}
                   </Text>
                 </Table.Td>
                 <Table.Td>

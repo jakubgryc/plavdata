@@ -155,7 +155,7 @@ function ResultsFilterBar({ filters, onFilterChange }: FilterBarProps) {
 
           <Box>
             <Text size="xs" pl="xs" pb={4} fw={600} c="dimmed" tt="uppercase">
-              Měřené úseky
+              Mezičasy
             </Text>
             <SegmentedControl
               size="xs"
@@ -171,7 +171,7 @@ function ResultsFilterBar({ filters, onFilterChange }: FilterBarProps) {
 
           <Box>
             <Text size="xs" pl="xs" pb={4} fw={600} c="dimmed" tt="uppercase">
-              Výkony
+              Rozsah výsledků
             </Text>
             <SegmentedControl
               size="xs"
