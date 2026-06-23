@@ -4,7 +4,8 @@ from typing import List, Optional
 from pydantic import BaseModel
 from pydantic.alias_generators import to_camel
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy import and_
 from sqlalchemy.orm import Session, contains_eager
 
 from app.models import Swimmer, Discipline, Course, Result
@@ -230,3 +231,100 @@ async def get_all_club_records(
     ]
 
     return club_records_out
+
+
+class SwimmerResultRowOut(BaseModel):
+    result_id: int
+    swimmer_id: int
+    swimmer_name: str
+    swimmer_surname: str
+    birth_year: int
+    time: int
+    points: Optional[int] = None
+    pool_length: int
+    location: Optional[str] = None
+    date: datetime
+
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+@router.get(
+    "/statistics", summary="Get results", response_model=List[SwimmerResultRowOut]
+)
+async def get_statistics(
+    db: Session = Depends(get_db),
+    course: Optional[str] = Query(
+        None, description="Pool length in meters, e.g. '25' or '50'"
+    ),
+    discipline_code: str = Query(...),
+    gender: str = Query(...),
+    age_category: str = Query("open"),
+    time_type: str = Query("onlyFinal"),
+    view_mode: str = Query("best"),
+    date_from: Optional[str] = Query(None),
+    date_to: Optional[str] = Query(None),
+):
+    query = (
+        db.query(
+            Result.id.label("result_id"),
+            Swimmer.id.label("swimmer_id"),
+            Swimmer.name.label("swimmer_name"),
+            Swimmer.surname.label("swimmer_surname"),
+            Swimmer.birth_year.label("birth_year"),
+            Result.time.label("time"),
+            Result.points.label("points"),
+            Course.length.label("pool_length"),
+            Result.competition_location.label("location"),
+            Result.date.label("date"),
+        )
+        .join(Swimmer, Result.swimmer_id == Swimmer.id)
+        .join(Discipline, Result.discipline_id == Discipline.id)
+        .join(Course, Result.course_id == Course.id)
+    )
+
+    filters = [Discipline.code == discipline_code]
+
+    sex_map = {"male": "male", "female": "female"}  # adjust if your stored values differ
+    if gender in sex_map:
+        filters.append(Swimmer.sex == sex_map[gender])
+
+    if course:
+        try:
+            filters.append(Course.length == int(course))
+        except ValueError:
+            pass
+
+    if time_type == "onlyFinal":
+        filters.append(Result.split_time.is_(False))
+        filters.append(Result.relay_part.is_(False))
+
+    if date_from:
+        filters.append(Result.date >= datetime.fromisoformat(date_from).date())
+    if date_to:
+        filters.append(Result.date <= datetime.fromisoformat(date_to).date())
+
+    if age_category != "open":
+        try:
+            max_age = int(age_category)
+            filters.append(Result.age_at_result <= max_age)
+        except ValueError:
+            pass  # ignore malformed age_category rather than 500ing
+
+    query = query.filter(and_(*filters))
+
+    if view_mode == "best":
+        query = query.order_by(Swimmer.id, Result.time)
+        rows = query.all()
+        seen_swimmers = set()
+        deduped = []
+        for row in rows:
+            if row.swimmer_id not in seen_swimmers:
+                seen_swimmers.add(row.swimmer_id)
+                deduped.append(row)
+        deduped.sort(key=lambda r: r.time)
+        return deduped[:100]
+    else:
+        query = query.order_by(Result.time)
+        return query.limit(100)
