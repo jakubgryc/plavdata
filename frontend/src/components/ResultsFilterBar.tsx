@@ -20,6 +20,26 @@ interface FilterBarProps {
 
 const DATE_PRESETS = [
   {
+    label: "Tato sezóna",
+    value: [
+      dayjs().month() >= 8
+        ? dayjs().month(8).startOf("month").format("YYYY-MM-DD")
+        : dayjs().subtract(1, "year").month(8).startOf("month").format("YYYY-MM-DD"),
+      dayjs().format("YYYY-MM-DD"),
+    ] as [string, string],
+  },
+  {
+    label: "Minulá sezóna",
+    value: [
+      dayjs().month() >= 8
+        ? dayjs().subtract(1, "year").month(8).startOf("month").format("YYYY-MM-DD")
+        : dayjs().subtract(2, "year").month(8).startOf("month").format("YYYY-MM-DD"),
+      dayjs().month() >= 8
+        ? dayjs().month(7).endOf("month").format("YYYY-MM-DD")
+        : dayjs().subtract(1, "year").month(7).endOf("month").format("YYYY-MM-DD"),
+    ] as [string, string],
+  },
+  {
     label: "Tento rok",
     value: [
       dayjs().startOf("year").format("YYYY-MM-DD"),

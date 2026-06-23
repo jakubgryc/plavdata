@@ -1,4 +1,4 @@
-import { Center, Loader, Paper, Table, Text } from "@mantine/core";
+import { Center, Flex, Loader, Paper, Space, Table, Text, Tooltip } from "@mantine/core";
 import { Link } from "react-router";
 import type { SwimResultRow } from "../pages/results";
 import { formatDate, parseTimeFromMillis } from "../utils/timeUtils.ts";
@@ -69,7 +69,24 @@ function ResultsTable({ results, loading, page }: ResultsTableProps) {
                 </Table.Td>
                 <Table.Td>{row.birthYear}</Table.Td>
                 <Table.Td style={{ fontFamily: "monospace", fontWeight: 600 }}>
-                  {parseTimeFromMillis(row.time)}
+                  <Flex align="center">
+                    {parseTimeFromMillis(row.time)}
+                    <Space w="sm" />
+                    {row.splitTime && (
+                      <Tooltip label="Mezičas" withArrow>
+                        <Text size="xs" c="green" variant="light">
+                          M
+                        </Text>
+                      </Tooltip>
+                    )}
+                    {row.relayPart && (
+                      <Tooltip label="Štafeta" withArrow>
+                        <Text size="xs" c="pink" variant="light">
+                          Š
+                        </Text>
+                      </Tooltip>
+                    )}
+                  </Flex>
                 </Table.Td>
                 <Table.Td>{row.points}</Table.Td>
                 <Table.Td>{row.poolLength}m</Table.Td>

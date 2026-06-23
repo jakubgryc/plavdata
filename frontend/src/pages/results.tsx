@@ -10,6 +10,8 @@ export interface SwimResultRow {
   swimmerId: number;
   swimmerName: string;
   swimmerSurname: string;
+  splitTime: boolean;
+  relayPart: boolean;
   birthYear: number;
   time: number;
   points: number;

@@ -239,6 +239,8 @@ class SwimmerResultRowOut(BaseModel):
     swimmer_id: int
     swimmer_name: str
     swimmer_surname: str
+    split_time: bool
+    relay_part: bool
     birth_year: int
     time: int
     points: Optional[int] = None
@@ -289,6 +291,8 @@ async def get_statistics(
             Swimmer.birth_year.label("birth_year"),
             Result.time.label("time"),
             Result.points.label("points"),
+            Result.split_time.label("split_time"),
+            Result.relay_part.label("relay_part"),
             Course.length.label("pool_length"),
             Result.competition_location.label("location"),
             Result.date.label("date"),
@@ -349,6 +353,8 @@ async def get_statistics(
             swimmer_id=row.swimmer_id,
             swimmer_name=row.swimmer_name,
             swimmer_surname=row.swimmer_surname,
+            split_time=row.split_time,
+            relay_part=row.relay_part,
             birth_year=row.birth_year,
             time=row.time,
             points=row.points,
