@@ -48,17 +48,11 @@ const STROKE_MAP = [
 ];
 
 function ResultsFilterBar({ filters, onFilterChange }: FilterBarProps) {
-  // const [dateRangeValue, setDateRangeValue] = useState<[string | null, string | null]>([
-  //   null,
-  //   null,
-  // ]);
-  // Determine active stroke group
   const currentStrokeGroup = useMemo(() => {
     const matched = STROKE_MAP.find((group) => group.distances.includes(filters.discipline));
     return matched ? matched.value : "VZ";
   }, [filters.discipline]);
 
-  // Available distances filtered by context options
   const availableDistances = useMemo(() => {
     const matched = STROKE_MAP.find((group) => group.value === currentStrokeGroup);
     let distances = matched ? matched.distances : [];
@@ -235,7 +229,6 @@ function ResultsFilterBar({ filters, onFilterChange }: FilterBarProps) {
             </Flex>
           </Paper>
         </Box>
-        <Box onClick={() => console.log(dateRangeValue)}>TEST</Box>
       </Flex>
     </Paper>
   );

@@ -1,7 +1,7 @@
-import { Center, Loader, Table, Text } from "@mantine/core";
+import { Center, Loader, Paper, Table, Text } from "@mantine/core";
 import { Link } from "react-router";
 import type { SwimResultRow } from "../pages/results";
-import { parseTimeFromMillis } from "../utils/timeUtils.ts";
+import { formatDate, parseTimeFromMillis } from "../utils/timeUtils.ts";
 
 interface ResultsTableProps {
   results: SwimResultRow[];
@@ -26,47 +26,68 @@ function ResultsTable({ results, loading }: ResultsTableProps) {
   }
 
   return (
-    <Table.ScrollContainer minWidth={600}>
-      <Table striped highlightOnHover verticalSpacing="sm">
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>Jméno</Table.Th>
-            <Table.Th>Ročník</Table.Th>
-            <Table.Th>Čas</Table.Th>
-            <Table.Th>FINA body</Table.Th>
-            <Table.Th>Bazén</Table.Th>
-            <Table.Th>Místo / Závod</Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {results.map((row) => (
-            <Table.Tr key={row.resultId}>
-              <Table.Td>
-                <Text
-                  component={Link}
-                  to={`/swimmer/${row.swimmerId}`}
-                  c="blue"
-                  style={{ textDecoration: "none", fontWeight: 500 }}
-                >
-                  {row.swimmerSurname} {row.swimmerName}
-                </Text>
-              </Table.Td>
-              <Table.Td>{row.birthYear}</Table.Td>
-              <Table.Td style={{ fontFamily: "monospace", fontWeight: 600 }}>
-                {parseTimeFromMillis(row.time)}
-              </Table.Td>
-              <Table.Td>{row.points}</Table.Td>
-              <Table.Td>{row.poolLength}m</Table.Td>
-              <Table.Td>
-                <Text size="xs" c="dimmed">
-                  {row.location} ({new Date(row.date).toLocaleDateString("cs-CZ")})
-                </Text>
-              </Table.Td>
+    <Paper radius="md" withBorder>
+      <Table.ScrollContainer minWidth={500}>
+        <Table
+          verticalSpacing="xs"
+          highlightOnHover
+          tabularNums
+          striped
+          className="responsive-results-table"
+        >
+          <Table.Thead>
+            <Table.Tr c="blue">
+              <Table.Th w="5%">#</Table.Th>
+              <Table.Th w="30%">Jméno</Table.Th>
+              <Table.Th w="8%">Ročník</Table.Th>
+              <Table.Th w="8%">Čas</Table.Th>
+              <Table.Th w="8%">Body</Table.Th>
+              <Table.Th w="8%">Bazén</Table.Th>
+              <Table.Th w="13%">Datum</Table.Th>
+              <Table.Th w="13%">Místo</Table.Th>
             </Table.Tr>
-          ))}
-        </Table.Tbody>
-      </Table>
-    </Table.ScrollContainer>
+          </Table.Thead>
+          <Table.Tbody>
+            {results.map((row, index) => (
+              <Table.Tr key={row.resultId}>
+                <Table.Td>
+                  <Text size="sm" c="dimmed">
+                    {index + 1}
+                  </Text>
+                </Table.Td>
+                <Table.Td>
+                  <Text
+                    component={Link}
+                    to={`/swimmer/${row.swimmerId}`}
+                    style={{ textDecoration: "none", fontWeight: 500 }}
+                    className="textHoverLink"
+                  >
+                    {row.swimmerSurname} {row.swimmerName}
+                  </Text>
+                </Table.Td>
+                <Table.Td>{row.birthYear}</Table.Td>
+                <Table.Td style={{ fontFamily: "monospace", fontWeight: 600 }}>
+                  {parseTimeFromMillis(row.time)}
+                </Table.Td>
+                <Table.Td>{row.points}</Table.Td>
+                <Table.Td>{row.poolLength}m</Table.Td>
+                <Table.Td>{formatDate(row.date)}</Table.Td>
+                <Table.Td
+                  style={{
+                    maxWidth: 0,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {row.location}
+                </Table.Td>
+              </Table.Tr>
+            ))}
+          </Table.Tbody>
+        </Table>
+      </Table.ScrollContainer>
+    </Paper>
   );
 }
 
