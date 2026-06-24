@@ -209,13 +209,7 @@ function ResultsFilterBar({ filters, onFilterChange }: FilterBarProps) {
           <Text size="xs" pl="xs" pb={4} fw={600} c="dimmed" tt="uppercase">
             Disciplína
           </Text>
-          <Paper
-            withBorder
-            p={6}
-            radius="md"
-            bg="var(--mantine-color-body)"
-            style={{ borderColor: "var(--mantine-color-default-border)" }}
-          >
+          <Paper withBorder p={6} radius="md">
             <Flex gap="md" align="center" direction={{ base: "column", sm: "row" }}>
               <SegmentedControl
                 size="xs"
@@ -240,7 +234,7 @@ function ResultsFilterBar({ filters, onFilterChange }: FilterBarProps) {
               >
                 <Flex gap="xs" wrap="wrap" justify={{ base: "center", sm: "flex-start" }}>
                   {availableDistances.map((dist) => (
-                    <Chip key={dist} value={dist} size="xs" variant="light">
+                    <Chip key={dist} value={dist} size="xs" variant="filled">
                       {dist}
                     </Chip>
                   ))}
