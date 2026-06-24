@@ -38,25 +38,60 @@ const Navbar = () => {
 
   const navLinks = (
     <>
-      <NavLink to="/" style={navLinkStyle} onClick={() => setOpened(false)}>
+      <NavLink
+        to="/"
+        style={navLinkStyle}
+        onClick={() => setOpened(false)}
+        className="textHoverLink"
+      >
         Úvod
       </NavLink>
-      <NavLink to="/competitions" style={navLinkStyle} onClick={() => setOpened(false)}>
+      <NavLink
+        to="/competitions"
+        style={navLinkStyle}
+        onClick={() => setOpened(false)}
+        className="textHoverLink"
+      >
         Závody
       </NavLink>
-      <NavLink to="/results" style={navLinkStyle} onClick={() => setOpened(false)}>
+      <NavLink
+        to="/results"
+        style={navLinkStyle}
+        onClick={() => setOpened(false)}
+        className="textHoverLink"
+      >
         Výsledky
       </NavLink>
-      <NavLink to="/compare-swimmers" style={navLinkStyle} onClick={() => setOpened(false)}>
+      <NavLink
+        to="/compare-swimmers"
+        style={navLinkStyle}
+        onClick={() => setOpened(false)}
+        className="textHoverLink"
+      >
         Porovnání plavců
       </NavLink>
-      <NavLink to="/personal-bests" style={navLinkStyle} onClick={() => setOpened(false)}>
+      <NavLink
+        to="/personal-bests"
+        style={navLinkStyle}
+        onClick={() => setOpened(false)}
+        className="textHoverLink"
+      >
         Osobní rekordy
       </NavLink>
-      <NavLink to="/club-records" style={navLinkStyle} onClick={() => setOpened(false)}>
+      <NavLink
+        to="/club-records"
+        style={navLinkStyle}
+        onClick={() => setOpened(false)}
+        className="textHoverLink"
+      >
         Klubové rekordy
       </NavLink>
-      <NavLink to="/utils" style={navLinkStyle} onClick={() => setOpened(false)}>
+      <NavLink
+        to="/utils"
+        style={navLinkStyle}
+        onClick={() => setOpened(false)}
+        className="textHoverLink"
+      >
         Nástroje
       </NavLink>
     </>
