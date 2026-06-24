@@ -1,4 +1,4 @@
-import { Flex, Paper, Title } from "@mantine/core";
+import { Paper, Title } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { format } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
@@ -62,103 +62,91 @@ function ComparisonSwimmerChart({
   };
 
   return (
-    <Paper
-      p={{ base: "sm", md: "lg" }}
-      shadow="md"
-      radius="md"
-      withBorder
-      className="mt-4 w-full border-2 border-gray-900"
-    >
+    <Paper p={{ base: "sm", md: "lg" }} shadow="md" radius="md" withBorder w="100%" mt="md">
       <Title order={3} size="xl" fw={600} mb="md" pt="xs">
         Srovnání - {currentDiscipline}
       </Title>
-      <Flex direction="column" w="100%" gap="md">
-        <LineChart
-          responsive
-          style={{
-            width: "100%",
-            height: isMobile ? 370 : 570,
+      <LineChart
+        responsive
+        style={{
+          width: "100%",
+          height: isMobile ? 370 : 570,
+        }}
+        margin={
+          isMobile
+            ? { top: 5, right: 5, left: 0, bottom: 5 }
+            : { top: 10, right: 10, left: 10, bottom: 10 }
+        }
+      >
+        <XAxis
+          dataKey="name"
+          type="number"
+          tick={{
+            fontSize: isMobile ? 14 : 15,
+            fill: colorScheme === "dark" ? theme.colors.gray[3] : theme.colors.gray[7],
           }}
-          margin={
-            isMobile
-              ? { top: 5, right: 5, left: 0, bottom: 5 }
-              : { top: 10, right: 10, left: 10, bottom: 10 }
+          tickFormatter={timeAxis === "absolute" ? dateFormatterAbsolute : dateFormatterRelative}
+          padding={{ left: 20, right: 20 }}
+          ticks={
+            timeAxis === "relative"
+              ? createRelativeDomainTicks(parsedResults)
+              : createAbsoluteDomainTicks(parsedResults)
           }
-        >
-          <XAxis
-            dataKey="name"
-            type="number"
-            tick={{
-              fontSize: isMobile ? 14 : 15,
-              fill: colorScheme === "dark" ? theme.colors.gray[3] : theme.colors.gray[7],
-            }}
-            tickFormatter={timeAxis === "absolute" ? dateFormatterAbsolute : dateFormatterRelative}
-            padding={{ left: 20, right: 20 }}
-            ticks={
-              timeAxis === "relative"
-                ? createRelativeDomainTicks(parsedResults)
-                : createAbsoluteDomainTicks(parsedResults)
-            }
-          />
-          <YAxis
-            tick={{
-              fontSize: isMobile ? 14 : 15,
-              fill: colorScheme === "dark" ? theme.colors.gray[3] : theme.colors.gray[7],
-            }}
-            tickFormatter={parseTimeFromMillis}
-            ticks={yAxisTicks}
-            padding={{ bottom: 20 }}
-          />
-          <CartesianGrid strokeDasharray={colorScheme === "dark" ? "1 3" : ""} />
-          <Legend
-            wrapperStyle={{
-              fontSize: isMobile ? "12px" : "14px",
-              color: colorScheme === "dark" ? theme.colors.gray[3] : theme.colors.gray[7],
-            }}
-          />
-          {parsedResults.map((swimmerData, index) => {
-            const color = getGraphColor(index);
-            return (
-              <Line
-                key={swimmerData.swimmer.id}
-                dot={{ fill: color, r: isMobile ? 1 : 1.5 }}
-                type="monotone"
-                dataKey="time"
-                data={swimmerData.results
-                  .filter((result, index) => {
-                    if (result.time > DNF_TRESHOLD) return false;
-                    if (intermediateTimes === "onlyFinal" && result.split_time && index !== 0) {
-                      return false;
-                    }
-                    return !(
-                      resultType === "onlyImprovements" &&
-                      !result.improvement &&
-                      index !== 0
-                    );
-                  })
-                  .map((result) => ({
-                    name: new Date(result.date).getTime(),
-                    time: result.time,
-                  }))}
-                name={`${swimmerData.swimmer.surname} ${swimmerData.swimmer.name}`}
-                stroke={color}
-                strokeWidth={isMobile ? 1.5 : 2}
-                connectNulls
-              />
-            );
-          })}
-          <Tooltip
-            contentStyle={{
-              fontSize: isMobile ? "12px" : "14px",
-              backgroundColor: colorScheme === "dark" ? theme.colors.dark[7] : theme.white,
-              border: `1px solid ${colorScheme === "dark" ? theme.colors.gray[7] : theme.colors.gray[4]}`,
-              color: colorScheme === "dark" ? theme.colors.gray[3] : theme.colors.gray[7],
-            }}
-            formatter={(value, name) => [parseTimeFromMillis(Number(value)), name]}
-            labelFormatter={timeAxis === "absolute" ? formatDateFromMs : () => ""}
-          />
-        </LineChart>
-      </Flex>
+        />
+        <YAxis
+          tick={{
+            fontSize: isMobile ? 14 : 15,
+            fill: colorScheme === "dark" ? theme.colors.gray[3] : theme.colors.gray[7],
+          }}
+          tickFormatter={parseTimeFromMillis}
+          ticks={yAxisTicks}
+          padding={{ bottom: 20 }}
+        />
+        <CartesianGrid strokeDasharray={colorScheme === "dark" ? "1 3" : ""} />
+        <Legend
+          wrapperStyle={{
+            fontSize: isMobile ? "12px" : "14px",
+            color: colorScheme === "dark" ? theme.colors.gray[3] : theme.colors.gray[7],
+          }}
+        />
+        {parsedResults.map((swimmerData, index) => {
+          const color = getGraphColor(index);
+          return (
+            <Line
+              key={swimmerData.swimmer.id}
+              dot={{ fill: color, r: isMobile ? 1 : 1.5 }}
+              type="monotone"
+              dataKey="time"
+              data={swimmerData.results
+                .filter((result, index) => {
+                  if (result.time > DNF_TRESHOLD) return false;
+                  if (intermediateTimes === "onlyFinal" && result.split_time && index !== 0) {
+                    return false;
+                  }
+                  return !(resultType === "onlyImprovements" && !result.improvement && index !== 0);
+                })
+                .map((result) => ({
+                  name: new Date(result.date).getTime(),
+                  time: result.time,
+                }))}
+              name={`${swimmerData.swimmer.surname} ${swimmerData.swimmer.name}`}
+              stroke={color}
+              strokeWidth={isMobile ? 1.5 : 2}
+              connectNulls
+            />
+          );
+        })}
+        <Tooltip
+          contentStyle={{
+            fontSize: isMobile ? "12px" : "14px",
+            backgroundColor: colorScheme === "dark" ? theme.colors.dark[7] : theme.white,
+            border: `1px solid ${colorScheme === "dark" ? theme.colors.gray[7] : theme.colors.gray[4]}`,
+            color: colorScheme === "dark" ? theme.colors.gray[3] : theme.colors.gray[7],
+          }}
+          formatter={(value, name) => [parseTimeFromMillis(Number(value)), name]}
+          labelFormatter={timeAxis === "absolute" ? formatDateFromMs : () => ""}
+        />
+      </LineChart>
     </Paper>
   );
 }

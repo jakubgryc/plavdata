@@ -96,8 +96,8 @@ function CompareSwimmers() {
 
   return (
     <Flex direction="column" w="100%" pb="xl">
-      <Title order={2} mb="4">
-        Srovnání výsledků
+      <Title order={2} mb="md">
+        Porovnání plavců
       </Title>
       <ComparisonFilterBar
         groupedSwimmers={groupedSwimmers}
@@ -116,13 +116,15 @@ function CompareSwimmers() {
         onFetchResults={fetchComparisonResults}
         lastFetchedFilterHash={lastFetchedFilterHash}
       />
-      <ComparisonSwimmerChart
-        parsedResults={parsedResults}
-        currentDiscipline={parsedDiscipline}
-        timeAxis={timeAxis}
-        intermediateTimes={intermediateTimes}
-        resultType={resultType}
-      />
+      {parsedResults.length !== 0 && (
+        <ComparisonSwimmerChart
+          parsedResults={parsedResults}
+          currentDiscipline={parsedDiscipline}
+          timeAxis={timeAxis}
+          intermediateTimes={intermediateTimes}
+          resultType={resultType}
+        />
+      )}
     </Flex>
   );
 }
