@@ -95,17 +95,16 @@ function ResultsPage() {
 
   const updateFilters = (updates: Record<string, string>) => {
     setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
       for (const [key, value] of Object.entries(updates)) {
-        if (!value) {
-          prev.delete(key);
-        } else {
-          prev.set(key, value);
-        }
+        if (!value) next.delete(key);
+        else next.set(key, value);
       }
-      prev.set("page", "1");
-      return prev;
+      next.set("page", "1");
+      return next;
     });
   };
+
   const handlePageChange = (newPage: number) => {
     setSearchParams((prev) => {
       prev.set("page", String(newPage));
