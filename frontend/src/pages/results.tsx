@@ -35,7 +35,7 @@ function ResultsPage() {
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  const pool = searchParams.get("pool") ?? "all";
+  const pool = searchParams.get("pool") ?? "25";
   const discipline = searchParams.get("discipline") ?? "50 VZ";
   const gender = searchParams.get("gender") ?? "male";
   const ageCategory = searchParams.get("ageCategory") ?? "open";
