@@ -1,11 +1,14 @@
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
+import { DatesProvider } from "@mantine/dates";
 import { Notifications } from "@mantine/notifications";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
+import "dayjs/locale/cs";
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
+import "@mantine/dates/styles.css";
 import "mantine-datatable/styles.css";
 import "./index.css";
 import App from "./App.tsx";
@@ -19,6 +22,7 @@ import Home from "./pages/home";
 import Login from "./pages/login";
 import NotFound from "./pages/notFound";
 import PersonalBests from "./pages/personalBests";
+import Results from "./pages/results";
 import SwimmerProfile from "./pages/swimmerProfile";
 import Utils from "./pages/utils";
 import { theme } from "./theme";
@@ -73,6 +77,10 @@ const router = createBrowserRouter([
         element: <AdminGroupsPage />,
       },
       {
+        path: "results",
+        element: <Results />,
+      },
+      {
         path: "*",
         element: <NotFound />,
       },
@@ -87,10 +95,12 @@ if (!root) {
 
 createRoot(root).render(
   <StrictMode>
-    <ColorSchemeScript defaultColorScheme="dark" />
-    <MantineProvider theme={theme} defaultColorScheme="dark">
-      <Notifications position="top-right" zIndex={1000} />
-      <RouterProvider router={router} />
-    </MantineProvider>
+    <DatesProvider settings={{ locale: "cs" }}>
+      <ColorSchemeScript defaultColorScheme="dark" />
+      <MantineProvider theme={theme} defaultColorScheme="dark">
+        <Notifications position="top-right" zIndex={1000} />
+        <RouterProvider router={router} />
+      </MantineProvider>
+    </DatesProvider>
   </StrictMode>,
 );

@@ -4,10 +4,12 @@ from typing import List, Optional
 from pydantic import BaseModel
 from pydantic.alias_generators import to_camel
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy import and_, func
 from sqlalchemy.orm import Session, contains_eager
 
 from app.models import Swimmer, Discipline, Course, Result
+from app.constants import EXCLUDED_COMPETITION_LOCATIONS
 from app.crud.results import get_best_times_for_age, get_club_records
 from app.db import get_db
 from app.api.schemas import (
@@ -230,3 +232,145 @@ async def get_all_club_records(
     ]
 
     return club_records_out
+
+
+class SwimmerResultRowOut(BaseModel):
+    result_id: int
+    swimmer_id: int
+    swimmer_name: str
+    swimmer_surname: str
+    split_time: bool
+    relay_part: bool
+    birth_year: int
+    time: int
+    points: Optional[int] = None
+    pool_length: int
+    location: Optional[str] = None
+    date: datetime
+
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+class PaginatedSwimmerResultRowOut(BaseModel):
+    total: int
+    page: int
+    page_limit: int
+    results: List[SwimmerResultRowOut]
+
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+@router.get(
+    "/statistics", summary="Get results", response_model=PaginatedSwimmerResultRowOut
+)
+async def get_statistics(
+    db: Session = Depends(get_db),
+    course: Optional[str] = Query(
+        None, description="Pool length in meters, e.g. '25' or '50'"
+    ),
+    discipline_code: str = Query(...),
+    gender: str = Query(...),
+    age_category: str = Query("open"),
+    time_type: str = Query("onlyFinal"),
+    view_mode: str = Query("best"),
+    date_from: Optional[str] = Query(None),
+    date_to: Optional[str] = Query(None),
+    page: int = Query(1, ge=1),
+    page_limit: int = Query(25, ge=1, le=100),
+):
+    query = (
+        db.query(
+            Result.id.label("result_id"),
+            Swimmer.id.label("swimmer_id"),
+            Swimmer.name.label("swimmer_name"),
+            Swimmer.surname.label("swimmer_surname"),
+            Swimmer.birth_year.label("birth_year"),
+            Result.time.label("time"),
+            Result.points.label("points"),
+            Result.split_time.label("split_time"),
+            Result.relay_part.label("relay_part"),
+            Course.length.label("pool_length"),
+            Result.competition_location.label("location"),
+            Result.date.label("date"),
+        )
+        .join(Swimmer, Result.swimmer_id == Swimmer.id)
+        .join(Discipline, Result.discipline_id == Discipline.id)
+        .join(Course, Result.course_id == Course.id)
+    )
+
+    filters = [Discipline.code == discipline_code]
+
+    filters.append(Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS))
+
+    filters.append(Swimmer.sex == gender)
+
+    if course:
+        try:
+            filters.append(Course.length == int(course))
+        except ValueError:
+            pass
+
+    if time_type == "onlyFinal":
+        filters.append(Result.split_time.is_(False))
+        filters.append(Result.relay_part.is_(False))
+
+    if date_from:
+        filters.append(Result.date >= datetime.fromisoformat(date_from).date())
+    if date_to:
+        filters.append(Result.date <= datetime.fromisoformat(date_to).date())
+
+    if age_category != "open":
+        if age_category == "junior":
+            filters.append(Result.age_at_result <= 18)
+            filters.append(Result.age_at_result >= 15)
+        else:
+            age = int(age_category)
+            filters.append(Result.age_at_result == age)
+
+    query = query.filter(and_(*filters))
+
+    if view_mode == "best":
+        ranked = query.add_columns(
+            func.row_number()
+            .over(partition_by=Swimmer.id, order_by=Result.time)
+            .label("rn")
+        ).subquery()
+        query = (
+            db.query(ranked)
+            .filter(ranked.c.rn == 1)
+            .order_by(ranked.c.time, ranked.c.date)
+        )
+        total = query.count()
+    else:
+        total = query.count()
+        query = query.order_by(Result.time, Result.date)
+
+    offset = (page - 1) * page_limit
+    rows = query.offset(offset).limit(page_limit).all()
+    rows_out = [
+        SwimmerResultRowOut(
+            result_id=row.result_id,
+            swimmer_id=row.swimmer_id,
+            swimmer_name=row.swimmer_name,
+            swimmer_surname=row.swimmer_surname,
+            split_time=row.split_time,
+            relay_part=row.relay_part,
+            birth_year=row.birth_year,
+            time=row.time,
+            points=row.points,
+            pool_length=row.pool_length,
+            location=row.location,
+            date=row.date,
+        )
+        for row in rows
+    ]
+    return PaginatedSwimmerResultRowOut(
+        total=total,
+        page=page,
+        page_limit=page_limit,
+        results=rows_out,
+    )

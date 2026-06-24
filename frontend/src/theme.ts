@@ -37,7 +37,7 @@ export const theme = createTheme({
   components: {
     Button: {
       defaultProps: {
-        color: "blue",
+        color: "blue.5",
       },
     },
     SegmentedControl: {
@@ -47,12 +47,12 @@ export const theme = createTheme({
     },
     ActionIcon: {
       defaultProps: {
-        color: "blue",
+        color: "blue.5",
       },
     },
     Chip: {
       defaultProps: {
-        color: "blue",
+        color: "blue.5",
       },
     },
     Text: {
@@ -93,7 +93,7 @@ export const theme = createTheme({
     },
     Tab: {
       defaultProps: {
-        color: "blue",
+        color: "blue.5",
       },
     },
   },
