@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 
 import { API_BASE_URL } from "../../config";
+import TableSplitRelayLegend from "../components/shared/TableSplitRelayLegend";
 import { useTheme } from "../hooks/useTheme";
 import type { SwimmerPersonalBest } from "../schema/types";
 import { DISCIPLINES, GROUPS, POOLS } from "../utils/constants";
@@ -117,6 +118,7 @@ function PersonalBests() {
           radius="xl"
         />
       </Flex>
+      <TableSplitRelayLegend />
       <Box mah="70vh" pt="sm" style={{ overflowY: "auto" }}>
         <DataTable<PersonalBestRow>
           className="shadow-xl responsive-generic-table"

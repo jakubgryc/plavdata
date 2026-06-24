@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 
 import { API_BASE_URL } from "../../config";
+import TableSplitRelayLegend from "../components/shared/TableSplitRelayLegend";
 import { useTheme } from "../hooks/useTheme";
 import { DISCIPLINES, POOLS } from "../utils/constants";
 import { formatDate, parseTimeFromMillis } from "../utils/timeUtils";
@@ -214,6 +215,7 @@ function ClubRecords() {
           radius="xl"
         />
       </Flex>
+      <TableSplitRelayLegend />
 
       <Box mah="75vh" pt="sm" style={{ overflowY: "auto" }}>
         <DataTable<ClubRecordRow>
