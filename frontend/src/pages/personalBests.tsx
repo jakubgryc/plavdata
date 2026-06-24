@@ -187,7 +187,13 @@ function PersonalBests() {
                       {description.time}
                     </Text>
                   </Box>
-                ) : null;
+                ) : (
+                  <Box style={{ padding: "10px 10px" }}>
+                    <Text style={{ visibility: "hidden" }}>
+                      .{/* Placeholder for correct row sizing when row is empty*/}
+                    </Text>
+                  </Box>
+                );
               },
             })),
           ]}
