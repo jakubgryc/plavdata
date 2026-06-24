@@ -339,11 +339,15 @@ async def get_statistics(
             .over(partition_by=Swimmer.id, order_by=Result.time)
             .label("rn")
         ).subquery()
-        query = db.query(ranked).filter(ranked.c.rn == 1).order_by(ranked.c.time)
+        query = (
+            db.query(ranked)
+            .filter(ranked.c.rn == 1)
+            .order_by(ranked.c.time, ranked.c.date)
+        )
         total = query.count()
     else:
         total = query.count()
-        query = query.order_by(Result.time)
+        query = query.order_by(Result.time, Result.date)
 
     offset = (page - 1) * page_limit
     rows = query.offset(offset).limit(page_limit).all()
