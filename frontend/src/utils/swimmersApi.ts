@@ -33,19 +33,19 @@ export const swimmersApi = {
       page_size: pageSize.toString(),
     });
 
-    return apiGet(`${API_BASE_URL}/api/admin/swimmers?${searchParams}`);
+    return apiGet(`${API_BASE_URL}/admin/swimmers?${searchParams}`);
   },
 
   async update(swimmerId: number, data: UpdateSwimmerRequest): Promise<Swimmer> {
     // Currently not used, will keep it if I decide to implement single swimmer editing (perhaps in the swimmers profile)
-    return apiPatch(`${API_BASE_URL}/api/admin/swimmers/${swimmerId}`, data);
+    return apiPatch(`${API_BASE_URL}/admin/swimmers/${swimmerId}`, data);
   },
 
   async bulkUpdate(data: BulkUpdateSwimmersRequest): Promise<BulkUpdateSwimmersResponse> {
-    return apiPatch(`${API_BASE_URL}/api/admin/swimmers/bulk`, data);
+    return apiPatch(`${API_BASE_URL}/admin/swimmers/bulk`, data);
   },
 
   async getGroups(): Promise<Group[]> {
-    return apiGet(`${API_BASE_URL}/api/admin/groups`);
+    return apiGet(`${API_BASE_URL}/admin/groups`);
   },
 };

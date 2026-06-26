@@ -40,7 +40,7 @@ function CompareSwimmers() {
   useEffect(() => {
     const fetchGroupedSwimmers = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/swimmers/grouped?include_former=true`, {
+        const response = await fetch(`${API_BASE_URL}/swimmers/grouped?include_former=true`, {
           method: "GET",
         });
         if (!response.ok) {
@@ -68,7 +68,7 @@ function CompareSwimmers() {
           discipline = selectedDiscipline;
         }
       }
-      const response = await fetch(`${API_BASE_URL}/api/results/compare`, {
+      const response = await fetch(`${API_BASE_URL}/results/compare`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

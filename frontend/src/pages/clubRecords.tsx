@@ -82,7 +82,7 @@ function ClubRecords() {
     const fetchClubRecords = async (course: string) => {
       setIsFetching(true);
       try {
-        const response = await fetch(`${API_BASE_URL}/api/results/club-records?course=${course}`, {
+        const response = await fetch(`${API_BASE_URL}/results/club-records?course=${course}`, {
           method: "GET",
         });
         if (!response.ok) {

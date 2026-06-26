@@ -27,7 +27,7 @@ function Competitions() {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`${API_BASE_URL}/api/competitions?year=${selectedYear}`);
+        const res = await fetch(`${API_BASE_URL}/competitions?year=${selectedYear}`);
         if (!res.ok) {
           setError("Nepodařilo se načíst závody");
           return;

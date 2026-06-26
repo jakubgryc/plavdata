@@ -69,7 +69,7 @@ function ResultsPage() {
         if (dateTo) queryParams.append("date_to", dateTo);
 
         const response = await fetch(
-          `${API_BASE_URL}/api/results/statistics?${queryParams.toString()}`,
+          `${API_BASE_URL}/results/statistics?${queryParams.toString()}`,
           {
             method: "GET",
           },

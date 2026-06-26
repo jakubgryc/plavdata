@@ -22,7 +22,7 @@ function CompetitionDetail() {
       setIsFetching(true);
       setError(null);
       try {
-        const response = await fetch(`${API_BASE_URL}/api/competitions/${id}`, { method: "GET" });
+        const response = await fetch(`${API_BASE_URL}/competitions/${id}`, { method: "GET" });
         if (!response.ok) {
           setError(
             response.status === 404 ? "Závod nebyl nalezen" : "Nepodařilo se načíst data závodu",

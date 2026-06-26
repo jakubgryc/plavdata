@@ -38,7 +38,7 @@ function SwimmerSearch() {
       setIsLoading(true);
       try {
         const response = await fetch(
-          `${API_BASE_URL}/api/swimmers/search?query=${encodeURIComponent(debouncedQuery)}`,
+          `${API_BASE_URL}/swimmers/search?query=${encodeURIComponent(debouncedQuery)}`,
         );
         if (response.ok) {
           const data: SwimmerSearchResult[] = await response.json();

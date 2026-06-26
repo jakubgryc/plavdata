@@ -41,7 +41,7 @@ function PersonalBests() {
       setIsFetching(true);
       try {
         const response = await fetch(
-          `${API_BASE_URL}/api/personal_bests/grouped?group=${group}&course=${course}`,
+          `${API_BASE_URL}/personal_bests/grouped?group=${group}&course=${course}`,
           { method: "GET" },
         );
         if (!response.ok) {

@@ -54,12 +54,9 @@ function Home() {
       setIsFetching(true);
       setError(null);
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/api/stats/dashboard?period_type=${periodType}`,
-          {
-            method: "GET",
-          },
-        );
+        const response = await fetch(`${API_BASE_URL}/stats/dashboard?period_type=${periodType}`, {
+          method: "GET",
+        });
         if (!response.ok) {
           console.error("Error fetching dashboard", response.status);
           return;

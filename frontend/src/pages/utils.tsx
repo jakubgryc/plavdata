@@ -30,7 +30,7 @@ function Utils() {
   useEffect(() => {
     const fetchSwimmers = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/swimmers/grouped`);
+        const response = await fetch(`${API_BASE_URL}/swimmers/grouped`);
         if (!response.ok) {
           console.error("Error fetching grouped swimmers", response.status);
           return;
@@ -65,7 +65,7 @@ function Utils() {
     }
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/utils/best-relay`, {
+      const response = await fetch(`${API_BASE_URL}/utils/best-relay`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -126,7 +126,7 @@ function Utils() {
     }
     setIsLoadingEqualRelay(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/utils/equal-relays`, {
+      const response = await fetch(`${API_BASE_URL}/utils/equal-relays`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

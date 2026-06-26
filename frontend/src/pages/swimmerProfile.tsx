@@ -26,7 +26,7 @@ function SwimmerProfile() {
       setError(null);
 
       try {
-        const response = await fetch(`${API_BASE_URL}/api/swimmers/${id}/profile`, {
+        const response = await fetch(`${API_BASE_URL}/swimmers/${id}/profile`, {
           method: "GET",
         });
 
