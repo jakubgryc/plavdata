@@ -1,3 +1,4 @@
+import asyncio
 import argparse
 from datetime import datetime
 
@@ -174,12 +175,58 @@ def sync_competitions(year: int = None, create_tables: bool = False):
 
         print(f"\n✓ Successfully synced {total_competitions} total competitions")
 
+        return total_competitions
+
     except Exception as e:
         print(f"Error during sync: {e}")
         db.rollback()
         raise
     finally:
         db.close()
+
+
+async def sync_competitions_generator(year: int | None = None):
+    """
+    Async generator that wraps the sync logic to yield live updates for SSE.
+    """
+    yield {
+        "status": "syncing",
+        "synced_count": 0,
+        "message": "Příprava synchronizace závodů...",
+    }
+
+    if year is None:
+        current_year = datetime.now().year
+        years_to_sync = list(range(EARLIEST_COMPETITION_YEAR, current_year + 1))
+    else:
+        years_to_sync = [year]
+
+    total_added = 0
+
+    for y in years_to_sync:
+        yield {
+            "status": "syncing",
+            "synced_count": total_added,
+            "message": f"Stahuji závody pro rok {y}...",
+        }
+
+        try:
+            added = await asyncio.to_thread(sync_competitions, y, False)
+            total_added += added
+            await asyncio.sleep(0.5)
+        except Exception as e:
+            yield {
+                "status": "error",
+                "synced_count": total_added,
+                "message": f"Chyba u roku {y}: {str(e)}",
+            }
+            return
+
+    yield {
+        "status": "success",
+        "synced_count": total_added,
+        "message": f"Dokončeno. Celkem uloženo/aktualizováno {total_added} závodů.",
+    }
 
 
 def parse_args():

@@ -3,6 +3,7 @@ from collections import defaultdict
 from datetime import date, datetime
 from typing import Literal
 
+import asyncio
 import requests
 from sqlalchemy.orm import Session
 
@@ -20,8 +21,10 @@ def save_fetched_results(
     results: list[dict],
     disciplines: list[Discipline],
     courses: list[Course],
-) -> None:
+) -> int:
     swimmers = db.query(Swimmer).all()
+    added_count = 0
+
     for entry in results:
         swimmer_csps_id = entry.get("userId")
         discipline_code = entry.get("disciplineName")
@@ -103,10 +106,12 @@ def save_fetched_results(
                     age_at_result=age_at_result,
                 )
             )
+            added_count += 1
         else:
             print("Result already exists, skipping...")
 
     db.commit()
+    return added_count
 
 
 def fetch_results_by_discipline(
@@ -207,6 +212,81 @@ def sync_results(
 
     db.commit()
     db.close()
+
+
+# asyncio fetching
+def fetch_and_save_page_sync(
+    db: Session, url: str, disciplines, courses
+) -> tuple[int, int]:
+    """Synchronous helper to fetch and save one page without blocking the event loop."""
+    response = requests.get(url, headers=HEADERS, timeout=10)
+    response.raise_for_status()
+    data = response.json()
+    results_list = data.get("publicStatisticDtos", [])
+
+    added_count = save_fetched_results(db, results_list, disciplines, courses)
+    return added_count, len(results_list)
+
+
+async def sync_results_generator(db: Session, after_date: str, before_date: str):
+    """Async generator that yields live updates for SSE."""
+    yield {
+        "status": "syncing",
+        "synced_count": 0,
+        "message": "Načítám základní data...",
+    }
+
+    disciplines = db.query(Discipline).all()
+    courses = db.query(Course).all()
+    genders = ["MALE", "FEMALE"]
+    per_page = 50
+    total_added = 0
+
+    for discipline in disciplines:
+        for gender in genders:
+            page = 1
+            while True:
+                url = RESULTS_API_URL.format(
+                    discipline.code.replace(" ", "+"),
+                    before_date,
+                    gender,
+                    page,
+                    per_page,
+                    after_date,
+                )
+
+                try:
+                    # Run blocking network/DB code in a separate thread
+                    added, fetched_count = await asyncio.to_thread(
+                        fetch_and_save_page_sync, db, url, disciplines, courses
+                    )
+                except Exception as e:
+                    yield {
+                        "status": "error",
+                        "synced_count": total_added,
+                        "message": f"Chyba u {discipline.code}: {str(e)}",
+                    }
+                    return  # Exit on critical error
+
+                total_added += added
+
+                yield {
+                    "status": "syncing",
+                    "synced_count": total_added,
+                    "message": f"Zpracovávám {discipline.code} ({'Muži' if gender == 'MALE' else 'Ženy'}) - Strana {page}...",
+                }
+
+                if fetched_count < per_page:
+                    break  # Reached the last page for this discipline/gender
+
+                page += 1
+                await asyncio.sleep(1.5)  # Prevent aggressive rate limiting
+
+    yield {
+        "status": "success",
+        "synced_count": total_added,
+        "message": f"Dokončeno. Uloženo {total_added} nových výsledků.",
+    }
 
 
 def parse_args():

@@ -10,6 +10,7 @@ from app.constants import DNF_THRESHOLD
 def update_personal_bests(create_tables: bool = False):
     # Thanks Copilot for more efficient lookup
 
+    new_pb_count, updated_pb_count = 0, 0
     if create_tables:
         print("Creating database tables...")
         Base.metadata.create_all(bind=engine)
@@ -61,6 +62,7 @@ def update_personal_bests(create_tables: bool = False):
                     existing_pb.points = res.points
                     existing_pb.competition_location = res.competition_location
                     existing_pb.date = res.date
+                    updated_pb_count += 1
             else:
                 # Create new PB
                 new_pb = PersonalBest(
@@ -74,10 +76,13 @@ def update_personal_bests(create_tables: bool = False):
                     competition_location=res.competition_location,
                     date=res.date,
                 )
+
+                new_pb_count += 1
                 db.add(new_pb)
 
         db.commit()
         print("Personal bests updated successfully.")
+        return updated_pb_count, new_pb_count
 
     except Exception as e:
         db.rollback()

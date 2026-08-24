@@ -1,7 +1,36 @@
+import difflib
+
 from sqlalchemy.orm import Session
 
 from app.db import SessionLocal
 from app.models import Competition, Course, Result
+
+
+def is_match(loc1: str, loc2: str) -> bool:
+    """
+    Check if the result location matches the competition location using fuzzy matching.
+
+    Args:
+        loc1: Location from the result
+        loc2: Location from the competition
+
+    Returns:
+        True if the locations match, False otherwise
+    """
+
+    if not loc1 or not loc2:
+        return False
+
+    # Normalization
+    l1 = loc1.lower().strip()
+    l2 = loc2.lower().strip()
+
+    if l1 in l2 or l2 in l1:
+        return True
+
+    similarity_ratio = difflib.SequenceMatcher(None, l1, l2).ratio()
+
+    return similarity_ratio >= 0.5
 
 
 def link_results_to_competitions():
@@ -20,10 +49,9 @@ def link_results_to_competitions():
                 unmatched_count += 1
                 continue
 
-            matching_competitions = (
+            date_matches = (
                 db.query(Competition)
                 .filter(
-                    Competition.location == result.competition_location,
                     Competition.start_date <= result.date,
                     Competition.end_date >= result.date,
                     Competition.pool_length == course.length,
@@ -31,6 +59,12 @@ def link_results_to_competitions():
                 )
                 .all()
             )
+
+            matching_competitions = [
+                comp
+                for comp in date_matches
+                if is_match(result.competition_location, comp.location)
+            ]
 
             if len(matching_competitions) == 1:
                 result.competition_id = matching_competitions[0].id
@@ -49,6 +83,7 @@ def link_results_to_competitions():
         print("Results linked to competitions successfully.")
         print(f"Matched: {matched_count}")
         print(f"Unmatched: {unmatched_count}")
+        return matched_count, unmatched_count
     except Exception as e:
         db.rollback()
         print(f"Error linking results to competitions: {e}")

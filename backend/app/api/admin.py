@@ -2,10 +2,13 @@
 Admin API endpoints for managing swimmers.
 """
 
+import asyncio
+import json
 from datetime import date
 from typing import Annotated, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy import asc, desc, func
 from sqlalchemy.orm import Session
@@ -13,6 +16,12 @@ from sqlalchemy.orm import Session
 from app.auth import get_current_user
 from app.db import get_db
 from app.models import Group, Swimmer, User
+from scripts.db.sync_competitions import sync_competitions_generator
+from scripts.db.sync_results import sync_results_generator
+from scripts.db.link_results_to_competitions import link_results_to_competitions
+from scripts.db.calculate_improvements import calculate_improvements
+from app.crud.update_personal_bests import update_personal_bests
+from app.crud.update_club_records import update_club_records
 
 router = APIRouter(tags=["admin"], prefix="/admin")
 
@@ -294,3 +303,96 @@ async def update_swimmer(
             group_display_name = group.display_name_cs
 
     return SwimmerAdminOut.from_swimmer(swimmer, group_display_name)
+
+
+class SyncResultsRequest(BaseModel):
+    after_date: str
+    before_date: str
+
+
+@router.post("/sync/results")
+async def sync_results_action(
+    request: SyncResultsRequest,
+    _current_user: Annotated[User, Depends(get_current_user)],
+    db: Session = Depends(get_db),
+):
+    """
+    Triggers live syncing of results and streams the progress.
+    Requires authentication.
+    """
+
+    async def event_publisher():
+        try:
+            async for update in sync_results_generator(
+                db, request.after_date, request.before_date
+            ):
+                # SSE format requires "data: " prefix and two newlines at the end
+                yield f"data: {json.dumps(update)}\n\n"
+        except Exception as e:
+            error_data = {
+                "status": "error",
+                "synced_count": 0,
+                "message": f"Kritická chyba serveru: {str(e)}",
+            }
+            yield f"data: {json.dumps(error_data)}\n\n"
+
+    return StreamingResponse(event_publisher(), media_type="text/event-stream")
+
+
+class SyncCompetitionsRequest(BaseModel):
+    year: Optional[int] = None
+
+
+@router.post("/sync/competitions")
+async def sync_competitions_action(
+    request: SyncCompetitionsRequest,
+    _current_user: Annotated[User, Depends(get_current_user)],
+):
+    """
+    Triggers live syncing of competitions and streams the progress via SSE.
+    """
+
+    async def event_publisher():
+        try:
+            async for update in sync_competitions_generator(request.year):
+                yield f"data: {json.dumps(update)}\n\n"
+        except Exception as e:
+            error_data = {
+                "status": "error",
+                "synced_count": 0,
+                "message": f"Kritická chyba serveru: {str(e)}",
+            }
+            yield f"data: {json.dumps(error_data)}\n\n"
+
+    return StreamingResponse(event_publisher(), media_type="text/event-stream")
+
+
+@router.post("/sync/link-results")
+async def api_link_results(_current_user: Annotated[User, Depends(get_current_user)]):
+    matched, unmatched = await asyncio.to_thread(link_results_to_competitions)
+    return {
+        "message": f"Spárováno: {matched} výsledků | Nespárováno: {unmatched} výsledků."
+    }
+
+
+@router.post("/sync/calculate-improvements")
+async def api_calc_improvements(
+    _current_user: Annotated[User, Depends(get_current_user)],
+):
+    await asyncio.to_thread(calculate_improvements)
+    return {"message": "Zlepšení a mezičasy byly úspěšně přepočítány."}
+
+
+@router.post("/sync/update-pbs")
+async def api_update_pbs(_current_user: Annotated[User, Depends(get_current_user)]):
+    new_pbs, updated_pbs = await asyncio.to_thread(update_personal_bests, False)
+    return {"message": f"Hotovo. Nových OR: {new_pbs}, Překonaných OR: {updated_pbs}."}
+
+
+@router.post("/sync/update-club-records")
+async def api_update_club_records(
+    _current_user: Annotated[User, Depends(get_current_user)],
+):
+    await asyncio.to_thread(update_club_records)
+    return {"message": "Klubové rekordy byly úspěšně zkontrolovány a aktualizovány."}
+
