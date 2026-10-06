@@ -395,4 +395,3 @@ async def api_update_club_records(
 ):
     await asyncio.to_thread(update_club_records)
     return {"message": "Klubové rekordy byly úspěšně zkontrolovány a aktualizovány."}
-
