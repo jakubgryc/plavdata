@@ -1,6 +1,6 @@
 import asyncio
 import argparse
-from datetime import datetime
+from datetime import date, datetime
 
 import requests
 from sqlalchemy.orm import Session
@@ -39,6 +39,28 @@ def fetch_competitions(year: int) -> list[dict]:
     except Exception as e:
         print(f"Failed to fetch competitions for {year}: {e}")
         return []
+
+
+def filter_competitions_from_month(
+    competitions: list[dict], year: int, month_from: int
+) -> list[dict]:
+    """
+    Filter competitions to only those ending on or after the first day of the
+    given month. Uses endDate so that multi-day competitions spanning the
+    cutoff (e.g., Aug 31 - Sep 1) are included.
+
+    Args:
+        competitions: List of competition dictionaries from the API
+        year: Year the competitions belong to
+        month_from: First month to include (1-12)
+
+    Returns:
+        Filtered list of competition dictionaries
+    """
+    cutoff = date(year, month_from, 1)
+    return [
+        c for c in competitions if datetime.fromisoformat(c["endDate"]).date() >= cutoff
+    ]
 
 
 def get_tag(db: Session, tag_data: dict) -> type[CompetitionTag]:
@@ -127,12 +149,16 @@ def store_competition(db: Session, comp_data: dict):
     )
 
 
-def sync_competitions(year: int = None, create_tables: bool = False):
+def sync_competitions(
+    year: int = None, month_from: int = None, create_tables: bool = False
+):
     """
     Sync competitions from CSPS API to database.
 
     Args:
         year: Year to sync. If None, syncs all years from EARLIEST_COMPETITION_YEAR to current year.
+        month_from: If set (together with year), only store competitions ending
+            on or after the first day of this month (1-12). Ignored when year is None.
         create_tables: If True, creates tables before syncing
     """
     # Create tables if requested
@@ -140,6 +166,10 @@ def sync_competitions(year: int = None, create_tables: bool = False):
         print("Creating database tables...")
         Base.metadata.create_all(bind=engine)
         print("✓ Tables created\n")
+
+    if month_from is not None and year is None:
+        print("Note: --month is ignored when no specific year is given.")
+        month_from = None
 
     db: Session = SessionLocal()
 
@@ -152,7 +182,8 @@ def sync_competitions(year: int = None, create_tables: bool = False):
             )
         else:
             years_to_sync = [year]
-            print(f"=== Syncing Competitions ===\nSyncing year {year}\n")
+            suffix = f" (from month {month_from})" if month_from else ""
+            print(f"=== Syncing Competitions ===\nSyncing year {year}{suffix}\n")
 
         total_competitions = 0
 
@@ -162,6 +193,16 @@ def sync_competitions(year: int = None, create_tables: bool = False):
             if not competitions_data:
                 print(f"No competitions found for {year_to_sync}")
                 continue
+
+            if month_from is not None:
+                fetched_count = len(competitions_data)
+                competitions_data = filter_competitions_from_month(
+                    competitions_data, year_to_sync, month_from
+                )
+                print(
+                    f"Filtering: {len(competitions_data)}/{fetched_count} competitions "
+                    f"end on or after {year_to_sync}-{month_from:02d}-01"
+                )
 
             for comp_data in competitions_data:
                 store_competition(db, comp_data)
@@ -185,7 +226,9 @@ def sync_competitions(year: int = None, create_tables: bool = False):
         db.close()
 
 
-async def sync_competitions_generator(year: int | None = None):
+async def sync_competitions_generator(
+    year: int | None = None, month_from: int | None = None
+):
     """
     Async generator that wraps the sync logic to yield live updates for SSE.
     """
@@ -198,20 +241,22 @@ async def sync_competitions_generator(year: int | None = None):
     if year is None:
         current_year = datetime.now().year
         years_to_sync = list(range(EARLIEST_COMPETITION_YEAR, current_year + 1))
+        month_from = None  # month filter only applies to a single year
     else:
         years_to_sync = [year]
 
     total_added = 0
 
     for y in years_to_sync:
+        month_suffix = f" (od {month_from}. měsíce)" if month_from else ""
         yield {
             "status": "syncing",
             "synced_count": total_added,
-            "message": f"Stahuji závody pro rok {y}...",
+            "message": f"Stahuji závody pro rok {y}{month_suffix}...",
         }
 
         try:
-            added = await asyncio.to_thread(sync_competitions, y, False)
+            added = await asyncio.to_thread(sync_competitions, y, month_from, False)
             total_added += added
             await asyncio.sleep(0.5)
         except Exception as e:
@@ -242,15 +287,27 @@ def parse_args():
     )
 
     parser.add_argument(
+        "--month",
+        type=int,
+        choices=range(1, 13),
+        metavar="{1..12}",
+        help="Only sync competitions ending on or after the first day of this month (requires --year)",
+        default=None,
+    )
+
+    parser.add_argument(
         "--create-tables",
         action="store_true",
         help="Create database tables before syncing",
         default=False,
     )
 
-    return parser.parse_args()
+    args = parser.parse_args()
+    if args.month is not None and args.year is None:
+        parser.error("--month requires --year")
+    return args
 
 
 if __name__ == "__main__":
     args = parse_args()
-    sync_competitions(args.year, args.create_tables)
+    sync_competitions(args.year, args.month, args.create_tables)

@@ -341,6 +341,7 @@ async def sync_results_action(
 
 class SyncCompetitionsRequest(BaseModel):
     year: Optional[int] = None
+    month: Optional[int] = None  # 1-12, only valid together with year
 
 
 @router.post("/sync/competitions")
@@ -350,11 +351,23 @@ async def sync_competitions_action(
 ):
     """
     Triggers live syncing of competitions and streams the progress via SSE.
+    Optionally filters to competitions ending on/after the first day of `month`.
     """
+    if request.month is not None:
+        if request.year is None:
+            raise HTTPException(
+                status_code=400, detail="Filtr měsíce vyžaduje zvolený rok."
+            )
+        if not (1 <= request.month <= 12):
+            raise HTTPException(
+                status_code=400, detail="Měsíc musí být v rozsahu 1-12."
+            )
 
     async def event_publisher():
         try:
-            async for update in sync_competitions_generator(request.year):
+            async for update in sync_competitions_generator(
+                request.year, request.month
+            ):
                 yield f"data: {json.dumps(update)}\n\n"
         except Exception as e:
             error_data = {

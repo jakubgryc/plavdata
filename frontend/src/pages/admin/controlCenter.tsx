@@ -8,6 +8,7 @@ import {
   Group,
   NumberInput,
   Paper,
+  Select,
   Stack,
   Text,
   ThemeIcon,
@@ -32,6 +33,21 @@ import TaskCard from "../../components/admin/TaskCard";
 import { useAuth } from "../../hooks/useAuth";
 import { authApi } from "../../utils/auth";
 
+const MONTH_OPTIONS_CS = [
+  "Leden",
+  "Únor",
+  "Březen",
+  "Duben",
+  "Květen",
+  "Červen",
+  "Červenec",
+  "Srpen",
+  "Září",
+  "Říjen",
+  "Listopad",
+  "Prosinec",
+].map((label, i) => ({ value: String(i + 1), label }));
+
 function AdminControlCenterPage() {
   const { isAuthenticated } = useAuth();
 
@@ -45,6 +61,7 @@ function AdminControlCenterPage() {
 
   // States for Competitions Sync
   const [compYear, setCompYear] = useState<number | "">(new Date().getFullYear());
+  const [compMonth, setCompMonth] = useState<string | null>(null);
   const [compStatus, setCompStatus] = useState<"idle" | "syncing" | "success" | "error">("idle");
   const [compSyncedCount, setCompSyncedCount] = useState(0);
   const [compMessage, setCompMessage] = useState("");
@@ -116,7 +133,10 @@ function AdminControlCenterPage() {
     setCompMessage("Navazuji spojení se serverem...");
 
     try {
-      const payload = { year: compYear === "" ? null : Number(compYear) };
+      const payload = {
+        year: compYear === "" ? null : Number(compYear),
+        month: compYear !== "" && compMonth ? Number(compMonth) : null,
+      };
 
       const response = await fetch(`${API_BASE_URL}/admin/sync/competitions`, {
         method: "POST",
@@ -268,7 +288,8 @@ function AdminControlCenterPage() {
             </Group>
 
             <Text size="sm" c="dimmed">
-              Stáhne závody z ČSPS.
+              Stáhne závody z ČSPS. Volitelně lze omezit na závody od vybraného měsíce (podle
+              data ukončení závodu).
             </Text>
 
             <Group align="flex-end" wrap="wrap">
@@ -279,10 +300,25 @@ function AdminControlCenterPage() {
                   allowDecimal={false}
                   allowNegative={false}
                   value={compYear}
-                  onChange={(val) => setCompYear(val === "" ? "" : Number(val))}
+                  onChange={(val) => {
+                    const next = val === "" ? "" : Number(val);
+                    setCompYear(next);
+                    if (next === "") setCompMonth(null);
+                  }}
                   disabled={compStatus === "syncing"}
                   min={2002}
                   max={new Date().getFullYear()}
+                />
+              </Box>
+              <Box style={{ flex: 1, minWidth: "200px" }}>
+                <Select
+                  label="Od měsíce (volitelné)"
+                  placeholder="Celý rok"
+                  data={MONTH_OPTIONS_CS}
+                  value={compMonth}
+                  onChange={setCompMonth}
+                  clearable
+                  disabled={compStatus === "syncing" || compYear === ""}
                 />
               </Box>
               <Button
