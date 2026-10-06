@@ -1,5 +1,3 @@
-import difflib
-
 from sqlalchemy.orm import Session
 
 from app.db import SessionLocal
@@ -28,9 +26,7 @@ def is_match(loc1: str, loc2: str) -> bool:
     if l1 in l2 or l2 in l1:
         return True
 
-    similarity_ratio = difflib.SequenceMatcher(None, l1, l2).ratio()
-
-    return similarity_ratio >= 0.5
+    return False
 
 
 def link_results_to_competitions():
