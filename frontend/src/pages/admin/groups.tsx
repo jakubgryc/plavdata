@@ -9,11 +9,13 @@ import {
   Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { IconArrowsSort } from "@tabler/icons-react";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { CreateGroupModal } from "../../components/admin/CreateGroupModal";
 import { GroupCard } from "../../components/admin/GroupCard";
 import { GroupDetailModal } from "../../components/admin/GroupDetailModal";
+import { ReorderGroupsModal } from "../../components/admin/ReorderGroupsModal";
 import type { Group, GroupDetail } from "../../schema/groups";
 import { authApi } from "../../utils/auth";
 import { groupsApi } from "../../utils/groupsApi";
@@ -26,6 +28,7 @@ export function AdminGroupsPage() {
   const [loading, setLoading] = useState(true);
   const [createOpened, { open: openCreate, close: closeCreate }] = useDisclosure(false);
   const [detailOpened, { open: openDetail, close: closeDetail }] = useDisclosure(false);
+  const [reorderOpened, { open: openReorder, close: closeReorder }] = useDisclosure(false);
 
   const loadGroups = useCallback(async () => {
     try {
@@ -78,6 +81,11 @@ export function AdminGroupsPage() {
     closeDetail();
   };
 
+  const handleReorder = async (orderedIds: number[]) => {
+    await groupsApi.reorder(orderedIds);
+    await loadGroups();
+  };
+
   return (
     <Flex direction="column" h="100%" w="100%" py="md" pb="xl">
       <Box pos="relative">
@@ -85,7 +93,17 @@ export function AdminGroupsPage() {
 
         <MantineGroup justify="space-between" mb="xl">
           <Title order={2}>Správa skupin</Title>
-          <Button onClick={openCreate}>Přidat skupinu</Button>
+          <MantineGroup gap="sm">
+            <Button
+              variant="default"
+              leftSection={<IconArrowsSort size={16} stroke={1.5} />}
+              onClick={openReorder}
+              disabled={groups.length < 2}
+            >
+              Seřadit
+            </Button>
+            <Button onClick={openCreate}>Přidat skupinu</Button>
+          </MantineGroup>
         </MantineGroup>
 
         {groups.length === 0 && !loading ? (
@@ -101,6 +119,13 @@ export function AdminGroupsPage() {
         )}
 
         <CreateGroupModal opened={createOpened} onClose={closeCreate} onCreate={handleCreate} />
+
+        <ReorderGroupsModal
+          opened={reorderOpened}
+          onClose={closeReorder}
+          groups={groups}
+          onReorder={handleReorder}
+        />
 
         <GroupDetailModal
           group={selectedGroup}

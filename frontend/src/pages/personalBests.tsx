@@ -6,8 +6,9 @@ import { Link } from "react-router";
 import { API_BASE_URL } from "../../config";
 import TableSplitRelayLegend from "../components/shared/TableSplitRelayLegend";
 import { useTheme } from "../hooks/useTheme";
+import type { PBGroup } from "../schema/groups";
 import type { SwimmerPersonalBest } from "../schema/types";
-import { DISCIPLINES, GROUPS, POOLS } from "../utils/constants";
+import { DISCIPLINES, POOLS } from "../utils/constants";
 import type { DisciplineDescription, PersonalBestRow } from "../utils/tableUtils";
 import { buildTableData } from "../utils/tableUtils";
 import { formatDate } from "../utils/timeUtils";
@@ -18,7 +19,8 @@ function isDisciplineDescription(value: unknown): value is DisciplineDescription
 
 function PersonalBests() {
   const { colorScheme } = useTheme();
-  const [selectedGroup, setSelectedGroup] = useState<string | null>("Z1");
+  const [groups, setGroups] = useState<PBGroup[]>([]);
+  const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<string>("25");
   const [personalBests, setPersonalBests] = useState<Array<SwimmerPersonalBest>>([]);
   const [isFetching, setIsFetching] = useState<boolean>(false);
@@ -36,12 +38,32 @@ function PersonalBests() {
     discipline: string;
   } | null>(null);
 
+  // Load the groups that have at least one swimmer visible in personal bests
   useEffect(() => {
-    const fetchPersonalBests = async (group: string, course: string) => {
+    const fetchGroups = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/personal_bests/groups`, { method: "GET" });
+        if (!response.ok) {
+          console.error("Error fetching personal best groups", response.status);
+          return;
+        }
+        const data = (await response.json()) as PBGroup[];
+        setGroups(data);
+        setSelectedGroupId((prev) => prev ?? (data.length > 0 ? data[0].id : null));
+      } catch (error) {
+        console.error("Error fetching personal best groups:", error);
+      }
+    };
+
+    void fetchGroups();
+  }, []);
+
+  useEffect(() => {
+    const fetchPersonalBests = async (groupId: number, course: string) => {
       setIsFetching(true);
       try {
         const response = await fetch(
-          `${API_BASE_URL}/personal_bests/grouped?group=${group}&course=${course}`,
+          `${API_BASE_URL}/personal_bests/grouped?group_id=${groupId}&course=${course}`,
           { method: "GET" },
         );
         if (!response.ok) {
@@ -49,7 +71,7 @@ function PersonalBests() {
           return;
         }
         const data = (await response.json()) as SwimmerPersonalBest[];
-        const cacheKey = `${group}-${course}`;
+        const cacheKey = `${groupId}-${course}`;
         setCache((prevCache) => ({ ...prevCache, [cacheKey]: data }));
         setPersonalBests(data);
       } catch (error) {
@@ -59,15 +81,17 @@ function PersonalBests() {
       }
     };
 
-    if (selectedGroup) {
-      const cacheKey = `${selectedGroup}-${selectedCourse}`;
+    if (selectedGroupId !== null) {
+      const cacheKey = `${selectedGroupId}-${selectedCourse}`;
       if (cache[cacheKey]) {
         setPersonalBests(cache[cacheKey]);
       } else {
-        void fetchPersonalBests(selectedGroup, selectedCourse);
+        void fetchPersonalBests(selectedGroupId, selectedCourse);
       }
+    } else {
+      setPersonalBests([]);
     }
-  }, [selectedGroup, selectedCourse, cache]);
+  }, [selectedGroupId, selectedCourse, cache]);
 
   return (
     <Flex direction="column" h="80vh" w="100%" pb="xl">
@@ -97,15 +121,15 @@ function PersonalBests() {
         className="w-full mx-auto py-2"
       >
         <Flex gap="xs" wrap="wrap" justify="flex-start">
-          {GROUPS.map((group) => (
+          {groups.map((group) => (
             <Chip
-              key={group.value}
-              checked={selectedGroup === group.value}
-              onClick={() => setSelectedGroup(group.value)}
+              key={group.id}
+              checked={selectedGroupId === group.id}
+              onClick={() => setSelectedGroupId(group.id)}
               size="sm"
               style={{ flex: "1 1 auto", minWidth: 0 }}
             >
-              {group.label}
+              {group.display_name_cs}
             </Chip>
           ))}
         </Flex>

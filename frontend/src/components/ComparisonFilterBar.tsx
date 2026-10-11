@@ -94,7 +94,7 @@ function ComparisonFilterBar({
               value={selectedSwimmers.map(String)}
               onChange={(values) => setSelectedSwimmers(values.map(Number))}
               data={groupedSwimmers.map(({ group, swimmers }) => ({
-                group: group === "veteran" ? "bývalí" : group,
+                group,
                 items: swimmers.map((swimmer) => ({
                   value: swimmer.id.toString(),
                   label: `${swimmer.surname} ${swimmer.name}`,

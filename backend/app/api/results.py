@@ -97,7 +97,7 @@ async def get_results(
         .filter(Discipline.code == discipline_code)
         .filter(Course.length == course)
         .options(
-            contains_eager(Result.swimmer),
+            contains_eager(Result.swimmer).joinedload(Swimmer.group_rel),
             contains_eager(Result.discipline),
             contains_eager(Result.course),
         )

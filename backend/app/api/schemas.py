@@ -56,7 +56,8 @@ class BaseSwimmerOut(BaseSwimmerModel):
 
 
 class GroupedSwimmersOut(BaseModel):
-    group: str
+    group_id: int
+    group: str  # Czech display name of the group
     swimmers: List[BaseSwimmerOut]
 
     class Config:
@@ -69,7 +70,7 @@ class SwimmerOut(BaseSwimmerModel):
     surname: str
     birth_year: int
     current_age: Optional[int] = None
-    group: str
+    group: Optional[str] = None  # Czech display name of the swimmer's group
     sex: str
 
     @classmethod
@@ -85,7 +86,7 @@ class SwimmerOut(BaseSwimmerModel):
             surname=swimmer.surname,
             birth_year=swimmer.birth_year,
             current_age=current_age,
-            group=swimmer.group,
+            group=swimmer.group_display_name,
             sex=swimmer.sex,
         )
 
@@ -122,7 +123,7 @@ class PersonalBestOut(BaseModel):
     course: CourseOut
     age_at_pb: Optional[int] = None
     time: int
-    points: int
+    points: Optional[int] = None
     split_time: Optional[bool] = None
     relay_part: Optional[bool] = None
     competition_location: Optional[str] = None
@@ -162,7 +163,7 @@ class PersonalBestStrippedOut(BaseModel):
     course: CourseOut
     age_at_pb: Optional[int] = None
     time: int
-    points: int
+    points: Optional[int] = None
     split_time: Optional[bool] = None
     relay_part: Optional[bool] = None
     competition_location: Optional[str] = None
@@ -283,7 +284,7 @@ class SwimmerBasicInfo(BaseModel):
     name: str
     surname: str
     birth_year: int
-    group: Optional[str]
+    group: Optional[str] = None  # Czech display name of the swimmer's group
     sex: str
 
     class Config:
@@ -421,7 +422,7 @@ class SwimmerSearchResult(BaseModel):
     id: int
     name: str
     surname: str
-    group: Optional[str]
+    group: Optional[str] = None  # Czech display name of the swimmer's group
     birth_year: int
 
     class Config:

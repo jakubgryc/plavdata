@@ -33,4 +33,7 @@ COPY --chown=appuser:appuser . /app
 RUN --mount=type=cache,target=/home/appuser/.cache/uv,uid=${UID},gid=${GID} \
     uv sync --locked --no-dev
 
-ENTRYPOINT []
+# 7. Startup script: runs `alembic upgrade head`, then execs the compose command
+RUN chmod +x /app/entrypoint.sh
+
+ENTRYPOINT ["/app/entrypoint.sh"]

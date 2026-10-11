@@ -2,10 +2,11 @@
 Admin API endpoints for managing groups.
 """
 
-from typing import Annotated, Optional
+from typing import Annotated, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.auth import get_current_user
@@ -19,6 +20,7 @@ class GroupOut(BaseModel):
     id: int
     name: str
     display_name_cs: str
+    display_order: int
     swimmer_count: int
 
     class Config:
@@ -29,6 +31,7 @@ class GroupDetail(BaseModel):
     id: int
     name: str
     display_name_cs: str
+    display_order: int
     swimmer_count: int
     active_swimmer_count: int
 
@@ -44,6 +47,11 @@ class CreateGroupRequest(BaseModel):
 class UpdateGroupRequest(BaseModel):
     name: Optional[str] = None
     display_name_cs: Optional[str] = None
+
+
+class ReorderGroupsRequest(BaseModel):
+    # Group ids in the desired display order (first = position 0)
+    ordered_ids: List[int]
 
 
 class SwimmerInGroup(BaseModel):
@@ -67,7 +75,7 @@ async def get_all_groups(
     Get all groups with swimmer counts.
     Requires authentication.
     """
-    groups = db.query(Group).order_by(Group.name).all()
+    groups = db.query(Group).order_by(Group.display_order, Group.name).all()
 
     result = []
     for group in groups:
@@ -79,11 +87,48 @@ async def get_all_groups(
                 id=group.id,
                 name=group.name,
                 display_name_cs=group.display_name_cs,
+                display_order=group.display_order,
                 swimmer_count=swimmer_count,
             )
         )
 
     return result
+
+
+@router.patch("/reorder")
+async def reorder_groups(
+    reorder_data: ReorderGroupsRequest,
+    _current_user: Annotated[User, Depends(get_current_user)],
+    db: Session = Depends(get_db),
+):
+    """
+    Set the display order of all groups at once.
+    Body contains the group ids in the desired order.
+    Requires authentication.
+    """
+    ordered_ids = reorder_data.ordered_ids
+
+    if len(set(ordered_ids)) != len(ordered_ids):
+        raise HTTPException(
+            status_code=400, detail="Duplicate group ids in ordered_ids"
+        )
+
+    groups = db.query(Group).all()
+    groups_by_id = {group.id: group for group in groups}
+
+    # Require the full set of group ids so the ordering is always complete
+    if set(ordered_ids) != set(groups_by_id.keys()):
+        raise HTTPException(
+            status_code=400,
+            detail="ordered_ids must contain exactly all existing group ids",
+        )
+
+    for position, group_id in enumerate(ordered_ids):
+        groups_by_id[group_id].display_order = position
+
+    db.commit()
+
+    return {"message": "Group order updated successfully"}
 
 
 @router.get("/{group_id}", response_model=GroupDetail)
@@ -118,6 +163,7 @@ async def get_group_detail(
         id=group.id,
         name=group.name,
         display_name_cs=group.display_name_cs,
+        display_order=group.display_order,
         swimmer_count=swimmer_count,
         active_swimmer_count=active_swimmer_count,
     )
@@ -176,9 +222,14 @@ async def create_group(
             status_code=400, detail="Group with this name already exists"
         )
 
+    # Place the new group at the end of the current ordering
+    max_order = db.query(func.max(Group.display_order)).scalar()
+    next_order = 0 if max_order is None else max_order + 1
+
     new_group = Group(
         name=create_data.name,
         display_name_cs=create_data.display_name_cs,
+        display_order=next_order,
     )
 
     db.add(new_group)
@@ -189,6 +240,7 @@ async def create_group(
         id=new_group.id,
         name=new_group.name,
         display_name_cs=new_group.display_name_cs,
+        display_order=new_group.display_order,
         swimmer_count=0,
     )
 
@@ -229,6 +281,7 @@ async def update_group(
         id=group.id,
         name=group.name,
         display_name_cs=group.display_name_cs,
+        display_order=group.display_order,
         swimmer_count=swimmer_count,
     )
 

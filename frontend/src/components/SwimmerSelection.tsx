@@ -20,7 +20,7 @@ export function SwimmerSelection({
       </Text>
       <MultiSelect
         data={groupedSwimmers.map(({ group, swimmers }) => ({
-          group: group === "veteran" ? "bývalí" : group,
+          group,
           items: swimmers.map((swimmer) => `${swimmer.surname} ${swimmer.name}`),
         }))}
         value={selectedSwimmers}
@@ -37,7 +37,7 @@ export function SwimmerSelection({
         <Group gap="xs">
           {groupedSwimmers.map((group) => (
             <Text
-              key={group.group}
+              key={group.group_id}
               size="xs"
               c="blue"
               style={{ cursor: "pointer" }}
@@ -51,7 +51,7 @@ export function SwimmerSelection({
                 onSwimmersChange(newSelection);
               }}
             >
-              {group.group === "veteran" ? "Vybrat všechny bývalé" : `Vybrat celou ${group.group}`}
+              {`Vybrat celou ${group.group}`}
             </Text>
           ))}
         </Group>

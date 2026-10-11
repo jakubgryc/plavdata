@@ -89,7 +89,6 @@ def init_swimmers(db: Session, swimmers_file: Path):
             name=s.get("name"),
             surname=s.get("surname"),
             birth_year=s.get("birth_year"),
-            group=s.get("group"),
             sex=s.get("sex"),
             membership_start=datetime.fromisoformat(membership_start_str).date(),
             membership_end=datetime.fromisoformat(membership_end_str).date()

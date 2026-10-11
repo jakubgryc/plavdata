@@ -12,6 +12,7 @@ from sqlalchemy import (
     Table,
     UniqueConstraint,
     Index,
+    text,
 )
 from sqlalchemy.orm import relationship
 
@@ -42,6 +43,9 @@ class Group(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, nullable=False)
     display_name_cs = Column(String, nullable=False)
+    # Manual ordering of groups in public views (lower = first); managed
+    # via drag & drop in the admin center.
+    display_order = Column(Integer, nullable=False, default=0, server_default=text("0"))
 
     swimmers = relationship("Swimmer", back_populates="group_rel")
 
@@ -54,7 +58,6 @@ class Swimmer(Base):
     name = Column(String, nullable=False)
     surname = Column(String, nullable=False)
     birth_year = Column(Integer, nullable=False)
-    group = Column(String, nullable=True)
     group_id = Column(Integer, ForeignKey("groups.id"), nullable=True)
     sex = Column(String)
     membership_start = Column(Date, nullable=True)
@@ -64,6 +67,11 @@ class Swimmer(Base):
     show_in_relay_builder = Column(Boolean, default=False)
 
     group_rel = relationship("Group", back_populates="swimmers")
+
+    @property
+    def group_display_name(self) -> str | None:
+        """Czech display name of the swimmer's group, or None when ungrouped."""
+        return self.group_rel.display_name_cs if self.group_rel else None
 
 
 class Result(Base):
