@@ -288,8 +288,8 @@ function AdminControlCenterPage() {
             </Group>
 
             <Text size="sm" c="dimmed">
-              Stáhne závody z ČSPS. Volitelně lze omezit na závody od vybraného měsíce (podle
-              data ukončení závodu).
+              Stáhne závody z ČSPS. Volitelně lze omezit na závody od vybraného měsíce (podle data
+              ukončení závodu).
             </Text>
 
             <Group align="flex-end" wrap="wrap">
