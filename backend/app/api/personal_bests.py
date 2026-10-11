@@ -102,7 +102,7 @@ async def get_personal_bests_groups(db: Session = Depends(get_db)):
         .join(Swimmer, Swimmer.group_id == Group.id)
         .filter(Swimmer.show_in_personal_bests.is_(True))
         .distinct()
-        .order_by(Group.name)
+        .order_by(Group.display_order, Group.name)
         .all()
     )
     return groups

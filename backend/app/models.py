@@ -12,6 +12,7 @@ from sqlalchemy import (
     Table,
     UniqueConstraint,
     Index,
+    text,
 )
 from sqlalchemy.orm import relationship
 
@@ -42,6 +43,9 @@ class Group(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, nullable=False)
     display_name_cs = Column(String, nullable=False)
+    # Manual ordering of groups in public views (lower = first); managed
+    # via drag & drop in the admin center.
+    display_order = Column(Integer, nullable=False, default=0, server_default=text("0"))
 
     swimmers = relationship("Swimmer", back_populates="group_rel")
 

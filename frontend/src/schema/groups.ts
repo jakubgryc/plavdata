@@ -2,6 +2,7 @@ export interface Group {
   id: number;
   name: string;
   display_name_cs: string;
+  display_order: number;
   swimmer_count: number;
 }
 

@@ -29,6 +29,10 @@ export const groupsApi = {
     return apiDelete(`${API_BASE_URL}/admin/groups/${groupId}`);
   },
 
+  async reorder(orderedIds: number[]): Promise<{ message: string }> {
+    return apiPatch(`${API_BASE_URL}/admin/groups/reorder`, { ordered_ids: orderedIds });
+  },
+
   async getSwimmers(groupId: number): Promise<SwimmerInGroup[]> {
     return apiGet(`${API_BASE_URL}/admin/groups/${groupId}/swimmers`);
   },

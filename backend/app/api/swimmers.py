@@ -66,7 +66,7 @@ async def get_swimmers_grouped(
         db.query(Swimmer)
         .join(Group, Swimmer.group_id == Group.id)
         .filter(visibility_flag.is_(True))
-        .order_by(Group.name, Swimmer.surname, Swimmer.name)
+        .order_by(Group.display_order, Group.name, Swimmer.surname, Swimmer.name)
         .options(contains_eager(Swimmer.group_rel))
         .all()
     )
