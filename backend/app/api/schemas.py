@@ -123,7 +123,7 @@ class PersonalBestOut(BaseModel):
     course: CourseOut
     age_at_pb: Optional[int] = None
     time: int
-    points: int
+    points: Optional[int] = None
     split_time: Optional[bool] = None
     relay_part: Optional[bool] = None
     competition_location: Optional[str] = None
@@ -163,7 +163,7 @@ class PersonalBestStrippedOut(BaseModel):
     course: CourseOut
     age_at_pb: Optional[int] = None
     time: int
-    points: int
+    points: Optional[int] = None
     split_time: Optional[bool] = None
     relay_part: Optional[bool] = None
     competition_location: Optional[str] = None

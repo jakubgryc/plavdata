@@ -86,7 +86,7 @@ interface BasePersonalBest {
   course: Course;
   age_at_pb?: number;
   time: number; // Time in milliseconds
-  points: number;
+  points: number | null;
   split_time?: boolean;
   relay_part?: boolean;
   competition_location?: string;
@@ -193,7 +193,7 @@ export interface SwimmerPersonalBestRecord {
   discipline: string;
   code: string;
   time: number;
-  points: number;
+  points: number | null;
   date: string;
   location: string;
   splitTime: boolean;

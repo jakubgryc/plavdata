@@ -8,7 +8,7 @@ export type DisciplineDescription = {
   isSplit: boolean | undefined;
   isRelayPart: boolean | undefined;
   location: string | undefined;
-  points: number | undefined;
+  points: number | null | undefined;
 };
 
 export type PersonalBestRow = {
