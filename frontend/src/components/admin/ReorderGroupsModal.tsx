@@ -1,11 +1,11 @@
 import {
   closestCenter,
   DndContext,
+  type DragEndEvent,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
-  type DragEndEvent,
 } from "@dnd-kit/core";
 import { restrictToParentElement, restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {
@@ -16,15 +16,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import {
-  ActionIcon,
-  Button,
-  Flex,
-  Modal,
-  Paper,
-  Stack,
-  Text,
-} from "@mantine/core";
+import { ActionIcon, Button, Flex, Modal, Paper, Stack, Text } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { IconGripVertical } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
@@ -79,7 +71,12 @@ function SortableGroupRow({ group }: { group: Group }) {
   );
 }
 
-export function ReorderGroupsModal({ opened, onClose, groups, onReorder }: ReorderGroupsModalProps) {
+export function ReorderGroupsModal({
+  opened,
+  onClose,
+  groups,
+  onReorder,
+}: ReorderGroupsModalProps) {
   const [order, setOrder] = useState<Group[]>([]);
   const [saving, setSaving] = useState(false);
 
@@ -138,7 +135,10 @@ export function ReorderGroupsModal({ opened, onClose, groups, onReorder }: Reord
           modifiers={[restrictToVerticalAxis, restrictToParentElement]}
           onDragEnd={handleDragEnd}
         >
-          <SortableContext items={order.map((group) => group.id)} strategy={verticalListSortingStrategy}>
+          <SortableContext
+            items={order.map((group) => group.id)}
+            strategy={verticalListSortingStrategy}
+          >
             <Stack gap="xs">
               {order.map((group) => (
                 <SortableGroupRow key={group.id} group={group} />

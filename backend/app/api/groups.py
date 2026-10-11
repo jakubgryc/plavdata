@@ -109,7 +109,9 @@ async def reorder_groups(
     ordered_ids = reorder_data.ordered_ids
 
     if len(set(ordered_ids)) != len(ordered_ids):
-        raise HTTPException(status_code=400, detail="Duplicate group ids in ordered_ids")
+        raise HTTPException(
+            status_code=400, detail="Duplicate group ids in ordered_ids"
+        )
 
     groups = db.query(Group).all()
     groups_by_id = {group.id: group for group in groups}
