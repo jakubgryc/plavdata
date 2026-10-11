@@ -12,6 +12,7 @@ import "@mantine/dates/styles.css";
 import "mantine-datatable/styles.css";
 import "./index.css";
 import App from "./App.tsx";
+import AdminControlCenterPage from "./pages/admin/controlCenter.tsx";
 import { AdminGroupsPage } from "./pages/admin/groups";
 import { AdminSwimmersPage } from "./pages/admin/SwimmersAdmin.tsx";
 import ClubRecords from "./pages/clubRecords";
@@ -75,6 +76,10 @@ const router = createBrowserRouter([
       {
         path: "admin/groups",
         element: <AdminGroupsPage />,
+      },
+      {
+        path: "admin/control-center",
+        element: <AdminControlCenterPage />,
       },
       {
         path: "results",

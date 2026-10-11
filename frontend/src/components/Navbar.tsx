@@ -8,7 +8,14 @@ import {
   Text,
   useComputedColorScheme,
 } from "@mantine/core";
-import { IconClock, IconLogout, IconMoon, IconSun, IconUser } from "@tabler/icons-react";
+import {
+  IconClock,
+  IconDatabaseImport,
+  IconLogout,
+  IconMoon,
+  IconSun,
+  IconUser,
+} from "@tabler/icons-react";
 import { useState } from "react";
 import { NavLink } from "react-router";
 import { formatTimeRemaining, useAuth } from "../hooks/useAuth";
@@ -165,6 +172,14 @@ const Navbar = () => {
                   Správa skupin
                 </Menu.Item>
                 <Menu.Divider />
+                <Menu.Item
+                  component={NavLink}
+                  to="/admin/control-center"
+                  leftSection={<IconDatabaseImport size={14} />}
+                  onClick={() => setOpened(false)}
+                >
+                  Ovládací centrum
+                </Menu.Item>
                 <Menu.Item color="red" leftSection={<IconLogout size={14} />} onClick={logout}>
                   Odhlásit se
                 </Menu.Item>
@@ -245,6 +260,14 @@ const Navbar = () => {
                   }}
                 >
                   Odhlásit se
+                </Menu.Item>
+                <Menu.Item
+                  component={NavLink}
+                  to="/admin/control-center"
+                  leftSection={<IconDatabaseImport size={14} />}
+                  onClick={() => setOpened(false)}
+                >
+                  Ovládací centrum
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>
