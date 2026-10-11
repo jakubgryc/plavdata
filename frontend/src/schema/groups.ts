@@ -5,6 +5,12 @@ export interface Group {
   swimmer_count: number;
 }
 
+/** A group that has at least one swimmer visible in the personal bests view. */
+export interface PBGroup {
+  id: number;
+  display_name_cs: string;
+}
+
 export interface GroupDetail extends Group {
   active_swimmer_count: number;
 }

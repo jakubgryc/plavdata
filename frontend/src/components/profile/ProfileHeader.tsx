@@ -19,8 +19,6 @@ import {
   IconUsers,
 } from "@tabler/icons-react";
 import type { SwimmerBasicInfo, SwimmerStats } from "../../schema/types";
-import { ACTIVE_GROUPS } from "../../utils/constants.ts";
-import { getGroupLabel } from "../../utils/profileUtils";
 
 interface ProfileHeaderProps {
   basicInfo: SwimmerBasicInfo;
@@ -100,11 +98,11 @@ function ProfileHeader({ basicInfo, stats }: ProfileHeaderProps) {
               Ročník: <strong>{basicInfo.birthYear}</strong> ({age} let)
             </Text>
           </Group>
-          {ACTIVE_GROUPS.includes(basicInfo.group) && (
+          {basicInfo.group && (
             <Group gap="xs">
               <IconUsers size={16} stroke={1.5} />
               <Text size="sm" c="dimmed" className="profile-info-text">
-                Skupina: <strong>{getGroupLabel(basicInfo.group)}</strong>
+                Skupina: <strong>{basicInfo.group}</strong>
               </Text>
             </Group>
           )}

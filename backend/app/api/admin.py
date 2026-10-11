@@ -103,9 +103,9 @@ async def get_all_swimmers_admin(
     page: int = Query(1, ge=1),
     page_size: int = Query(50, ge=1, le=200),
     search: Optional[str] = None,
-    group_filter: Optional[str] = Query(None, alias="group"),
+    group_filter: Optional[int] = Query(None, alias="group_id"),
     active_only: bool = Query(False),
-    sort_by: str = Query("surname", regex="^(surname|name|birth_year|group)$"),
+    sort_by: str = Query("surname", regex="^(surname|name|birth_year)$"),
     sort_order: str = Query("asc", regex="^(asc|desc)$"),
     current_user: Annotated[User, Depends(get_current_user)] = None,
     db: Session = Depends(get_db),
@@ -127,7 +127,7 @@ async def get_all_swimmers_admin(
         )
 
     if group_filter:
-        query = query.filter(Swimmer.group == group_filter)
+        query = query.filter(Swimmer.group_id == group_filter)
 
     if active_only:
         today = date.today()

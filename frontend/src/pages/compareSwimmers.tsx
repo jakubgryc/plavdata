@@ -40,7 +40,7 @@ function CompareSwimmers() {
   useEffect(() => {
     const fetchGroupedSwimmers = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/swimmers/grouped?include_former=true`, {
+        const response = await fetch(`${API_BASE_URL}/swimmers/grouped?view=comparison`, {
           method: "GET",
         });
         if (!response.ok) {

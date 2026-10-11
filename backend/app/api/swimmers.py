@@ -1,6 +1,8 @@
+from typing import Literal
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, or_
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session, contains_eager, joinedload
 
 from app.api.schemas import (
     BaseSwimmerOut,
@@ -8,7 +10,6 @@ from app.api.schemas import (
     SwimmerProfileResponse,
     SwimmerSearchResult,
 )
-from app.constants import GROUPS_TO_LOOKUP
 from app.crud.swimmer_profile import (
     get_swimmer_basic_info,
     get_swimmer_competitions,
@@ -20,20 +21,26 @@ from app.crud.swimmer_profile import (
     get_swimmer_top_results,
 )
 from app.db import get_db
-from app.models import Swimmer
+from app.models import Group, Swimmer
 
 router = APIRouter(
     prefix="/swimmers",
     tags=["swimmers"],
 )
 
+# Maps a public view to the swimmer visibility flag that controls it
+VIEW_VISIBILITY_FLAGS = {
+    "relay_builder": Swimmer.show_in_relay_builder,
+    "comparison": Swimmer.show_in_comparison,
+}
+
 
 @router.get("", response_model=list[BaseSwimmerOut])
 async def get_swimmers(db: Session = Depends(get_db)):
-    """Get all swimmers."""
+    """Get all swimmers that belong to a group."""
     swimmers = (
         db.query(Swimmer)
-        .filter(Swimmer.group.in_(GROUPS_TO_LOOKUP))
+        .filter(Swimmer.group_id.isnot(None))
         .options(joinedload(Swimmer.personal_bests))
         .all()
     )
@@ -42,32 +49,41 @@ async def get_swimmers(db: Session = Depends(get_db)):
 
 @router.get("/grouped", response_model=list[GroupedSwimmersOut])
 async def get_swimmers_grouped(
-    include_former: bool = False, db: Session = Depends(get_db)
+    view: Literal["relay_builder", "comparison"] = Query(
+        ..., description="Public view to list swimmers for"
+    ),
+    db: Session = Depends(get_db),
 ):
-    """Get swimmers grouped by their group. Optionally include former swimmers who left the club."""
-    groups_to_include = GROUPS_TO_LOOKUP.copy()
-    if include_former:
-        groups_to_include.append("runaway")
+    """
+    Get swimmers visible in the given view, grouped by their group.
+
+    Only swimmers with the view's visibility flag enabled are returned, and only
+    groups that contain at least one such swimmer appear in the response.
+    """
+    visibility_flag = VIEW_VISIBILITY_FLAGS[view]
 
     swimmers = (
         db.query(Swimmer)
-        .filter(Swimmer.group.in_(groups_to_include))
-        .order_by(Swimmer.surname, Swimmer.name)
+        .join(Group, Swimmer.group_id == Group.id)
+        .filter(visibility_flag.is_(True))
+        .order_by(Group.name, Swimmer.surname, Swimmer.name)
+        .options(contains_eager(Swimmer.group_rel))
         .all()
     )
 
-    grouped = {}
+    grouped: dict[int, dict] = {}
     for swimmer in swimmers:
-        if swimmer.group == "runaway":
-            swimmer.group = "veteran"
-        grouped.setdefault(swimmer.group, []).append(swimmer)
+        entry = grouped.setdefault(
+            swimmer.group_id,
+            {
+                "group_id": swimmer.group_id,
+                "group": swimmer.group_display_name,
+                "swimmers": [],
+            },
+        )
+        entry["swimmers"].append(swimmer)
 
-    result = [
-        GroupedSwimmersOut(group=group, swimmers=swimmers_in_group)
-        for group, swimmers_in_group in grouped.items()
-    ]
-
-    return result
+    return [GroupedSwimmersOut(**entry) for entry in grouped.values()]
 
 
 @router.get("/{swimmer_id}/profile", response_model=SwimmerProfileResponse)
@@ -130,12 +146,18 @@ async def search_swimmers(
             )
         )
         .order_by(Swimmer.surname, Swimmer.name)
+        .options(joinedload(Swimmer.group_rel))
         .limit(20)
         .all()
     )
 
-    for swimmer in matching_swimmers:
-        if swimmer.group not in GROUPS_TO_LOOKUP or swimmer.group == "veteran":
-            swimmer.group = None
-
-    return matching_swimmers
+    return [
+        SwimmerSearchResult(
+            id=swimmer.id,
+            name=swimmer.name,
+            surname=swimmer.surname,
+            group=swimmer.group_display_name,
+            birth_year=swimmer.birth_year,
+        )
+        for swimmer in matching_swimmers
+    ]

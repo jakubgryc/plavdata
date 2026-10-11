@@ -29,7 +29,7 @@ def get_swimmer_basic_info(db: Session, swimmer_id: int) -> dict | None:
         "name": swimmer.name,
         "surname": swimmer.surname,
         "birthYear": swimmer.birth_year,
-        "group": swimmer.group,
+        "group": swimmer.group_display_name,
         "sex": swimmer.sex,
     }
 

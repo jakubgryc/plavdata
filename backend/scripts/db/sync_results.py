@@ -45,7 +45,6 @@ def save_fetched_results(
                 name=swimmer_data.name,
                 surname=swimmer_data.surname,
                 birth_year=swimmer_data.birth_year,
-                group=None,
                 group_id=None,
                 sex=swimmer_data.sex,
                 membership_start=datetime.fromisoformat(

@@ -30,7 +30,7 @@ function Utils() {
   useEffect(() => {
     const fetchSwimmers = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/swimmers/grouped`);
+        const response = await fetch(`${API_BASE_URL}/swimmers/grouped?view=relay_builder`);
         if (!response.ok) {
           console.error("Error fetching grouped swimmers", response.status);
           return;

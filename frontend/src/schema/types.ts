@@ -5,7 +5,8 @@ export interface BaseSwimmer {
 }
 
 export interface GroupedSwimmers {
-  group: string;
+  group_id: number;
+  group: string; // Czech display name of the group
   swimmers: BaseSwimmer[];
 }
 
@@ -61,7 +62,7 @@ export interface Swimmer {
   surname: string;
   birth_year: number;
   current_age?: number;
-  group: string;
+  group?: string | null; // Czech display name of the swimmer's group
   gender: string;
 }
 
@@ -145,7 +146,7 @@ export interface SwimmerBasicInfo {
   name: string;
   surname: string;
   birthYear: number;
-  group: string;
+  group?: string | null; // Czech display name of the swimmer's group
   sex: string;
   cspsId: number;
 }

@@ -5,7 +5,7 @@ from typing import List, Optional
 from pydantic import BaseModel
 from collections import defaultdict
 
-from app.models import PersonalBest, Swimmer, Discipline, Course
+from app.models import Group, PersonalBest, Swimmer, Discipline, Course
 from app.db import get_db
 from app.api.schemas import (
     PersonalBestOut,
@@ -13,7 +13,7 @@ from app.api.schemas import (
     SwimmerPersonalBestOut,
     SwimmerOut,
 )
-from app.constants import GROUPS_TO_LOOKUP, DISCIPLINE_ORDER
+from app.constants import DISCIPLINE_ORDER
 
 router = APIRouter(
     prefix="/personal_bests",
@@ -28,8 +28,20 @@ def discipline_case():
     return case(
         {title: index for index, title in enumerate(DISCIPLINE_ORDER)},
         value=Discipline.code,
-        else_=len(GROUPS_TO_LOOKUP),  # Default case for unknown disciplines
+        else_=999,  # Default case for unknown disciplines
     )
+
+
+class PBGroupOut(BaseModel):
+    """
+    A group that has at least one swimmer visible in the personal bests view.
+    """
+
+    id: int
+    display_name_cs: str
+
+    class Config:
+        from_attributes = True
 
 
 class PB_Payload(BaseModel):
@@ -51,7 +63,7 @@ async def get_personal_bests(payload: PB_Payload, db: Session = Depends(get_db))
     course = payload.get("course", 25)
 
     query = db.query(PersonalBest).options(
-        joinedload(PersonalBest.swimmer),
+        joinedload(PersonalBest.swimmer).joinedload(Swimmer.group_rel),
         joinedload(PersonalBest.discipline),
         joinedload(PersonalBest.course),
     )
@@ -69,7 +81,7 @@ async def get_personal_bests(payload: PB_Payload, db: Session = Depends(get_db))
         query.join(Swimmer)
         .join(Discipline)
         .join(Course)
-        .filter(Swimmer.group.in_(GROUPS_TO_LOOKUP))
+        .filter(Swimmer.show_in_personal_bests.is_(True))
     )
     if course:
         query = query.filter(Course.length == course)
@@ -79,22 +91,43 @@ async def get_personal_bests(payload: PB_Payload, db: Session = Depends(get_db))
     return [PersonalBestOut.with_ages(pb) for pb in personal_bests]
 
 
+@router.get("/groups", response_model=list[PBGroupOut])
+async def get_personal_bests_groups(db: Session = Depends(get_db)):
+    """
+    Get groups that have at least one swimmer visible in the personal bests view.
+    Used to render the group tabs on the personal bests page.
+    """
+    groups = (
+        db.query(Group)
+        .join(Swimmer, Swimmer.group_id == Group.id)
+        .filter(Swimmer.show_in_personal_bests.is_(True))
+        .distinct()
+        .order_by(Group.name)
+        .all()
+    )
+    return groups
+
+
 @router.get("/grouped")
 async def get_personal_bests_by_group(
-    group: str,
+    group_id: int,
     course: Optional[int] = Query(25, description="Course length (25 or 50)"),
     db: Session = Depends(get_db),
 ):
     """
     Get personal bests for a specific group.
+    Only swimmers enabled for the personal bests view are included.
     """
-    if group not in GROUPS_TO_LOOKUP:
-        raise HTTPException(status_code=400, detail="Invalid group")
+    group = db.query(Group).filter(Group.id == group_id).first()
+    if not group:
+        raise HTTPException(status_code=404, detail="Group not found")
 
     swimmers_in_group = (
         db.query(Swimmer)
-        .filter(Swimmer.group == group)
+        .filter(Swimmer.group_id == group_id)
+        .filter(Swimmer.show_in_personal_bests.is_(True))
         .order_by(Swimmer.surname.asc(), Swimmer.name.asc())
+        .options(joinedload(Swimmer.group_rel))
         .all()
     )
 
@@ -103,10 +136,11 @@ async def get_personal_bests_by_group(
         .join(PersonalBest.swimmer)
         .join(PersonalBest.discipline)
         .join(PersonalBest.course)
-        .filter(Swimmer.group == group)
+        .filter(Swimmer.group_id == group_id)
+        .filter(Swimmer.show_in_personal_bests.is_(True))
         .filter(Course.length == course)
         .options(
-            contains_eager(PersonalBest.swimmer),
+            contains_eager(PersonalBest.swimmer).joinedload(Swimmer.group_rel),
             contains_eager(PersonalBest.discipline),
             contains_eager(PersonalBest.course),
         )

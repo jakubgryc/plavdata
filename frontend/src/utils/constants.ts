@@ -1,14 +1,5 @@
 import type { SegmentedControlItem } from "@mantine/core";
 
-export const GROUPS = [
-  { label: "Z1", value: "Z1" },
-  { label: "Z2", value: "Z2" },
-  { label: "P1", value: "P1" },
-  { label: "bývalí", value: "veteran" },
-];
-
-export const ACTIVE_GROUPS = ["Z1", "Z2", "P1"];
-
 export const POOLS: SegmentedControlItem[] = [
   { label: "25 m", value: "25" },
   { label: "50 m", value: "50" },
