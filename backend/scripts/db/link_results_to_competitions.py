@@ -32,9 +32,18 @@ def is_match(loc1: str, loc2: str) -> bool:
 def link_results_to_competitions():
     db: Session = SessionLocal()
     try:
-        courses = {course.id: course for course in db.query(Course).all()}
+        courses = {c.id: c for c in db.query(Course).all()}
 
+        # Fetch only results needing a link
         results = db.query(Result).filter(Result.competition_id.is_(None)).all()
+        if not results:
+            print("No unlinked results found.")
+            return 0, 0
+
+        # Load all eligible competitions once into memory
+        competitions = (
+            db.query(Competition).filter(Competition.masters.is_(False)).all()
+        )
 
         matched_count = 0
         unmatched_count = 0
@@ -45,41 +54,32 @@ def link_results_to_competitions():
                 unmatched_count += 1
                 continue
 
-            date_matches = (
-                db.query(Competition)
-                .filter(
-                    Competition.start_date <= result.date,
-                    Competition.end_date >= result.date,
-                    Competition.pool_length == course.length,
-                    Competition.masters.is_(False),
-                )
-                .all()
-            )
-
+            # In-memory candidate filtering
             matching_competitions = [
                 comp
-                for comp in date_matches
-                if is_match(result.competition_location, comp.location)
+                for comp in competitions
+                if comp.start_date <= result.date <= comp.end_date
+                and comp.pool_length == course.length
+                and is_match(result.competition_location, comp.location)
             ]
 
             if len(matching_competitions) == 1:
-                result.competition_id = matching_competitions[0].id
+                comp = matching_competitions[0]
+                result.competition_id = comp.id
                 matched_count += 1
             elif len(matching_competitions) > 1:
                 unmatched_count += 1
                 print(
                     f"Warning: Multiple competitions found for result {result.id} "
-                    f"at {result.competition_location} on {result.date}. "
-                    f"Skipping linking."
+                    f"at {result.competition_location} on {result.date}."
                 )
             else:
                 unmatched_count += 1
 
         db.commit()
-        print("Results linked to competitions successfully.")
-        print(f"Matched: {matched_count}")
-        print(f"Unmatched: {unmatched_count}")
+        print(f"Done. Matched: {matched_count}, Unmatched: {unmatched_count}")
         return matched_count, unmatched_count
+
     except Exception as e:
         db.rollback()
         print(f"Error linking results to competitions: {e}")
