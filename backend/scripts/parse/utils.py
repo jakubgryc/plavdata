@@ -32,7 +32,7 @@ def get_swimmer_profile(csps_id: int) -> dict | None:
 
 def _get_membership_dates(
     swimmer_profile_data: dict,
-) -> tuple[str | None, str | None, bool]:
+) -> tuple[str | None, str | None]:
     """
 
     Get the membership start and end dates (if any) for the duration of the swimmer's
@@ -45,25 +45,20 @@ def _get_membership_dates(
         tuple:
             membership_start (str | None): The start date of the swimmer's membership in PKBoh, or None if not found.
             membership_end (str | None): The end date of the swimmer's membership in PKBoh, or None if not found.
-            runaway (bool): True if the swimmer has more than one club in their history, False otherwise.
     """
     club_history = swimmer_profile_data.get("membershipHistory")
-    runaway = False
-    if len(club_history) > 1:
-        runaway = True
     for membership in club_history:
         if membership.get("clubAbbrev") == TARGET_CLUB:
             membership_start_str = membership.get("membershipStart")
             membership_end_str = membership.get("membershipEnd", None)
-            return membership_start_str, membership_end_str, runaway
+            return membership_start_str, membership_end_str
 
-    return None, None, runaway
+    return None, None
 
 
 def parse_swimmer_data(
     swimmer: dict | None,
     swimmer_profile_data: dict,
-    group: str,
 ) -> SwimmerData:
     """
 
@@ -77,17 +72,13 @@ def parse_swimmer_data(
     Returns:
         SwimmerData dataclass instance with parsed data.
     """
-    membership_start, membership_end, runaway = _get_membership_dates(
-        swimmer_profile_data
-    )
-    group = "runaway" if runaway else group
+    membership_start, membership_end = _get_membership_dates(swimmer_profile_data)
     return SwimmerData(
         csps_id=swimmer_profile_data.get("userId"),
         name=swimmer["name"] if swimmer else swimmer_profile_data.get("firstName"),
         surname=swimmer["surname"]
         if swimmer
         else swimmer_profile_data.get("lastName").capitalize(),
-        group=group,
         sex=swimmer_profile_data.get("sex").lower(),
         birth_year=swimmer_profile_data.get("birthYear"),
         membership_start=membership_start,
