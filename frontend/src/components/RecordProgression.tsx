@@ -223,7 +223,8 @@ function RecordProgression() {
           <Flex gap="lg" wrap="wrap" align="flex-start">
             <Box>
               <Text size="xs" pl="xs" pb={4} fw={600} c="dimmed" tt="uppercase">
-                Bazén </Text>
+                Bazén{" "}
+              </Text>
               <SegmentedControl size="xs" value={course} onChange={setCourse} data={POOLS} />
             </Box>
             <Box>

@@ -113,11 +113,15 @@ def _fetch_record_steps(db: Session) -> list:
     # Best time before this row (NULL for the first ever), and best time
     # across the whole partition — a step whose time equals the all-time
     # best is the standing record for that combination
-    prev_best = func.min(Result.time).over(
-        partition_by=partition,
-        order_by=(Result.date, Result.id),
-        rows=(None, -1),
-    ).label("prev_best")
+    prev_best = (
+        func.min(Result.time)
+        .over(
+            partition_by=partition,
+            order_by=(Result.date, Result.id),
+            rows=(None, -1),
+        )
+        .label("prev_best")
+    )
     all_best = func.min(Result.time).over(partition_by=partition).label("all_best")
 
     inner = (
@@ -149,7 +153,9 @@ def _fetch_record_steps(db: Session) -> list:
 
     # Discipline/course combinations that have no club records (100 O on 50m)
     for code, length in EXCLUDED_DISCIPLINE_COURSES:
-        inner = inner.where(not_(and_(Discipline.code == code, Course.length == length)))
+        inner = inner.where(
+            not_(and_(Discipline.code == code, Course.length == length))
+        )
 
     steps = inner.subquery()
 
@@ -201,9 +207,7 @@ def get_club_records_count(
     period — unlike the old logic, which could only see current record
     holders and returned 0 for past years.
     """
-    return _count_steps_in_period(
-        _fetch_record_steps(db), period_value, period_type
-    )
+    return _count_steps_in_period(_fetch_record_steps(db), period_value, period_type)
 
 
 def get_personal_bests_count(
@@ -288,9 +292,7 @@ def _group_steps(steps: list, limit: int, oldest: bool) -> list:
                 if False, all steps, most recent first (beaten ones included)
     """
     relevant = [s for s in steps if s.is_current] if oldest else steps
-    relevant = sorted(
-        relevant, key=lambda s: (s.date, s.result_id), reverse=not oldest
-    )
+    relevant = sorted(relevant, key=lambda s: (s.date, s.result_id), reverse=not oldest)
 
     grouped: dict[int, dict] = {}
     for step in relevant:
