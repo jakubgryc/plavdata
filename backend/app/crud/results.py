@@ -1,4 +1,4 @@
-from sqlalchemy import func, cast, Integer, case
+from sqlalchemy import func, cast, desc, Integer, case
 from sqlalchemy.orm import Session
 
 from app.models import Swimmer, Discipline, Course, Result, ClubRecord, AgeCategory
@@ -65,6 +65,36 @@ def get_record_progression(
             best_time = result.time
 
     return steps
+
+
+def get_record_holders(db: Session, course_length: int):
+    """
+    Rank swimmers by the number of club records they currently hold on
+    the given course length, most records first.
+
+    One record = one (discipline, age category) combination, so a single
+    swim standing as the record in several categories counts several
+    times — consistent with how records are counted elsewhere.
+    """
+    record_count = func.count(ClubRecord.id).label("record_count")
+
+    return (
+        db.query(
+            Swimmer.id.label("swimmer_id"),
+            Swimmer.name,
+            Swimmer.surname,
+            Swimmer.sex,
+            record_count,
+        )
+        .select_from(ClubRecord)
+        .join(ClubRecord.result)
+        .join(Result.swimmer)
+        .join(Result.course)
+        .filter(Course.length == course_length)
+        .group_by(Swimmer.id, Swimmer.name, Swimmer.surname, Swimmer.sex)
+        .order_by(desc(record_count), Swimmer.surname)
+        .all()
+    )
 
 
 def get_club_records(db: Session, course_length: int):

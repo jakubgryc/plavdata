@@ -10,7 +10,11 @@ from sqlalchemy.orm import Session, contains_eager
 
 from app.models import Swimmer, Discipline, Course, Result
 from app.constants import EXCLUDED_COMPETITION_LOCATIONS
-from app.crud.results import get_club_records, get_record_progression
+from app.crud.results import (
+    get_club_records,
+    get_record_holders,
+    get_record_progression,
+)
 from app.db import get_db
 from app.api.schemas import (
     SwimmerResultOut,
@@ -228,6 +232,45 @@ async def get_all_club_records(
     ]
 
     return club_records_out
+
+
+class RecordHolderOut(BaseModel):
+    swimmer_id: int
+    name: str
+    surname: str
+    sex: str
+    record_count: int
+
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+@router.get(
+    "/record-holders",
+    summary="Rank swimmers by number of club records held",
+    response_model=List[RecordHolderOut],
+)
+async def get_all_record_holders(
+    course: int = 25,
+    db: Session = Depends(get_db),
+):
+    """
+    Returns swimmers ranked by how many club records they currently hold
+    on the given course length, most records first.
+    """
+    holders = get_record_holders(db, course)
+
+    return [
+        RecordHolderOut(
+            swimmer_id=row.swimmer_id,
+            name=row.name,
+            surname=row.surname,
+            sex=row.sex,
+            record_count=row.record_count,
+        )
+        for row in holders
+    ]
 
 
 class SwimmerResultRowOut(BaseModel):

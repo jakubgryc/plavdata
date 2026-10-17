@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 
 import { API_BASE_URL } from "../../config";
+import RecordHolders from "../components/RecordHolders";
 import RecordProgression from "../components/RecordProgression";
 import TableSplitRelayLegend from "../components/shared/TableSplitRelayLegend";
 import { useTheme } from "../hooks/useTheme";
@@ -221,6 +222,7 @@ function ClubRecords() {
         <Tabs.List>
           <Tabs.Tab value="records">Aktuální rekordy</Tabs.Tab>
           <Tabs.Tab value="progression">Vývoj rekordů</Tabs.Tab>
+          <Tabs.Tab value="holders">Držitelé rekordů</Tabs.Tab>
         </Tabs.List>
 
         <Tabs.Panel value="records" pt="sm">
@@ -370,6 +372,12 @@ function ClubRecords() {
         <Tabs.Panel value="progression" pt="sm">
           <Box mah="72vh" style={{ overflowY: "auto" }}>
             <RecordProgression course={selectedCourse} />
+          </Box>
+        </Tabs.Panel>
+
+        <Tabs.Panel value="holders" pt="sm">
+          <Box mah="72vh" style={{ overflowY: "auto" }}>
+            <RecordHolders course={selectedCourse} />
           </Box>
         </Tabs.Panel>
       </Tabs>
