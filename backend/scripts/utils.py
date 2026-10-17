@@ -8,7 +8,6 @@ class SwimmerData:
     csps_id: int
     name: str
     surname: str
-    group: str
     birth_year: int
     sex: str
     membership_start: str | None

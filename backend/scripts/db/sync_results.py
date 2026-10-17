@@ -38,7 +38,7 @@ def save_fetched_results(
 
         if not swimmer:
             swimmer_profile = get_swimmer_profile(swimmer_csps_id)
-            swimmer_data = parse_swimmer_data(None, swimmer_profile, "unknown")
+            swimmer_data = parse_swimmer_data(None, swimmer_profile)
             print(f"Adding new swimmer: {swimmer_data.name} {swimmer_data.surname}")
             new_swimmer = Swimmer(
                 csps_id=swimmer_data.csps_id,
