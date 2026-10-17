@@ -1,74 +1,70 @@
-from sqlalchemy import func, cast, select, Integer, case
+from sqlalchemy import func, cast, Integer, case
 from sqlalchemy.orm import Session
 
 from app.models import Swimmer, Discipline, Course, Result, ClubRecord, AgeCategory
 from app.constants import DNF_THRESHOLD, EXCLUDED_COMPETITION_LOCATIONS
 
 
-def get_best_times_for_age(
+def get_record_progression(
     db: Session,
     discipline_code: str,
     course_length: int,
     sex: str,
-    max_age: int,
-    limit: int,
-    unique_swimmers: bool = False,
-    only_current_age: bool = False,
+    age_category_code: str,
 ):
-    age_at_result = (
-        cast(func.extract("year", Result.date), Integer) - Swimmer.birth_year
-    )
-    if only_current_age and max_age > 18:
-        only_current_age = False
+    """
+    Compute the historical progression of a club record.
 
-    # Subquery with row_number to rank results per swimmer
-    ranked_subquery = (
-        select(
-            Swimmer.id.label("swimmer_id"),
-            Swimmer.name,
-            Swimmer.surname,
-            Swimmer.birth_year,
-            Discipline.code.label("discipline"),
-            Result.id,
-            Result.time,
-            Result.split_time,
-            Result.relay_part,
-            Result.competition_location,
-            Result.date,
-            age_at_result.label("age_at_result"),
-            func.row_number()
-            .over(partition_by=Swimmer.id, order_by=[Result.time, age_at_result])
-            .label("swimmer_rank")
-            if unique_swimmers
-            else None,
-        )
-        .select_from(Result)
-        .join(Swimmer, Result.swimmer_id == Swimmer.id)
-        .join(Discipline, Result.discipline_id == Discipline.id)
-        .join(Course, Result.course_id == Course.id)
-        .where(
-            Discipline.code == discipline_code,
+    Returns None if the age category does not exist, otherwise a
+    chronological list of steps — every result that was strictly faster
+    than all eligible results before it (equal times do NOT take over the
+    record, the earlier swim keeps it).
+
+    The progression is computed on the fly from the results table, so it
+    always reflects the current data and current record rules. Within one
+    date, results are ordered by id (insertion order) — ČSPS provides no
+    finer chronological signal.
+    """
+    category = (
+        db.query(AgeCategory).filter(AgeCategory.code == age_category_code).first()
+    )
+    if category is None:
+        return None
+
+    # Frontend/display codes use VZ for freestyle, the DB stores K
+    db_discipline_code = discipline_code.replace(" VZ", " K")
+
+    rows = (
+        db.query(Result, Swimmer)
+        .join(Result.swimmer)
+        .join(Result.discipline)
+        .join(Result.course)
+        .filter(
+            Discipline.code == db_discipline_code,
             Course.length == course_length,
             Swimmer.sex == sex,
-            age_at_result <= max_age
-            if not only_current_age
-            else age_at_result == max_age,
+            Result.age_at_result <= category.max_age,
             Result.time < DNF_THRESHOLD,
             Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS),
         )
-    ).subquery()
+        .order_by(Result.date, Result.id)
+        .all()
+    )
 
-    # Main query
-    query = select(ranked_subquery)
+    steps = []
+    best_time = None
+    for result, swimmer in rows:
+        if best_time is None or result.time < best_time:
+            steps.append(
+                {
+                    "result": result,
+                    "swimmer": swimmer,
+                    "previous_best": best_time,
+                }
+            )
+            best_time = result.time
 
-    if unique_swimmers:
-        query = query.where(ranked_subquery.c.swimmer_rank == 1)
-
-    query = query.order_by(
-        ranked_subquery.c.time, ranked_subquery.c.age_at_result
-    ).limit(limit)
-
-    return db.execute(query).all()
+    return steps
 
 
 def get_club_records(db: Session, course_length: int):

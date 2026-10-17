@@ -207,24 +207,6 @@ class SwimmerPersonalBestOut(BaseModel):
         from_attributes = True
 
 
-class BestTimeResultOut(BaseModel):
-    swimmer_id: int
-    name: str
-    surname: str
-    birth_year: int
-    time: int
-    age_at_result: int
-    split_time: Optional[bool] = None
-    relay_part: Optional[bool] = None
-    competition_location: Optional[str] = None
-    date: datetime
-
-    class Config:
-        from_attributes = True
-        alias_generator = to_camel
-        validate_by_name = True
-
-
 # Relay Schemas
 class RelaySwimmerInfo(BaseModel):
     swimmer_id: int
