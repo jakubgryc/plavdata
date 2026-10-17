@@ -16,7 +16,7 @@ import {
 import { IconChartLine } from "@tabler/icons-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
-import type { TooltipProps } from "recharts";
+import type { TooltipContentProps } from "recharts";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import { API_BASE_URL } from "../../config";
@@ -72,7 +72,7 @@ function formatImprovement(previousTime: number | null, time: number): string | 
   return `${((previousTime - time) / 1000).toFixed(2)} s`;
 }
 
-function ProgressionTooltip({ active, payload }: TooltipProps<number, string>) {
+function ProgressionTooltip({ active, payload }: Partial<TooltipContentProps<number, string>>) {
   const { colorScheme } = useMantineColorScheme();
   if (!active || !payload?.length) return null;
   const step = payload[0]?.payload as ChartStep | undefined;
