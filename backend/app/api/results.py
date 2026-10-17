@@ -240,6 +240,8 @@ class RecordHolderOut(BaseModel):
     surname: str
     sex: str
     record_count: int
+    record_count_25: int
+    record_count_50: int
 
     class Config:
         alias_generator = to_camel
@@ -251,15 +253,13 @@ class RecordHolderOut(BaseModel):
     summary="Rank swimmers by number of club records held",
     response_model=List[RecordHolderOut],
 )
-async def get_all_record_holders(
-    course: int = 25,
-    db: Session = Depends(get_db),
-):
+async def get_all_record_holders(db: Session = Depends(get_db)):
     """
     Returns swimmers ranked by how many club records they currently hold
-    on the given course length, most records first.
+    in total (across both course lengths), most records first, including
+    the per-course breakdown (25m / 50m).
     """
-    holders = get_record_holders(db, course)
+    holders = get_record_holders(db)
 
     return [
         RecordHolderOut(
@@ -268,6 +268,8 @@ async def get_all_record_holders(
             surname=row.surname,
             sex=row.sex,
             record_count=row.record_count,
+            record_count_25=row.record_count_25,
+            record_count_50=row.record_count_50,
         )
         for row in holders
     ]

@@ -199,24 +199,9 @@ function ClubRecords() {
 
   return (
     <Flex direction="column" h="90vh" w="100%" pb="xl">
-      <Flex
-        direction={{ base: "column", sm: "row" }}
-        justify={{ sm: "space-between" }}
-        align={{ base: "stretch", sm: "center" }}
-        w="100%"
-        mb="md"
-        gap="md"
-      >
-        <Title order={2}>Klubové rekordy</Title>
-        <SegmentedControl
-          value={selectedCourse}
-          onChange={setSelectedCourse}
-          withItemsBorders={false}
-          data={POOLS}
-          defaultValue={POOLS[0]?.value}
-          radius="xl"
-        />
-      </Flex>
+      <Title order={2} mb="md">
+        Klubové rekordy
+      </Title>
 
       <Tabs defaultValue="records" mt="xs">
         <Tabs.List>
@@ -226,7 +211,17 @@ function ClubRecords() {
         </Tabs.List>
 
         <Tabs.Panel value="records" pt="sm">
-          <TableSplitRelayLegend />
+          <Flex justify="space-between" align="center" wrap="wrap" gap="sm">
+            <TableSplitRelayLegend />
+            <SegmentedControl
+              value={selectedCourse}
+              onChange={setSelectedCourse}
+              withItemsBorders={false}
+              data={POOLS}
+              defaultValue={POOLS[0]?.value}
+              radius="xl"
+            />
+          </Flex>
 
           <Box mah="70vh" pt="sm" style={{ overflowY: "auto" }}>
             <DataTable<ClubRecordRow>
@@ -371,13 +366,13 @@ function ClubRecords() {
 
         <Tabs.Panel value="progression" pt="sm">
           <Box mah="72vh" style={{ overflowY: "auto" }}>
-            <RecordProgression course={selectedCourse} />
+            <RecordProgression />
           </Box>
         </Tabs.Panel>
 
         <Tabs.Panel value="holders" pt="sm">
           <Box mah="72vh" style={{ overflowY: "auto" }}>
-            <RecordHolders course={selectedCourse} />
+            <RecordHolders />
           </Box>
         </Tabs.Panel>
       </Tabs>

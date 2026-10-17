@@ -67,16 +67,23 @@ def get_record_progression(
     return steps
 
 
-def get_record_holders(db: Session, course_length: int):
+def get_record_holders(db: Session):
     """
-    Rank swimmers by the number of club records they currently hold on
-    the given course length, most records first.
+    Rank swimmers by the total number of club records they currently hold
+    across both course lengths, most records first. Also returns the
+    per-course breakdown (25m / 50m) via conditional counts.
 
-    One record = one (discipline, age category) combination, so a single
-    swim standing as the record in several categories counts several
-    times — consistent with how records are counted elsewhere.
+    One record = one (discipline, age category, course) combination, so a
+    single swim standing as the record in several categories counts
+    several times — consistent with how records are counted elsewhere.
     """
     record_count = func.count(ClubRecord.id).label("record_count")
+    record_count_25 = (
+        func.count(ClubRecord.id).filter(Course.length == 25).label("record_count_25")
+    )
+    record_count_50 = (
+        func.count(ClubRecord.id).filter(Course.length == 50).label("record_count_50")
+    )
 
     return (
         db.query(
@@ -85,12 +92,13 @@ def get_record_holders(db: Session, course_length: int):
             Swimmer.surname,
             Swimmer.sex,
             record_count,
+            record_count_25,
+            record_count_50,
         )
         .select_from(ClubRecord)
         .join(ClubRecord.result)
         .join(Result.swimmer)
         .join(Result.course)
-        .filter(Course.length == course_length)
         .group_by(Swimmer.id, Swimmer.name, Swimmer.surname, Swimmer.sex)
         .order_by(desc(record_count), Swimmer.surname)
         .all()

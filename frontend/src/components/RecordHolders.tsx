@@ -10,7 +10,13 @@ import {
   ThemeIcon,
   Title,
 } from "@mantine/core";
-import { IconGenderFemale, IconGenderMale } from "@tabler/icons-react";
+import {
+  IconChevronDown,
+  IconChevronUp,
+  IconGenderFemale,
+  IconGenderMale,
+  IconSelector,
+} from "@tabler/icons-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 
@@ -22,6 +28,8 @@ interface RecordHolder {
   surname: string;
   sex: "male" | "female";
   recordCount: number;
+  recordCount25: number;
+  recordCount50: number;
 }
 
 type RankedHolder = RecordHolder & { rank: number };
@@ -39,6 +47,39 @@ function withRanks(holders: RecordHolder[]): RankedHolder[] {
   return ranked;
 }
 
+type SortKey = "rank" | "surname" | "recordCount" | "recordCount25" | "recordCount50";
+type SortState = { key: SortKey; direction: "asc" | "desc" };
+
+function SortableTh({
+  label,
+  sortKey,
+  sort,
+  onSort,
+  align = "left",
+}: {
+  label: string;
+  sortKey: SortKey;
+  sort: SortState;
+  onSort: (key: SortKey) => void;
+  align?: "left" | "right";
+}) {
+  const active = sort.key === sortKey;
+  const Icon = !active ? IconSelector : sort.direction === "asc" ? IconChevronUp : IconChevronDown;
+
+  return (
+    <Table.Th
+      ta={align}
+      style={{ cursor: "pointer", userSelect: "none" }}
+      onClick={() => onSort(sortKey)}
+    >
+      <Group gap={4} wrap="nowrap" justify={align === "right" ? "flex-end" : "flex-start"}>
+        {label}
+        <Icon size={14} opacity={active ? 1 : 0.35} />
+      </Group>
+    </Table.Th>
+  );
+}
+
 interface HoldersTableProps {
   title: string;
   icon: typeof IconGenderFemale;
@@ -48,6 +89,27 @@ interface HoldersTableProps {
 }
 
 function HoldersTable({ title, icon: Icon, iconColor, holders, isFetching }: HoldersTableProps) {
+  const [sort, setSort] = useState<SortState>({ key: "recordCount", direction: "desc" });
+
+  const handleSort = (key: SortKey) =>
+    setSort((prev) =>
+      prev.key === key
+        ? { key, direction: prev.direction === "asc" ? "desc" : "asc" }
+        : { key, direction: key === "surname" ? "asc" : "desc" },
+    );
+
+  const sortedHolders = useMemo(() => {
+    const mult = sort.direction === "asc" ? 1 : -1;
+    return [...holders].sort((a, b) => {
+      const av = a[sort.key];
+      const bv = b[sort.key];
+      if (typeof av === "number" && typeof bv === "number") {
+        return (av - bv) * mult;
+      }
+      return String(av).localeCompare(String(bv), "cs") * mult;
+    });
+  }, [holders, sort]);
+
   return (
     <Paper p={{ base: "sm", sm: "lg" }} radius="lg" withBorder>
       <Group gap="xs" mb="md">
@@ -66,16 +128,36 @@ function HoldersTable({ title, icon: Icon, iconColor, holders, isFetching }: Hol
           <Text c="dimmed">Žádní držitelé rekordů.</Text>
         </Center>
       ) : (
-        <Table striped highlightOnHover>
+        <Table striped highlightOnHover className="responsive-results-table">
           <Table.Thead>
             <Table.Tr>
-              <Table.Th w={50}>#</Table.Th>
-              <Table.Th>Plavec</Table.Th>
-              <Table.Th ta="right">Rekordů</Table.Th>
+              <SortableTh label="#" sortKey="rank" sort={sort} onSort={handleSort} />
+              <SortableTh label="Plavec" sortKey="surname" sort={sort} onSort={handleSort} />
+              <SortableTh
+                label="Celkem"
+                sortKey="recordCount"
+                sort={sort}
+                onSort={handleSort}
+                align="right"
+              />
+              <SortableTh
+                label="25 m"
+                sortKey="recordCount25"
+                sort={sort}
+                onSort={handleSort}
+                align="right"
+              />
+              <SortableTh
+                label="50 m"
+                sortKey="recordCount50"
+                sort={sort}
+                onSort={handleSort}
+                align="right"
+              />
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            {holders.map((holder) => (
+            {sortedHolders.map((holder) => (
               <Table.Tr key={holder.swimmerId}>
                 <Table.Td c="dimmed">{holder.rank}.</Table.Td>
                 <Table.Td>
@@ -94,6 +176,16 @@ function HoldersTable({ title, icon: Icon, iconColor, holders, isFetching }: Hol
                     {holder.recordCount}
                   </Text>
                 </Table.Td>
+                <Table.Td ta="right">
+                  <Text size="sm" c={holder.recordCount25 > 0 ? undefined : "dimmed"}>
+                    {holder.recordCount25 > 0 ? holder.recordCount25 : "–"}
+                  </Text>
+                </Table.Td>
+                <Table.Td ta="right">
+                  <Text size="sm" c={holder.recordCount50 > 0 ? undefined : "dimmed"}>
+                    {holder.recordCount50 > 0 ? holder.recordCount50 : "–"}
+                  </Text>
+                </Table.Td>
               </Table.Tr>
             ))}
           </Table.Tbody>
@@ -103,11 +195,7 @@ function HoldersTable({ title, icon: Icon, iconColor, holders, isFetching }: Hol
   );
 }
 
-interface RecordHoldersProps {
-  course: string;
-}
-
-function RecordHolders({ course }: RecordHoldersProps) {
+function RecordHolders() {
   const [holders, setHolders] = useState<RecordHolder[]>([]);
   const [isFetching, setIsFetching] = useState(false);
 
@@ -117,7 +205,7 @@ function RecordHolders({ course }: RecordHoldersProps) {
     const fetchHolders = async () => {
       setIsFetching(true);
       try {
-        const response = await fetch(`${API_BASE_URL}/results/record-holders?course=${course}`, {
+        const response = await fetch(`${API_BASE_URL}/results/record-holders`, {
           signal: controller.signal,
         });
         if (!response.ok) {
@@ -137,17 +225,14 @@ function RecordHolders({ course }: RecordHoldersProps) {
 
     void fetchHolders();
     return () => controller.abort();
-  }, [course]);
+  }, []);
 
-  const women = useMemo(
-    () => withRanks(holders.filter((h) => h.sex === "female")),
-    [holders],
-  );
+  const women = useMemo(() => withRanks(holders.filter((h) => h.sex === "female")), [holders]);
   const men = useMemo(() => withRanks(holders.filter((h) => h.sex === "male")), [holders]);
 
   return (
     <Flex direction="column" gap="md">
-      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md" style={{ alignItems: "start" }}>
         <HoldersTable
           title="Ženy"
           icon={IconGenderFemale}

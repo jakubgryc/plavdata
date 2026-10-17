@@ -7,7 +7,6 @@ import {
   Loader,
   Paper,
   SegmentedControl,
-  SimpleGrid,
   Table,
   Text,
   ThemeIcon,
@@ -21,6 +20,7 @@ import type { TooltipProps } from "recharts";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import { API_BASE_URL } from "../../config";
+import { POOLS } from "../utils/constants";
 import { formatDate, parseTimeFromMillis } from "../utils/timeUtils";
 import TableSplitRelayLegend from "./shared/TableSplitRelayLegend";
 
@@ -118,12 +118,9 @@ function ProgressionTooltip({ active, payload }: TooltipProps<number, string>) {
   );
 }
 
-interface RecordProgressionProps {
-  course: string;
-}
-
-function RecordProgression({ course }: RecordProgressionProps) {
+function RecordProgression() {
   const { colorScheme } = useMantineColorScheme();
+  const [course, setCourse] = useState<string>("25");
   const [discipline, setDiscipline] = useState<string>("50 VZ");
   const [sex, setSex] = useState<string>("male");
   const [ageCategory, setAgeCategory] = useState<string>("open");
@@ -223,7 +220,12 @@ function RecordProgression({ course }: RecordProgressionProps) {
     <Flex direction="column" gap="md">
       <Paper p="sm" shadow="sm" radius="md" withBorder>
         <Flex direction="column" gap="sm">
-          <SimpleGrid cols={{ base: 1, md: 2 }} spacing="sm">
+          <Flex gap="lg" wrap="wrap" align="flex-start">
+            <Box>
+              <Text size="xs" pl="xs" pb={4} fw={600} c="dimmed" tt="uppercase">
+                Bazén </Text>
+              <SegmentedControl size="xs" value={course} onChange={setCourse} data={POOLS} />
+            </Box>
             <Box>
               <Text size="xs" pl="xs" pb={4} fw={600} c="dimmed" tt="uppercase">
                 Pohlaví
@@ -236,10 +238,9 @@ function RecordProgression({ course }: RecordProgressionProps) {
                   { label: "Muži", value: "male" },
                   { label: "Ženy", value: "female" },
                 ]}
-                w="100%"
               />
             </Box>
-            <Box>
+            <Box style={{ flex: 1, minWidth: 280 }}>
               <Text size="xs" pl="xs" pb={4} fw={600} c="dimmed" tt="uppercase">
                 Kategorie
               </Text>
@@ -256,7 +257,7 @@ function RecordProgression({ course }: RecordProgressionProps) {
                 </Flex>
               </Chip.Group>
             </Box>
-          </SimpleGrid>
+          </Flex>
 
           <Box>
             <Text size="xs" pl="xs" pb={4} fw={600} c="dimmed" tt="uppercase">
@@ -355,7 +356,7 @@ function RecordProgression({ course }: RecordProgressionProps) {
 
       <Paper p={{ base: "sm", sm: "lg" }} radius="lg" withBorder>
         <Table.ScrollContainer minWidth={700}>
-          <Table striped highlightOnHover>
+          <Table striped highlightOnHover className="responsive-results-table">
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>#</Table.Th>
