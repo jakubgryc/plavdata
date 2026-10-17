@@ -385,6 +385,23 @@ class QuarterlyImprovement(BaseModel):
         populate_by_name = True
 
 
+class SwimmerClubRecord(BaseModel):
+    result_id: int
+    course_length: int
+    discipline_code: str
+    age_categories: List[str]
+    time: int
+    date: datetime
+    competition_location: Optional[str] = None
+    split_time: Optional[bool] = None
+    relay_part: Optional[bool] = None
+
+    class Config:
+        from_attributes = True
+        alias_generator = to_camel
+        populate_by_name = True
+
+
 class SwimmerProfileResponse(BaseModel):
     basic_info: SwimmerBasicInfo
     stats: SwimmerStats
@@ -394,6 +411,7 @@ class SwimmerProfileResponse(BaseModel):
     personal_bests: PersonalBestsByCourse
     starts_by_stroke: StartsByStroke
     quarterly_improvements: List[QuarterlyImprovement]
+    club_records: List[SwimmerClubRecord]
 
     class Config:
         alias_generator = to_camel

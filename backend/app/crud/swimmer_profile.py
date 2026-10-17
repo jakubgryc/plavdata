@@ -7,8 +7,10 @@ from sqlalchemy.orm import Session
 from app.constants import EXCLUDED_COMPETITION_LOCATIONS
 from app.api.schemas import PersonalBestDetail
 from app.models import (
+    AgeCategory,
     ClubRecord,
     Competition,
+    Course,
     Discipline,
     PersonalBest,
     Result,
@@ -334,3 +336,56 @@ def get_swimmer_quarterly_improvements(db: Session, swimmer_id: int) -> list:
         )
 
     return quarterly_data
+
+
+def get_swimmer_club_records(db: Session, swimmer_id: int) -> list:
+    """
+    Get all club records currently held by the swimmer, grouped per result:
+    one swim standing as the record in several age categories is a single
+    entry carrying all its categories (same shape as the home page's
+    recent club records).
+    """
+    rows = (
+        db.query(
+            Result.id.label("result_id"),
+            Course.length.label("course_length"),
+            Discipline.code.label("discipline_code"),
+            AgeCategory.code.label("age_category"),
+            Result.time,
+            Result.date,
+            Result.competition_location,
+            Result.split_time,
+            Result.relay_part,
+        )
+        .select_from(ClubRecord)
+        .join(ClubRecord.result)
+        .join(ClubRecord.age_category)
+        .join(Result.discipline)
+        .join(Result.course)
+        .filter(Result.swimmer_id == swimmer_id)
+        .filter(Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS))
+        .order_by(AgeCategory.max_age)
+        .all()
+    )
+
+    grouped = {}
+    for row in rows:
+        entry = grouped.get(row.result_id)
+        if entry is None:
+            entry = {
+                "resultId": row.result_id,
+                "courseLength": row.course_length,
+                # display codes use VZ for freestyle, the DB stores K
+                "disciplineCode": row.discipline_code.replace(" K", " VZ"),
+                "ageCategories": [],
+                "time": row.time,
+                "date": row.date,
+                "competitionLocation": row.competition_location,
+                "splitTime": row.split_time,
+                "relayPart": row.relay_part,
+            }
+            grouped[row.result_id] = entry
+        # ordered by max_age, so categories end up youngest -> oldest
+        entry["ageCategories"].append(row.age_category)
+
+    return list(grouped.values())

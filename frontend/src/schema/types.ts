@@ -273,6 +273,18 @@ export interface QuarterlyImprovement {
   improvementRate: number;
 }
 
+export interface SwimmerClubRecord {
+  resultId: number;
+  courseLength: number;
+  disciplineCode: string;
+  ageCategories: string[];
+  time: number;
+  date: string;
+  competitionLocation?: string;
+  splitTime?: boolean;
+  relayPart?: boolean;
+}
+
 export interface SwimmerProfileResponse {
   basicInfo: SwimmerBasicInfo;
   stats: SwimmerStats;
@@ -282,4 +294,5 @@ export interface SwimmerProfileResponse {
   personalBests: SwimmerPersonalBests;
   startsByStroke: StartsByStroke;
   quarterlyImprovements: QuarterlyImprovement[];
+  clubRecords: SwimmerClubRecord[];
 }

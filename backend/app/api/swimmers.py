@@ -12,6 +12,7 @@ from app.api.schemas import (
 )
 from app.crud.swimmer_profile import (
     get_swimmer_basic_info,
+    get_swimmer_club_records,
     get_swimmer_competitions,
     get_swimmer_personal_bests,
     get_swimmer_quarterly_improvements,
@@ -100,6 +101,7 @@ async def get_swimmer_profile(swimmer_id: int, db: Session = Depends(get_db)):
     personal_bests = get_swimmer_personal_bests(db, swimmer_id)
     starts_by_stroke = get_swimmer_starts_by_stroke(db, swimmer_id)
     quarterly_improvements = get_swimmer_quarterly_improvements(db, swimmer_id)
+    club_records = get_swimmer_club_records(db, swimmer_id)
 
     return SwimmerProfileResponse(
         basic_info=basic_info,
@@ -110,6 +112,7 @@ async def get_swimmer_profile(swimmer_id: int, db: Session = Depends(get_db)):
         personal_bests=personal_bests,
         starts_by_stroke=starts_by_stroke,
         quarterly_improvements=quarterly_improvements,
+        club_records=club_records,
     )
 
 
