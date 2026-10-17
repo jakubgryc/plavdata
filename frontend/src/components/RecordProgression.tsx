@@ -124,8 +124,8 @@ interface RecordProgressionProps {
 
 function RecordProgression({ course }: RecordProgressionProps) {
   const { colorScheme } = useMantineColorScheme();
-  const [discipline, setDiscipline] = useState<string>("100 VZ");
-  const [sex, setSex] = useState<string>("female");
+  const [discipline, setDiscipline] = useState<string>("50 VZ");
+  const [sex, setSex] = useState<string>("male");
   const [ageCategory, setAgeCategory] = useState<string>("open");
   const [steps, setSteps] = useState<ProgressionStep[]>([]);
   const [isFetching, setIsFetching] = useState(false);
