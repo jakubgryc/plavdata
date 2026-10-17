@@ -163,10 +163,7 @@ function CourseSection({ courseLength, records }: CourseSectionProps) {
                         style={{ opacity: 0.5 }}
                       />
                     )}
-                    <SimpleGrid
-                      cols={{ base: 1, sm: 2, lg: 3 }}
-                      spacing={{ base: 6, sm: "sm" }}
-                    >
+                    <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing={{ base: 6, sm: "sm" }}>
                       {distanceRecords.map((record) => (
                         <RecordCard key={record.resultId} record={record} />
                       ))}
