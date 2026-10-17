@@ -87,6 +87,102 @@ def get_meets_count(
     )
 
 
+def _fetch_record_steps(db: Session) -> list:
+    """
+    Single source query for all club-record dashboard stats: every
+    progression step (record improvement) in club history, one row per
+    (result, age category).
+
+    A step is any result strictly faster than every eligible result before
+    it, per (discipline, course, sex, age category) — the same rules as the
+    record-progression view. `is_current` marks steps that are still the
+    standing record for their combination.
+
+    The step set is small (record improvements, not results), so it is
+    fetched once and aggregated in Python — the expensive window query
+    runs a single time per dashboard load instead of four.
+    """
+    discipline_codes = [
+        f"{distance} {stroke_code}"
+        for stroke_code, distances in RECORD_DISCIPLINES
+        for distance in distances
+    ]
+
+    partition = (Result.discipline_id, Result.course_id, Swimmer.sex, AgeCategory.id)
+
+    # Best time before this row (NULL for the first ever), and best time
+    # across the whole partition — a step whose time equals the all-time
+    # best is the standing record for that combination
+    prev_best = func.min(Result.time).over(
+        partition_by=partition,
+        order_by=(Result.date, Result.id),
+        rows=(None, -1),
+    ).label("prev_best")
+    all_best = func.min(Result.time).over(partition_by=partition).label("all_best")
+
+    inner = (
+        select(
+            Result.id.label("result_id"),
+            Swimmer.id.label("swimmer_id"),
+            Swimmer.name.label("name"),
+            Swimmer.surname.label("surname"),
+            Discipline.title.label("discipline"),
+            Course.length.label("pool_length"),
+            Result.time.label("time"),
+            Result.date.label("date"),
+            AgeCategory.code.label("age_category"),
+            AgeCategory.max_age.label("max_age"),
+            prev_best,
+            all_best,
+        )
+        .select_from(Result)
+        .join(Swimmer, Result.swimmer_id == Swimmer.id)
+        .join(Discipline, Result.discipline_id == Discipline.id)
+        .join(Course, Result.course_id == Course.id)
+        .join(AgeCategory, Result.age_at_result <= AgeCategory.max_age)
+        .where(
+            Discipline.code.in_(discipline_codes),
+            Result.time < DNF_THRESHOLD,
+            Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS),
+        )
+    )
+
+    # Discipline/course combinations that have no club records (100 O on 50m)
+    for code, length in EXCLUDED_DISCIPLINE_COURSES:
+        inner = inner.where(not_(and_(Discipline.code == code, Course.length == length)))
+
+    steps = inner.subquery()
+
+    return db.execute(
+        select(
+            steps.c.result_id,
+            steps.c.swimmer_id,
+            steps.c.name,
+            steps.c.surname,
+            steps.c.discipline,
+            steps.c.pool_length,
+            steps.c.time,
+            steps.c.date,
+            steps.c.age_category,
+            steps.c.max_age,
+            (steps.c.time == steps.c.all_best).label("is_current"),
+        ).where(or_(steps.c.prev_best.is_(None), steps.c.time < steps.c.prev_best))
+    ).all()
+
+
+def _count_steps_in_period(
+    steps: list, period_value: int, period_type: PeriodType
+) -> int:
+    """Count progression steps swum in the given year/season (pure Python)."""
+    if period_type == PeriodType.YEAR:
+        return sum(1 for s in steps if s.date.year == period_value)
+
+    # Season runs from September 1st of period_value to August 31st of period_value+1
+    season_start = date(period_value, 9, 1)
+    season_end = date(period_value + 1, 8, 31)
+    return sum(1 for s in steps if season_start <= s.date <= season_end)
+
+
 def get_club_records_count(
     db: Session, period_value: int, period_type: PeriodType = PeriodType.YEAR
 ) -> int:
@@ -105,59 +201,9 @@ def get_club_records_count(
     period — unlike the old logic, which could only see current record
     holders and returned 0 for past years.
     """
-    discipline_codes = [
-        f"{distance} {stroke_code}"
-        for stroke_code, distances in RECORD_DISCIPLINES
-        for distance in distances
-    ]
-
-    # Best time swum before the current row (NULL for the first row),
-    # per record combination, in chronological order
-    prev_best = func.min(Result.time).over(
-        partition_by=(
-            Result.discipline_id,
-            Result.course_id,
-            Swimmer.sex,
-            AgeCategory.id,
-        ),
-        order_by=(Result.date, Result.id),
-        rows=(None, -1),
-    ).label("prev_best")
-
-    steps = (
-        select(
-            Result.date.label("date"),
-            Result.time.label("time"),
-            prev_best,
-        )
-        .select_from(Result)
-        .join(Swimmer, Result.swimmer_id == Swimmer.id)
-        .join(Discipline, Result.discipline_id == Discipline.id)
-        .join(Course, Result.course_id == Course.id)
-        .join(AgeCategory, Result.age_at_result <= AgeCategory.max_age)
-        .where(
-            Discipline.code.in_(discipline_codes),
-            Result.time < DNF_THRESHOLD,
-            Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS),
-        )
+    return _count_steps_in_period(
+        _fetch_record_steps(db), period_value, period_type
     )
-
-    # Discipline/course combinations that have no club records (100 O on 50m)
-    for code, length in EXCLUDED_DISCIPLINE_COURSES:
-        steps = steps.where(not_(and_(Discipline.code == code, Course.length == length)))
-
-    steps = steps.subquery()
-
-    count_query = (
-        select(func.count())
-        .select_from(steps)
-        .where(
-            or_(steps.c.prev_best.is_(None), steps.c.time < steps.c.prev_best),
-            get_date_filter(period_value, period_type, date_column=steps.c.date),
-        )
-    )
-
-    return db.execute(count_query).scalar() or 0
 
 
 def get_personal_bests_count(
@@ -229,6 +275,56 @@ def get_top_swimmers_by_points(db: Session, sex: str, limit: int = 5) -> list:
     ]
 
 
+def _group_steps(steps: list, limit: int, oldest: bool) -> list:
+    """
+    Group progression steps by result (one swim can break records in
+    several age categories at once — those are combined into a single
+    entry with all its categories). Pure Python.
+
+    Args:
+        steps: Rows from _fetch_record_steps
+        limit: Number of distinct swims to return
+        oldest: If True, only still-standing steps, oldest first;
+                if False, all steps, most recent first (beaten ones included)
+    """
+    relevant = [s for s in steps if s.is_current] if oldest else steps
+    relevant = sorted(
+        relevant, key=lambda s: (s.date, s.result_id), reverse=not oldest
+    )
+
+    grouped: dict[int, dict] = {}
+    for step in relevant:
+        entry = grouped.get(step.result_id)
+        if entry is None:
+            # Only start new entries while under the limit; later steps of
+            # already-collected swims still merge in (order guarantees the
+            # first appearance is the ranking position)
+            if len(grouped) >= limit:
+                continue
+            entry = {
+                "resultId": step.result_id,
+                "name": step.name,
+                "surname": step.surname,
+                "swimmerId": step.swimmer_id,
+                "discipline": step.discipline,
+                "time": step.time,
+                "date": step.date.isoformat() if step.date else None,
+                "poolLength": step.pool_length,
+                "isCurrent": False,
+                "_categories": [],
+            }
+            grouped[step.result_id] = entry
+        entry["_categories"].append((step.max_age, step.age_category))
+        entry["isCurrent"] = entry["isCurrent"] or step.is_current
+
+    results = []
+    for entry in grouped.values():
+        categories = entry.pop("_categories")
+        entry["ageCategories"] = [code for _, code in sorted(categories)]
+        results.append(entry)
+    return results
+
+
 def get_club_records(db: Session, limit: int = 5, oldest: bool = False) -> list:
     """
     Get club record progression events, grouped by result (one swim can
@@ -250,116 +346,7 @@ def get_club_records(db: Session, limit: int = 5, oldest: bool = False) -> list:
         oldest: If True, returns the oldest still-standing records;
                 if False, the most recent record events (current or not)
     """
-    discipline_codes = [
-        f"{distance} {stroke_code}"
-        for stroke_code, distances in RECORD_DISCIPLINES
-        for distance in distances
-    ]
-
-    partition = (Result.discipline_id, Result.course_id, Swimmer.sex, AgeCategory.id)
-
-    # Best time before this row (NULL for the first ever), and best time
-    # across the whole partition — a step whose time equals the all-time
-    # best is the standing record for that combination
-    prev_best = func.min(Result.time).over(
-        partition_by=partition,
-        order_by=(Result.date, Result.id),
-        rows=(None, -1),
-    ).label("prev_best")
-    all_best = func.min(Result.time).over(partition_by=partition).label("all_best")
-
-    inner = (
-        select(
-            Result.id.label("result_id"),
-            Swimmer.id.label("swimmer_id"),
-            Swimmer.name.label("name"),
-            Swimmer.surname.label("surname"),
-            Discipline.title.label("discipline"),
-            Course.length.label("pool_length"),
-            Result.time.label("time"),
-            Result.date.label("date"),
-            AgeCategory.code.label("age_category"),
-            AgeCategory.max_age.label("max_age"),
-            prev_best,
-            all_best,
-        )
-        .select_from(Result)
-        .join(Swimmer, Result.swimmer_id == Swimmer.id)
-        .join(Discipline, Result.discipline_id == Discipline.id)
-        .join(Course, Result.course_id == Course.id)
-        .join(AgeCategory, Result.age_at_result <= AgeCategory.max_age)
-        .where(
-            Discipline.code.in_(discipline_codes),
-            Result.time < DNF_THRESHOLD,
-            Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS),
-        )
-    )
-
-    # Discipline/course combinations that have no club records (100 O on 50m)
-    for code, length in EXCLUDED_DISCIPLINE_COURSES:
-        inner = inner.where(not_(and_(Discipline.code == code, Course.length == length)))
-
-    steps = inner.subquery()
-
-    # Keep only record-breaking steps; for the "oldest" table, only those
-    # that are still standing
-    filtered = select(steps).where(
-        or_(steps.c.prev_best.is_(None), steps.c.time < steps.c.prev_best)
-    )
-    if oldest:
-        filtered = filtered.where(steps.c.time == steps.c.all_best)
-    filtered = filtered.subquery()
-
-    rows = db.execute(
-        select(
-            filtered.c.result_id,
-            filtered.c.swimmer_id,
-            filtered.c.name,
-            filtered.c.surname,
-            filtered.c.discipline,
-            filtered.c.pool_length,
-            filtered.c.time,
-            filtered.c.date,
-            func.array_agg(filtered.c.age_category).label("age_categories"),
-            func.array_agg(filtered.c.max_age).label("max_ages"),
-            func.bool_or(filtered.c.time == filtered.c.all_best).label("is_current"),
-        )
-        .group_by(
-            filtered.c.result_id,
-            filtered.c.swimmer_id,
-            filtered.c.name,
-            filtered.c.surname,
-            filtered.c.discipline,
-            filtered.c.pool_length,
-            filtered.c.time,
-            filtered.c.date,
-        )
-        .order_by(
-            filtered.c.date.asc() if oldest else desc(filtered.c.date),
-            filtered.c.result_id.asc() if oldest else desc(filtered.c.result_id),
-        )
-        .limit(limit)
-    ).all()
-
-    return [
-        {
-            "resultId": row.result_id,
-            "name": row.name,
-            "surname": row.surname,
-            "swimmerId": row.swimmer_id,
-            "discipline": row.discipline,
-            "time": row.time,
-            "date": row.date.isoformat() if row.date else None,
-            "poolLength": row.pool_length,
-            # sort categories by max_age ascending (both arrays are fed by
-            # the same aggregate node, so their elements correspond)
-            "ageCategories": [
-                code for _, code in sorted(zip(row.max_ages, row.age_categories))
-            ],
-            "isCurrent": row.is_current,
-        }
-        for row in rows
-    ]
+    return _group_steps(_fetch_record_steps(db), limit, oldest)
 
 
 def get_dashboard_stats(db: Session, period_type: PeriodType = PeriodType.YEAR) -> dict:
@@ -386,6 +373,10 @@ def get_dashboard_stats(db: Session, period_type: PeriodType = PeriodType.YEAR) 
         current_label = f"{current_period}/{current_period + 1}"
         previous_label = f"{previous_period}/{previous_period + 1}"
 
+    # All club-record stats share one computation of the progression steps
+    # (the expensive window query runs once per dashboard load, not 4×)
+    record_steps = _fetch_record_steps(db)
+
     return {
         "periodType": period_type.value,
         "currentPeriod": current_label,
@@ -400,8 +391,12 @@ def get_dashboard_stats(db: Session, period_type: PeriodType = PeriodType.YEAR) 
                 "previous": get_meets_count(db, previous_period, period_type),
             },
             "clubRecords": {
-                "current": get_club_records_count(db, current_period, period_type),
-                "previous": get_club_records_count(db, previous_period, period_type),
+                "current": _count_steps_in_period(
+                    record_steps, current_period, period_type
+                ),
+                "previous": _count_steps_in_period(
+                    record_steps, previous_period, period_type
+                ),
             },
             "personalBests": {
                 "current": get_personal_bests_count(db, current_period, period_type),
@@ -410,6 +405,6 @@ def get_dashboard_stats(db: Session, period_type: PeriodType = PeriodType.YEAR) 
         },
         "topMen": get_top_swimmers_by_points(db, "male", limit=10),
         "topWomen": get_top_swimmers_by_points(db, "female", limit=10),
-        "recentRecords": get_club_records(db, limit=10, oldest=False),
-        "oldestRecords": get_club_records(db, limit=10, oldest=True),
+        "recentRecords": _group_steps(record_steps, limit=10, oldest=False),
+        "oldestRecords": _group_steps(record_steps, limit=10, oldest=True),
     }
