@@ -43,6 +43,7 @@ export interface RecentClubRecord {
   date: string;
   poolLength: 25 | 50;
   ageCategories: string[];
+  isCurrent: boolean;
 }
 
 export interface DashboardResponse {

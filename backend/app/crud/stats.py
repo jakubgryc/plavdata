@@ -11,7 +11,6 @@ from app.crud.update_club_records import (
 )
 from app.models import (
     AgeCategory,
-    ClubRecord,
     Course,
     Discipline,
     PersonalBest,
@@ -232,69 +231,135 @@ def get_top_swimmers_by_points(db: Session, sex: str, limit: int = 5) -> list:
 
 def get_club_records(db: Session, limit: int = 5, oldest: bool = False) -> list:
     """
-    Get club records, grouped by result_id.
-    Each result can have multiple age categories, which are combined.
-    Returns `limit` distinct results (swims), not `limit` club_record rows.
+    Get club record progression events, grouped by result (one swim can
+    break records in several age categories at once — those are combined
+    into a single entry with all its categories).
+
+    Uses the same progression logic as the record-progression endpoint:
+    a record event is any result strictly faster than every eligible
+    result before it, per (discipline, course, sex, age category). This
+    means a discipline broken three times in a week shows up three times.
+
+    Each entry carries `isCurrent` — whether the swim is still the
+    standing record in at least one of its categories. Entries that were
+    beaten again later are kept in the list but flagged as not current.
 
     Args:
         db: Database session
-        limit: Number of records to return
-        oldest: If True, returns oldest records; if False, returns most recent
+        limit: Number of distinct swims to return
+        oldest: If True, returns the oldest still-standing records;
+                if False, the most recent record events (current or not)
     """
-    # Get distinct result_ids ordered by date
-    order = func.max(Result.date).asc() if oldest else desc(func.max(Result.date))
+    discipline_codes = [
+        f"{distance} {stroke_code}"
+        for stroke_code, distances in RECORD_DISCIPLINES
+        for distance in distances
+    ]
 
-    result_ids_subquery = (
-        db.query(ClubRecord.result_id)
-        .join(Result, ClubRecord.result_id == Result.id)
-        .filter(Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS))
-        .group_by(ClubRecord.result_id)
-        .order_by(order)
-        .limit(limit)
-        .subquery()
-    )
+    partition = (Result.discipline_id, Result.course_id, Swimmer.sex, AgeCategory.id)
 
-    # Get all club records for those result_ids with full details
-    date_order = Result.date.asc() if oldest else desc(Result.date)
-    records = (
-        db.query(
+    # Best time before this row (NULL for the first ever), and best time
+    # across the whole partition — a step whose time equals the all-time
+    # best is the standing record for that combination
+    prev_best = func.min(Result.time).over(
+        partition_by=partition,
+        order_by=(Result.date, Result.id),
+        rows=(None, -1),
+    ).label("prev_best")
+    all_best = func.min(Result.time).over(partition_by=partition).label("all_best")
+
+    inner = (
+        select(
             Result.id.label("result_id"),
-            Swimmer.name,
-            Swimmer.surname,
             Swimmer.id.label("swimmer_id"),
+            Swimmer.name.label("name"),
+            Swimmer.surname.label("surname"),
             Discipline.title.label("discipline"),
-            Result.time,
-            Result.date,
             Course.length.label("pool_length"),
+            Result.time.label("time"),
+            Result.date.label("date"),
             AgeCategory.code.label("age_category"),
+            AgeCategory.max_age.label("max_age"),
+            prev_best,
+            all_best,
         )
-        .join(ClubRecord, ClubRecord.result_id == Result.id)
+        .select_from(Result)
         .join(Swimmer, Result.swimmer_id == Swimmer.id)
         .join(Discipline, Result.discipline_id == Discipline.id)
-        .join(AgeCategory, ClubRecord.age_category_id == AgeCategory.id)
         .join(Course, Result.course_id == Course.id)
-        .filter(Result.id.in_(db.query(result_ids_subquery.c.result_id)))
-        .order_by(date_order, Result.id, AgeCategory.max_age)
-        .all()
+        .join(AgeCategory, Result.age_at_result <= AgeCategory.max_age)
+        .where(
+            Discipline.code.in_(discipline_codes),
+            Result.time < DNF_THRESHOLD,
+            Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS),
+        )
     )
 
-    # Group by result_id to combine age categories
-    grouped = {}
-    for row in records:
-        if row.result_id not in grouped:
-            grouped[row.result_id] = {
-                "name": row.name,
-                "surname": row.surname,
-                "swimmerId": row.swimmer_id,
-                "discipline": row.discipline,
-                "time": row.time,
-                "date": row.date.isoformat() if row.date else None,
-                "poolLength": row.pool_length,
-                "ageCategories": [],
-            }
-        grouped[row.result_id]["ageCategories"].append(row.age_category)
+    # Discipline/course combinations that have no club records (100 O on 50m)
+    for code, length in EXCLUDED_DISCIPLINE_COURSES:
+        inner = inner.where(not_(and_(Discipline.code == code, Course.length == length)))
 
-    return list(grouped.values())
+    steps = inner.subquery()
+
+    # Keep only record-breaking steps; for the "oldest" table, only those
+    # that are still standing
+    filtered = select(steps).where(
+        or_(steps.c.prev_best.is_(None), steps.c.time < steps.c.prev_best)
+    )
+    if oldest:
+        filtered = filtered.where(steps.c.time == steps.c.all_best)
+    filtered = filtered.subquery()
+
+    rows = db.execute(
+        select(
+            filtered.c.result_id,
+            filtered.c.swimmer_id,
+            filtered.c.name,
+            filtered.c.surname,
+            filtered.c.discipline,
+            filtered.c.pool_length,
+            filtered.c.time,
+            filtered.c.date,
+            func.array_agg(filtered.c.age_category).label("age_categories"),
+            func.array_agg(filtered.c.max_age).label("max_ages"),
+            func.bool_or(filtered.c.time == filtered.c.all_best).label("is_current"),
+        )
+        .group_by(
+            filtered.c.result_id,
+            filtered.c.swimmer_id,
+            filtered.c.name,
+            filtered.c.surname,
+            filtered.c.discipline,
+            filtered.c.pool_length,
+            filtered.c.time,
+            filtered.c.date,
+        )
+        .order_by(
+            filtered.c.date.asc() if oldest else desc(filtered.c.date),
+            filtered.c.result_id.asc() if oldest else desc(filtered.c.result_id),
+        )
+        .limit(limit)
+    ).all()
+
+    return [
+        {
+            "resultId": row.result_id,
+            "name": row.name,
+            "surname": row.surname,
+            "swimmerId": row.swimmer_id,
+            "discipline": row.discipline,
+            "time": row.time,
+            "date": row.date.isoformat() if row.date else None,
+            "poolLength": row.pool_length,
+            # sort categories by max_age ascending (both arrays are fed by
+            # the same aggregate node, so their elements correspond)
+            "ageCategories": [
+                code for _, code in sorted(zip(row.max_ages, row.age_categories))
+            ],
+            "isCurrent": row.is_current,
+        }
+        for row in rows
+    ]
 
 
 def get_dashboard_stats(db: Session, period_type: PeriodType = PeriodType.YEAR) -> dict:
