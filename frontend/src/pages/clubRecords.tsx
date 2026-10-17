@@ -198,7 +198,7 @@ function ClubRecords() {
   };
 
   return (
-    <Flex direction="column" h="90vh" w="100%" pb="xl">
+    <Flex direction="column" mih="90vh" w="100%" pb="xl">
       <Title order={2} mb="md">
         Klubové rekordy
       </Title>
@@ -365,15 +365,11 @@ function ClubRecords() {
         </Tabs.Panel>
 
         <Tabs.Panel value="progression" pt="sm">
-          <Box mah="72vh" style={{ overflowY: "auto" }}>
-            <RecordProgression />
-          </Box>
+          <RecordProgression />
         </Tabs.Panel>
 
         <Tabs.Panel value="holders" pt="sm">
-          <Box mah="72vh" style={{ overflowY: "auto" }}>
-            <RecordHolders />
-          </Box>
+          <RecordHolders />
         </Tabs.Panel>
       </Tabs>
 
