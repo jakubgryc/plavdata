@@ -1,10 +1,14 @@
 from datetime import date
 from enum import Enum
 
-from sqlalchemy import and_, desc, extract, func
+from sqlalchemy import and_, desc, extract, func, not_, or_, select
 from sqlalchemy.orm import Session
 
-from app.constants import EXCLUDED_COMPETITION_LOCATIONS
+from app.constants import DNF_THRESHOLD, EXCLUDED_COMPETITION_LOCATIONS
+from app.crud.update_club_records import (
+    EXCLUDED_DISCIPLINE_COURSES,
+    RECORD_DISCIPLINES,
+)
 from app.models import (
     AgeCategory,
     ClubRecord,
@@ -21,24 +25,29 @@ class PeriodType(str, Enum):
     SEASON = "season"
 
 
-def get_date_filter(period_value: int, period_type: PeriodType = PeriodType.YEAR):
+def get_date_filter(
+    period_value: int,
+    period_type: PeriodType = PeriodType.YEAR,
+    date_column=Result.date,
+):
     """
     Build a date filter for SQLAlchemy queries.
 
     Args:
         period_value: Year (e.g., 2025) or season start year (e.g., 2025 for 2025/2026 season)
         period_type: Either "year" or "season"
+        date_column: Column to filter on (defaults to Result.date, can be a subquery column)
 
     Returns:
-        SQLAlchemy filter condition for Result.date
+        SQLAlchemy filter condition for the date column
     """
     if period_type == PeriodType.YEAR:
-        return extract("year", Result.date) == period_value
+        return extract("year", date_column) == period_value
     else:  # SEASON
         # Season runs from September 1st of period_value to August 31st of period_value+1
         season_start = date(period_value, 9, 1)
         season_end = date(period_value + 1, 8, 31)
-        return and_(Result.date >= season_start, Result.date <= season_end)
+        return and_(date_column >= season_start, date_column <= season_end)
 
 
 def get_results_count(
@@ -82,19 +91,74 @@ def get_meets_count(
 def get_club_records_count(
     db: Session, period_value: int, period_type: PeriodType = PeriodType.YEAR
 ) -> int:
-    """Count club records set/broken in a given period."""
-    if period_type == PeriodType.YEAR and period_value != date.today().year:
-        return 0
+    """
+    Count club record improvements (progression steps) in a given period.
 
-    # For seasons or current year, count records with date in the period
-    return (
-        db.query(func.count(ClubRecord.id))
-        .join(Result, ClubRecord.result_id == Result.id)
-        .filter(get_date_filter(period_value, period_type))
-        .filter(Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS))
-        .scalar()
-        or 0
+    A record improvement is any result that was strictly faster than every
+    eligible result before it, evaluated per (discipline, course, sex, age
+    category) with the same rules as the record progression view:
+    - the same discipline improved three times in a season counts three times,
+    - one swim that improves records in several age categories counts once
+      per category,
+    - equal times do NOT count as a new record (the earlier swim keeps it).
+
+    Computed on the fly from the results table, so it works for any past
+    period — unlike the old logic, which could only see current record
+    holders and returned 0 for past years.
+    """
+    discipline_codes = [
+        f"{distance} {stroke_code}"
+        for stroke_code, distances in RECORD_DISCIPLINES
+        for distance in distances
+    ]
+
+    # Best time swum before the current row (NULL for the first row),
+    # per record combination, in chronological order
+    prev_best = func.min(Result.time).over(
+        partition_by=(
+            Result.discipline_id,
+            Result.course_id,
+            Swimmer.sex,
+            AgeCategory.id,
+        ),
+        order_by=(Result.date, Result.id),
+        rows=(None, -1),
+    ).label("prev_best")
+
+    steps = (
+        select(
+            Result.date.label("date"),
+            Result.time.label("time"),
+            prev_best,
+        )
+        .select_from(Result)
+        .join(Swimmer, Result.swimmer_id == Swimmer.id)
+        .join(Discipline, Result.discipline_id == Discipline.id)
+        .join(Course, Result.course_id == Course.id)
+        .join(AgeCategory, Result.age_at_result <= AgeCategory.max_age)
+        .where(
+            Discipline.code.in_(discipline_codes),
+            Result.time < DNF_THRESHOLD,
+            Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS),
+        )
     )
+
+    # Discipline/course combinations that have no club records (100 O on 50m)
+    for code, length in EXCLUDED_DISCIPLINE_COURSES:
+        steps = steps.where(not_(and_(Discipline.code == code, Course.length == length)))
+
+    steps = steps.subquery()
+
+    count_query = (
+        select(func.count())
+        .select_from(steps)
+        .where(
+            or_(steps.c.prev_best.is_(None), steps.c.time < steps.c.prev_best),
+            get_date_filter(period_value, period_type, date_column=steps.c.date),
+        )
+    )
+
+    return db.execute(count_query).scalar() or 0
 
 
 def get_personal_bests_count(
@@ -272,6 +336,7 @@ def get_dashboard_stats(db: Session, period_type: PeriodType = PeriodType.YEAR) 
             },
             "clubRecords": {
                 "current": get_club_records_count(db, current_period, period_type),
+                "previous": get_club_records_count(db, previous_period, period_type),
             },
             "personalBests": {
                 "current": get_personal_bests_count(db, current_period, period_type),
