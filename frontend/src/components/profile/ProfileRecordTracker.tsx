@@ -129,12 +129,7 @@ function CourseSection({ courseLength, chances, beatable }: CourseSectionProps) 
       </Group>
 
       <Table.ScrollContainer minWidth={540}>
-        <Table
-          striped
-          highlightOnHover
-          verticalSpacing={6}
-          className="responsive-results-table"
-        >
+        <Table striped highlightOnHover verticalSpacing={6} className="responsive-results-table">
           <Table.Thead>
             <Table.Tr>
               <Table.Th>Disciplína</Table.Th>
@@ -197,9 +192,7 @@ function ProfileRecordTracker({ chances }: ProfileRecordTrackerProps) {
   if (comparable.length === 0) {
     return (
       <Center h={200}>
-        <Text c="dimmed">
-          Zatím není s čím srovnávat — chybí časy v rekordních disciplínách.
-        </Text>
+        <Text c="dimmed">Zatím není s čím srovnávat — chybí časy v rekordních disciplínách.</Text>
       </Center>
     );
   }
@@ -211,10 +204,7 @@ function ProfileRecordTracker({ chances }: ProfileRecordTrackerProps) {
           PB = nejlepší čas zaplavaný ještě v dané kategorii. Vyber kategorii — rozdíly k jejím
           rekordům jsou seřazené od nejmenšího.
         </Text>
-        <Chip.Group
-          value={category ?? ""}
-          onChange={(val) => setSelectedCategory(val as string)}
-        >
+        <Chip.Group value={category ?? ""} onChange={(val) => setSelectedCategory(val as string)}>
           <Flex gap="xs" wrap="wrap">
             {availableCategories.map((cat) => (
               <Chip key={cat} value={cat} size="xs" variant="filled">

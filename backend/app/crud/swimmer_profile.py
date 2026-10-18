@@ -418,9 +418,7 @@ def get_swimmer_record_chances(db: Session, swimmer_id: int) -> list | None:
         return None
 
     current_year = date.today().year
-    swimmer_age = (
-        current_year - swimmer.birth_year if swimmer.birth_year else None
-    )
+    swimmer_age = current_year - swimmer.birth_year if swimmer.birth_year else None
 
     record_rows = (
         db.query(
@@ -474,9 +472,7 @@ def get_swimmer_record_chances(db: Session, swimmer_id: int) -> list | None:
     chances = []
     for row in record_rows:
         candidates = times_by_key.get((row.discipline_id, row.course_length), [])
-        eligible_times = [
-            time for age, time in candidates if age <= row.max_age
-        ]
+        eligible_times = [time for age, time in candidates if age <= row.max_age]
         pb_time = min(eligible_times) if eligible_times else None
         beatable = swimmer_age is not None and row.max_age >= swimmer_age
         gap = pb_time - row.record_time if pb_time is not None else None
