@@ -273,6 +273,21 @@ export interface QuarterlyImprovement {
   improvementRate: number;
 }
 
+export interface RecordChance {
+  courseLength: number;
+  disciplineCode: string;
+  ageCategory: string;
+  maxAge: number;
+  recordTime: number;
+  holderId: number;
+  holderName: string;
+  holderSurname: string;
+  beatable: boolean;
+  holdsRecord: boolean;
+  pbTime: number | null;
+  gap: number | null;
+}
+
 export interface SwimmerClubRecord {
   resultId: number;
   courseLength: number;
@@ -295,4 +310,5 @@ export interface SwimmerProfileResponse {
   startsByStroke: StartsByStroke;
   quarterlyImprovements: QuarterlyImprovement[];
   clubRecords: SwimmerClubRecord[];
+  recordChances: RecordChance[];
 }

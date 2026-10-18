@@ -7,6 +7,7 @@ import PerformanceChart from "../components/profile/PerformanceChart";
 import PersonalBestsTable from "../components/profile/PersonalBestsTable";
 import ProfileClubRecords from "../components/profile/ProfileClubRecords";
 import ProfileHeader from "../components/profile/ProfileHeader";
+import ProfileRecordTracker from "../components/profile/ProfileRecordTracker";
 import QuarterlyImprovementChart from "../components/profile/QuarterlyImprovementChart";
 import StrokeRadarChart from "../components/profile/StrokeRadarChart";
 import TopResultsCard from "../components/profile/TopResultsCard";
@@ -76,6 +77,7 @@ function SwimmerProfile() {
     startsByStroke,
     quarterlyImprovements,
     clubRecords,
+    recordChances,
   } = profileData;
 
   const hasClubRecords = clubRecords.length > 0;
@@ -89,6 +91,7 @@ function SwimmerProfile() {
           <Tabs.Tab value="overview">Přehled</Tabs.Tab>
           <Tabs.Tab value="pb">Osobní rekordy</Tabs.Tab>
           {hasClubRecords && <Tabs.Tab value="records">Klubové rekordy</Tabs.Tab>}
+          <Tabs.Tab value="tracker">Rekordy na dosah</Tabs.Tab>
           <Tabs.Tab value="competitions">Závody</Tabs.Tab>
         </Tabs.List>
 
@@ -116,6 +119,10 @@ function SwimmerProfile() {
             <ProfileClubRecords records={clubRecords} />
           </Tabs.Panel>
         )}
+
+        <Tabs.Panel value="tracker" pt="md">
+          <ProfileRecordTracker chances={recordChances} />
+        </Tabs.Panel>
 
         <Tabs.Panel value="competitions" pt="md">
           <CompetitionsTable competitions={competitions} />
