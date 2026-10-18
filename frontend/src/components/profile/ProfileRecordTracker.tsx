@@ -133,7 +133,6 @@ function CourseSection({ courseLength, chances, beatable }: CourseSectionProps) 
           striped
           highlightOnHover
           verticalSpacing={6}
-          horizontalSpacing={{ base: 6, sm: "md" }}
           className="responsive-results-table"
         >
           <Table.Thead>
@@ -213,7 +212,6 @@ function ProfileRecordTracker({ chances }: ProfileRecordTrackerProps) {
           rekordům jsou seřazené od nejmenšího.
         </Text>
         <Chip.Group
-          type="radio"
           value={category ?? ""}
           onChange={(val) => setSelectedCategory(val as string)}
         >
