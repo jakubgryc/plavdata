@@ -4,13 +4,14 @@ Authentication utilities for JWT token handling and password hashing.
 
 import os
 from datetime import datetime, timedelta, UTC
-from typing import Optional
+from typing import Annotated, Optional
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from jose import JWTError, jwt
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.db import get_db
@@ -60,9 +61,13 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     return encoded_jwt
 
 
-def authenticate_user(db: Session, username: str, password: str) -> Optional[User]:
-    """Authenticate a user by username and password."""
-    user = db.query(User).filter(User.username == username).first()
+def authenticate_user(db: Session, identifier: str, password: str) -> Optional[User]:
+    """Authenticate a user by username or email and password."""
+    user = (
+        db.query(User)
+        .filter(or_(User.username == identifier, User.email == identifier))
+        .first()
+    )
     if not user:
         return None
     if not verify_password(password, user.hashed_password):
@@ -106,3 +111,18 @@ def get_current_user(
         )
 
     return user
+
+
+def get_current_admin(
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> User:
+    """
+    Dependency that requires the current user to have the admin role.
+    Raises HTTPException(403) if the user is not an admin.
+    """
+    if current_user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required",
+        )
+    return current_user
