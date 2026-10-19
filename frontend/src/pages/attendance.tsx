@@ -1,13 +1,4 @@
-import {
-  ActionIcon,
-  Box,
-  Center,
-  Flex,
-  SegmentedControl,
-  Stack,
-  Text,
-  Title,
-} from "@mantine/core";
+import { ActionIcon, Center, Flex, SegmentedControl, Stack, Text, Title } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import dayjs from "dayjs";
@@ -15,15 +6,17 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Navigate } from "react-router";
 import { API_BASE_URL } from "../../config";
 import DayView from "../components/attendance/DayView";
+import WeekView from "../components/attendance/WeekView";
 import { useAuth } from "../hooks/useAuth";
 import type { AttendanceContext, ContextGroup } from "../schema/attendance";
+import { defaultDate, isTrainingDay, mondayOf, toApiDate } from "../utils/attendance";
 import { authenticatedFetch } from "../utils/authenticatedFetch";
-import { defaultDate, isTrainingDay, toApiDate } from "../utils/attendance";
 
 function AttendancePage() {
   const { isAuthenticated, role } = useAuth();
 
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [weekStart, setWeekStart] = useState<Date>(mondayOf(new Date()));
   const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
   const [view, setView] = useState<"day" | "week">("day");
   const [context, setContext] = useState<AttendanceContext | null>(null);
@@ -86,24 +79,30 @@ function AttendancePage() {
 
   const schedule = selectedGroup?.schedule ?? [];
 
-  // Navigation: prev/next training day within ±90 days
+  // Navigation: prev/next based on view mode
   const prevDate = useMemo(() => {
+    if (view === "week") {
+      return dayjs(weekStart).subtract(7, "day").toDate();
+    }
     if (schedule.length === 0) return null;
     for (let i = 1; i <= 90; i++) {
       const candidate = dayjs(selectedDate).subtract(i, "day").toDate();
       if (isTrainingDay(schedule, candidate)) return candidate;
     }
     return null;
-  }, [selectedDate, schedule]);
+  }, [view, weekStart, selectedDate, schedule]);
 
   const nextDate = useMemo(() => {
+    if (view === "week") {
+      return dayjs(weekStart).add(7, "day").toDate();
+    }
     if (schedule.length === 0) return null;
     for (let i = 1; i <= 90; i++) {
       const candidate = dayjs(selectedDate).add(i, "day").toDate();
       if (isTrainingDay(schedule, candidate)) return candidate;
     }
     return null;
-  }, [selectedDate, schedule]);
+  }, [view, weekStart, selectedDate, schedule]);
 
   if (!isAuthenticated) {
     return <Navigate to="/admin" replace />;
@@ -142,7 +141,7 @@ function AttendancePage() {
       <Title order={2}>Docházka</Title>
 
       {/* Group selector */}
-      {context && context.groups.length > 1 && (
+      {context && context.groups.length > 0 && (
         <SegmentedControl
           value={selectedGroupId != null ? String(selectedGroupId) : ""}
           onChange={(val) => setSelectedGroupId(Number(val))}
@@ -161,17 +160,27 @@ function AttendancePage() {
           size="lg"
           disabled={!prevDate}
           onClick={() => {
-            if (prevDate) setSelectedDate(prevDate);
+            if (view === "week" && prevDate) {
+              setWeekStart(prevDate);
+            } else if (prevDate) {
+              setSelectedDate(prevDate);
+            }
           }}
-          aria-label="Předchozí trénink"
+          aria-label={view === "week" ? "Předchozí týden" : "Předchozí trénink"}
         >
           <IconChevronLeft size={20} />
         </ActionIcon>
 
         <DatePickerInput
-          value={selectedDate}
+          value={view === "week" ? weekStart : selectedDate}
           onChange={(val) => {
-            if (val) setSelectedDate(val);
+            if (val) {
+              if (view === "week") {
+                setWeekStart(mondayOf(val));
+              } else {
+                setSelectedDate(val);
+              }
+            }
           }}
           locale="cs"
           firstDayOfWeek={1}
@@ -185,16 +194,37 @@ function AttendancePage() {
           size="lg"
           disabled={!nextDate}
           onClick={() => {
-            if (nextDate) setSelectedDate(nextDate);
+            if (view === "week" && nextDate) {
+              setWeekStart(nextDate);
+            } else if (nextDate) {
+              setSelectedDate(nextDate);
+            }
           }}
-          aria-label="Další trénink"
+          aria-label={view === "week" ? "Další týden" : "Další trénink"}
         >
           <IconChevronRight size={20} />
         </ActionIcon>
 
         <SegmentedControl
           value={view}
-          onChange={(val) => setView(val as "day" | "week")}
+          onChange={(val) => {
+            const newView = val as "day" | "week";
+            if (newView === "week" && view === "day") {
+              // Switching day → week: set weekStart to mondayOf(selectedDate)
+              setWeekStart(mondayOf(selectedDate));
+            } else if (newView === "day" && view === "week") {
+              // Switching week → day: set selectedDate to first training day of the week, or weekStart
+              const firstTrainingDay = (() => {
+                for (let i = 0; i < 7; i++) {
+                  const candidate = dayjs(weekStart).add(i, "day").toDate();
+                  if (isTrainingDay(schedule, candidate)) return candidate;
+                }
+                return weekStart;
+              })();
+              setSelectedDate(firstTrainingDay);
+            }
+            setView(newView);
+          }}
           data={[
             { value: "day", label: "Den" },
             { value: "week", label: "Týden" },
@@ -203,17 +233,12 @@ function AttendancePage() {
       </Flex>
 
       {/* Content */}
-      {selectedGroupId != null && (
-        <>
-          {view === "day" ? (
-            <DayView groupId={selectedGroupId} date={selectedDate} />
-          ) : (
-            <Box p="lg">
-              <Text c="dimmed">Týdenní pohled — připravuje se.</Text>
-            </Box>
-          )}
-        </>
-      )}
+      {selectedGroupId != null &&
+        (view === "day" ? (
+          <DayView groupId={selectedGroupId} date={selectedDate} />
+        ) : (
+          <WeekView groupId={selectedGroupId} weekStart={weekStart} />
+        ))}
     </Stack>
   );
 }

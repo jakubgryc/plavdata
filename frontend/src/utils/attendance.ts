@@ -36,7 +36,10 @@ export function parseApiDate(s: string): Date {
  */
 export function mondayOf(d: Date): Date {
   const wd = isoWeekday(d);
-  return dayjs(d).subtract(wd - 1, "day").startOf("day").toDate();
+  return dayjs(d)
+    .subtract(wd - 1, "day")
+    .startOf("day")
+    .toDate();
 }
 
 /**

@@ -65,10 +65,14 @@ export interface WeekDayOut {
   date: string;
   is_training_day: boolean;
   schedule: ScheduleSlot | null;
-  training: TrainingOut | null;
+  filled: boolean;
+  present_count: number | null;
+  saved_by_name: string | null;
+  saved_at: string | null;
+  attendance: AttendanceEntry[];
 }
 
 export interface WeekOut {
-  week_start: string;
+  swimmers: SwimmerBrief[];
   days: WeekDayOut[];
 }

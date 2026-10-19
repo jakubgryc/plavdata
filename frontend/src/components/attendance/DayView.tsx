@@ -21,8 +21,8 @@ import utc from "dayjs/plugin/utc";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { API_BASE_URL } from "../../../config";
 import type { DayOut, SaveDayBody } from "../../schema/attendance";
-import { authenticatedFetch } from "../../utils/authenticatedFetch";
 import { fmtDayLabel, toApiDate } from "../../utils/attendance";
+import { authenticatedFetch } from "../../utils/authenticatedFetch";
 
 dayjs.extend(utc);
 
@@ -306,9 +306,7 @@ function DayView({ groupId, date }: DayViewProps) {
           label="Popis tréninku"
           minRows={3}
           value={draft.description}
-          onChange={(e) =>
-            setDraft((prev) => ({ ...prev, description: e.currentTarget.value }))
-          }
+          onChange={(e) => setDraft((prev) => ({ ...prev, description: e.currentTarget.value }))}
         />
       </Stack>
 

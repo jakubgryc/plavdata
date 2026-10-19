@@ -3,7 +3,7 @@ import { DatesProvider } from "@mantine/dates";
 import { Notifications } from "@mantine/notifications";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { Navigate, createBrowserRouter } from "react-router";
+import { createBrowserRouter, Navigate } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import "dayjs/locale/cs";
 import "@mantine/core/styles.css";
@@ -32,11 +32,7 @@ import { theme } from "./theme";
 import { authApi } from "./utils/auth";
 
 function AdminEntry() {
-  return authApi.isAuthenticated() ? (
-    <Navigate to="/admin/control-center" replace />
-  ) : (
-    <Login />
-  );
+  return authApi.isAuthenticated() ? <Navigate to="/admin/control-center" replace /> : <Login />;
 }
 
 const router = createBrowserRouter([
