@@ -1,9 +1,11 @@
-import { Box, Flex, Modal, SegmentedControl, Stack, Text, Title } from "@mantine/core";
+import { Box, Flex, Modal, SegmentedControl, Stack, Tabs, Text, Title } from "@mantine/core";
 import { DataTable } from "mantine-datatable";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 
 import { API_BASE_URL } from "../../config";
+import RecordHolders from "../components/RecordHolders";
+import RecordProgression from "../components/RecordProgression";
 import TableSplitRelayLegend from "../components/shared/TableSplitRelayLegend";
 import { useTheme } from "../hooks/useTheme";
 import { DISCIPLINES, POOLS } from "../utils/constants";
@@ -196,166 +198,180 @@ function ClubRecords() {
   };
 
   return (
-    <Flex direction="column" h="90vh" w="100%" pb="xl">
-      <Flex
-        direction={{ base: "column", sm: "row" }}
-        justify={{ sm: "space-between" }}
-        align={{ base: "stretch", sm: "center" }}
-        w="100%"
-        mb="md"
-        gap="md"
-      >
-        <Title order={2}>Klubové rekordy</Title>
-        <SegmentedControl
-          value={selectedCourse}
-          onChange={setSelectedCourse}
-          withItemsBorders={false}
-          data={POOLS}
-          defaultValue={POOLS[0]?.value}
-          radius="xl"
-        />
-      </Flex>
-      <TableSplitRelayLegend />
+    <Flex direction="column" mih="90vh" w="100%" pb="xl">
+      <Title order={2} mb="md">
+        Klubové rekordy
+      </Title>
 
-      <Box mah="75vh" pt="sm" style={{ overflowY: "auto" }}>
-        <DataTable<ClubRecordRow>
-          className="shadow-xl club-records-table"
-          withTableBorder
-          borderRadius="lg"
-          horizontalSpacing={0}
-          verticalSpacing={0}
-          withColumnBorders
-          striped
-          pinFirstColumn={true}
-          highlightOnHover
-          fetching={isFetching}
-          rowClassName={(record) => (record.isFirstOfType ? "first-of-type" : "")}
-          columns={[
-            {
-              accessor: "discipline",
-              width: 140,
-              title: "Disciplína",
-            },
-            ...ageCategories.map((category) => ({
-              accessor: category,
-              width: 350,
-              title: (
-                <Stack gap={4} align="center">
-                  <Text fw={700} size="sm">
-                    {category === "junior"
-                      ? "Dorost"
-                      : category === "open"
-                        ? "Absolutní"
-                        : `${category}letí`}
-                  </Text>
-                  <Flex w="100%" justify="flex-start" gap={{ base: 4, sm: "xs" }}>
-                    <Text
-                      size="xs"
-                      style={{
-                        flex: 3,
-                        padding: "0px 10px",
-                        textAlign: "left",
-                      }}
-                    >
-                      Jméno
-                    </Text>
-                    <Text
-                      size="xs"
-                      style={{
-                        flex: 2,
-                        textAlign: "left",
-                      }}
-                    >
-                      Čas
-                    </Text>
-                    <Text size="xs" style={{ flex: 1.5, textAlign: "left" }}>
-                      Datum
-                    </Text>
-                  </Flex>
-                </Stack>
-              ),
-              render: (record: ClubRecordRow) => {
-                const data = record[category];
-                if (!data) {
-                  return;
-                }
-                const bgColor = data.splitTime
-                  ? colorScheme === "dark"
-                    ? "#4A5D4A"
-                    : "#D4EDDA"
-                  : data.relayPart
-                    ? colorScheme === "dark"
-                      ? "#5A4A7A"
-                      : "#E2E3F1"
-                    : "transparent";
-                return (
-                  <Flex
-                    w="100%"
-                    justify="flex-start"
-                    gap={{ base: 4, sm: "xs" }}
-                    align="center"
-                    style={{
-                      backgroundColor: bgColor,
-                      padding: "10px",
-                    }}
-                  >
-                    <Box
-                      style={{
-                        flex: 3,
-                        textAlign: "left",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                      }}
-                    >
-                      <Text
-                        component={Link}
-                        to={`/swimmer/${data.swimmerId}`}
-                        className="textHoverLink"
-                        size="xs"
-                      >
-                        {data.surname} {data.name}
+      <Tabs defaultValue="records" mt="xs">
+        <Tabs.List>
+          <Tabs.Tab value="records">Aktuální rekordy</Tabs.Tab>
+          <Tabs.Tab value="progression">Vývoj rekordů</Tabs.Tab>
+          <Tabs.Tab value="holders">Držitelé rekordů</Tabs.Tab>
+        </Tabs.List>
+
+        <Tabs.Panel value="records" pt="sm">
+          <Flex justify="space-between" align="center" wrap="wrap" gap="sm">
+            <TableSplitRelayLegend />
+            <SegmentedControl
+              value={selectedCourse}
+              onChange={setSelectedCourse}
+              withItemsBorders={false}
+              data={POOLS}
+              defaultValue={POOLS[0]?.value}
+              radius="xl"
+            />
+          </Flex>
+
+          <Box mah="70vh" pt="sm" style={{ overflowY: "auto" }}>
+            <DataTable<ClubRecordRow>
+              className="shadow-xl club-records-table"
+              withTableBorder
+              borderRadius="lg"
+              horizontalSpacing={0}
+              verticalSpacing={0}
+              withColumnBorders
+              striped
+              pinFirstColumn={true}
+              highlightOnHover
+              fetching={isFetching}
+              rowClassName={(record) => (record.isFirstOfType ? "first-of-type" : "")}
+              columns={[
+                {
+                  accessor: "discipline",
+                  width: 140,
+                  title: "Disciplína",
+                },
+                ...ageCategories.map((category) => ({
+                  accessor: category,
+                  width: 350,
+                  title: (
+                    <Stack gap={4} align="center">
+                      <Text fw={700} size="sm">
+                        {category === "junior"
+                          ? "Dorost"
+                          : category === "open"
+                            ? "Absolutní"
+                            : `${category}letí`}
                       </Text>
-                    </Box>
-                    <Box
-                      style={{
-                        flex: 1.5,
-                        textAlign: "left",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <Text
-                        className="textHoverLink"
-                        size="xs"
-                        onClick={() => {
-                          setModalData({
-                            time: parseTimeFromMillis(data.time),
-                            name: data.name,
-                            surname: data.surname,
-                            age: data.ageAtResult,
-                            location: data.competitionLocation,
-                            isSplit: data.splitTime,
-                            isRelayPart: data.relayPart,
-                            date: data.date,
-                            discipline: record.discipline,
-                            ageCategory: category,
-                          });
-                          setModalOpen(true);
+                      <Flex w="100%" justify="flex-start" gap={{ base: 4, sm: "xs" }}>
+                        <Text
+                          size="xs"
+                          style={{
+                            flex: 3,
+                            padding: "0px 10px",
+                            textAlign: "left",
+                          }}
+                        >
+                          Jméno
+                        </Text>
+                        <Text
+                          size="xs"
+                          style={{
+                            flex: 2,
+                            textAlign: "left",
+                          }}
+                        >
+                          Čas
+                        </Text>
+                        <Text size="xs" style={{ flex: 1.5, textAlign: "left" }}>
+                          Datum
+                        </Text>
+                      </Flex>
+                    </Stack>
+                  ),
+                  render: (record: ClubRecordRow) => {
+                    const data = record[category];
+                    if (!data) {
+                      return;
+                    }
+                    const bgColor = data.splitTime
+                      ? colorScheme === "dark"
+                        ? "#4A5D4A"
+                        : "#D4EDDA"
+                      : data.relayPart
+                        ? colorScheme === "dark"
+                          ? "#5A4A7A"
+                          : "#E2E3F1"
+                        : "transparent";
+                    return (
+                      <Flex
+                        w="100%"
+                        justify="flex-start"
+                        gap={{ base: 4, sm: "xs" }}
+                        align="center"
+                        style={{
+                          backgroundColor: bgColor,
+                          padding: "10px",
                         }}
                       >
-                        {parseTimeFromMillis(data.time)}
-                      </Text>
-                    </Box>
-                    <Text size="xs" style={{ flex: 1.5, textAlign: "left" }} truncate>
-                      {data.date || "-"}
-                    </Text>
-                  </Flex>
-                );
-              },
-            })),
-          ]}
-          records={buildTableData()}
-        />
-      </Box>
+                        <Box
+                          style={{
+                            flex: 3,
+                            textAlign: "left",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                          }}
+                        >
+                          <Text
+                            component={Link}
+                            to={`/swimmer/${data.swimmerId}`}
+                            className="textHoverLink"
+                            size="xs"
+                          >
+                            {data.surname} {data.name}
+                          </Text>
+                        </Box>
+                        <Box
+                          style={{
+                            flex: 1.5,
+                            textAlign: "left",
+                            cursor: "pointer",
+                          }}
+                        >
+                          <Text
+                            className="textHoverLink"
+                            size="xs"
+                            onClick={() => {
+                              setModalData({
+                                time: parseTimeFromMillis(data.time),
+                                name: data.name,
+                                surname: data.surname,
+                                age: data.ageAtResult,
+                                location: data.competitionLocation,
+                                isSplit: data.splitTime,
+                                isRelayPart: data.relayPart,
+                                date: data.date,
+                                discipline: record.discipline,
+                                ageCategory: category,
+                              });
+                              setModalOpen(true);
+                            }}
+                          >
+                            {parseTimeFromMillis(data.time)}
+                          </Text>
+                        </Box>
+                        <Text size="xs" style={{ flex: 1.5, textAlign: "left" }} truncate>
+                          {data.date || "-"}
+                        </Text>
+                      </Flex>
+                    );
+                  },
+                })),
+              ]}
+              records={buildTableData()}
+            />
+          </Box>
+        </Tabs.Panel>
+
+        <Tabs.Panel value="progression" pt="sm">
+          <RecordProgression />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="holders" pt="sm">
+          <RecordHolders />
+        </Tabs.Panel>
+      </Tabs>
 
       <Modal
         opened={modalOpen}

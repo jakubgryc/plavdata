@@ -4,13 +4,17 @@ from typing import List, Optional
 from pydantic import BaseModel
 from pydantic.alias_generators import to_camel
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import and_, func
 from sqlalchemy.orm import Session, contains_eager
 
 from app.models import Swimmer, Discipline, Course, Result
 from app.constants import EXCLUDED_COMPETITION_LOCATIONS
-from app.crud.results import get_best_times_for_age, get_club_records
+from app.crud.results import (
+    get_club_records,
+    get_record_holders,
+    get_record_progression,
+)
 from app.db import get_db
 from app.api.schemas import (
     SwimmerResultOut,
@@ -18,7 +22,6 @@ from app.api.schemas import (
     SwimmerOut,
     DisciplineOut,
     CourseOut,
-    BestTimeResultOut,
 )
 
 router = APIRouter(
@@ -31,20 +34,6 @@ class ComparisonRequest(BaseModel):
     swimmer_ids: List[int]
     discipline_code: str
     course: Optional[int] = 25
-
-
-class BestTimesRequest(BaseModel):
-    discipline_code: str
-    course_length: Optional[int] = 25
-    sex: str
-    max_age: int
-    limit: int = 10
-    unique_swimmers: bool = False
-    only_current_age: bool = False
-
-    class Config:
-        alias_generator = to_camel
-        validate_by_name = True
 
 
 class ClubRecordOut(BaseModel):
@@ -149,53 +138,64 @@ async def get_results(
     return swimmer_results
 
 
-@router.post(
-    "/best-times",
-    summary="Get best times for given discipline",
-    response_model=List[BestTimeResultOut],
+class RecordProgressionStepOut(BaseModel):
+    result_id: int
+    swimmer_id: int
+    name: str
+    surname: str
+    time: int
+    previous_time: Optional[int] = None
+    age_at_result: Optional[int] = None
+    split_time: Optional[bool] = None
+    relay_part: Optional[bool] = None
+    competition_location: Optional[str] = None
+    date: datetime
+
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+@router.get(
+    "/record-progression",
+    summary="Get historical progression of a club record",
+    response_model=List[RecordProgressionStepOut],
 )
-async def best_times(
-    request: BestTimesRequest,
+async def get_record_progression_endpoint(
     db: Session = Depends(get_db),
+    discipline_code: str = Query(..., description="e.g. '100 VZ'"),
+    course: int = Query(25, description="Pool length in meters, 25 or 50"),
+    sex: str = Query(..., description="'male' or 'female'"),
+    age_category: str = Query(
+        "open", description="Age category code, e.g. '12' or 'open'"
+    ),
 ):
     """
-    Returns best times for given discipline, course, sex, and max age.
+    Returns the chronological progression of the club record for the given
+    discipline, course, sex, and age category. Each step is a result that
+    was strictly faster than every eligible result before it. Computed on
+    the fly from the results table — nothing is stored.
     """
-    discipline_code = request.discipline_code
-    course_length = request.course_length
-    sex = request.sex
-    max_age = request.max_age
-    limit = request.limit
-    unique_swimmers = request.unique_swimmers
-    only_current_age = request.only_current_age
-    results = get_best_times_for_age(
-        db,
-        discipline_code,
-        course_length,
-        sex,
-        max_age,
-        limit,
-        unique_swimmers,
-        only_current_age,
-    )
+    steps = get_record_progression(db, discipline_code, course, sex, age_category)
+    if steps is None:
+        raise HTTPException(status_code=404, detail="Věková kategorie nenalezena.")
 
-    best_times_out = [
-        BestTimeResultOut(
-            swimmer_id=r.swimmer_id,
-            name=r.name,
-            surname=r.surname,
-            birth_year=r.birth_year,
-            time=r.time,
-            age_at_result=r.age_at_result,
-            split_time=r.split_time,
-            relay_part=r.relay_part,
-            competition_location=r.competition_location,
-            date=r.date,
+    return [
+        RecordProgressionStepOut(
+            result_id=step["result"].id,
+            swimmer_id=step["swimmer"].id,
+            name=step["swimmer"].name,
+            surname=step["swimmer"].surname,
+            time=step["result"].time,
+            previous_time=step["previous_best"],
+            age_at_result=step["result"].age_at_result,
+            split_time=step["result"].split_time,
+            relay_part=step["result"].relay_part,
+            competition_location=step["result"].competition_location,
+            date=step["result"].date,
         )
-        for r in results
+        for step in steps
     ]
-
-    return best_times_out
 
 
 @router.get(
@@ -232,6 +232,47 @@ async def get_all_club_records(
     ]
 
     return club_records_out
+
+
+class RecordHolderOut(BaseModel):
+    swimmer_id: int
+    name: str
+    surname: str
+    sex: str
+    record_count: int
+    record_count_25: int
+    record_count_50: int
+
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+@router.get(
+    "/record-holders",
+    summary="Rank swimmers by number of club records held",
+    response_model=List[RecordHolderOut],
+)
+async def get_all_record_holders(db: Session = Depends(get_db)):
+    """
+    Returns swimmers ranked by how many club records they currently hold
+    in total (across both course lengths), most records first, including
+    the per-course breakdown (25m / 50m).
+    """
+    holders = get_record_holders(db)
+
+    return [
+        RecordHolderOut(
+            swimmer_id=row.swimmer_id,
+            name=row.name,
+            surname=row.surname,
+            sex=row.sex,
+            record_count=row.record_count,
+            record_count_25=row.record_count_25,
+            record_count_50=row.record_count_50,
+        )
+        for row in holders
+    ]
 
 
 class SwimmerResultRowOut(BaseModel):

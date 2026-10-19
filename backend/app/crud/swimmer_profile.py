@@ -4,11 +4,13 @@ from collections import defaultdict
 from sqlalchemy import extract, func, select, case, Integer
 from sqlalchemy.orm import Session
 
-from app.constants import EXCLUDED_COMPETITION_LOCATIONS
+from app.constants import DNF_THRESHOLD, EXCLUDED_COMPETITION_LOCATIONS
 from app.api.schemas import PersonalBestDetail
 from app.models import (
+    AgeCategory,
     ClubRecord,
     Competition,
+    Course,
     Discipline,
     PersonalBest,
     Result,
@@ -334,3 +336,160 @@ def get_swimmer_quarterly_improvements(db: Session, swimmer_id: int) -> list:
         )
 
     return quarterly_data
+
+
+def get_swimmer_club_records(db: Session, swimmer_id: int) -> list:
+    """
+    Get all club records currently held by the swimmer, grouped per result:
+    one swim standing as the record in several age categories is a single
+    entry carrying all its categories (same shape as the home page's
+    recent club records).
+    """
+    rows = (
+        db.query(
+            Result.id.label("result_id"),
+            Course.length.label("course_length"),
+            Discipline.code.label("discipline_code"),
+            AgeCategory.code.label("age_category"),
+            Result.time,
+            Result.date,
+            Result.competition_location,
+            Result.split_time,
+            Result.relay_part,
+        )
+        .select_from(ClubRecord)
+        .join(ClubRecord.result)
+        .join(ClubRecord.age_category)
+        .join(Result.discipline)
+        .join(Result.course)
+        .filter(Result.swimmer_id == swimmer_id)
+        .filter(Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS))
+        .order_by(AgeCategory.max_age)
+        .all()
+    )
+
+    grouped = {}
+    for row in rows:
+        entry = grouped.get(row.result_id)
+        if entry is None:
+            entry = {
+                "resultId": row.result_id,
+                "courseLength": row.course_length,
+                # display codes use VZ for freestyle, the DB stores K
+                "disciplineCode": row.discipline_code.replace(" K", " VZ"),
+                "ageCategories": [],
+                "time": row.time,
+                "date": row.date,
+                "competitionLocation": row.competition_location,
+                "splitTime": row.split_time,
+                "relayPart": row.relay_part,
+            }
+            grouped[row.result_id] = entry
+        # ordered by max_age, so categories end up youngest -> oldest
+        entry["ageCategories"].append(row.age_category)
+
+    return list(grouped.values())
+
+
+def get_swimmer_record_chances(db: Session, swimmer_id: int) -> list | None:
+    """
+    For every club record, compare the swimmer's personal best (same
+    discipline + course) with the record time and report the gap.
+
+    - `pbTime`: the swimmer's best time that is ELIGIBLE for that record's
+      age category — i.e. swum at age <= the category's max_age. For the
+      12letí category of a 14-year-old this is their best time from when
+      they were 12 or younger, not their current overall PB. For beatable
+      categories it naturally equals the current PB (all their times are
+      within the age limit).
+    - `beatable`: whether the swimmer can still set a record in that age
+      category (their current age must be <= the category's max_age —
+      a 12-year-old can no longer break the 11-and-under records).
+    - `holdsRecord`: whether the swimmer is the current holder.
+    - `gap`: pbTime - record time in ms (positive = still missing this
+      much; a record is only broken by a strictly faster time).
+    - Entries where the swimmer has no eligible time carry pbTime/gap =
+      None; the frontend skips them.
+
+    Returns None if the swimmer does not exist.
+    """
+    swimmer = db.query(Swimmer).filter(Swimmer.id == swimmer_id).first()
+    if not swimmer:
+        return None
+
+    current_year = date.today().year
+    swimmer_age = current_year - swimmer.birth_year if swimmer.birth_year else None
+
+    record_rows = (
+        db.query(
+            Course.length.label("course_length"),
+            Discipline.id.label("discipline_id"),
+            Discipline.code.label("discipline_code"),
+            AgeCategory.code.label("age_category"),
+            AgeCategory.max_age.label("max_age"),
+            Result.time.label("record_time"),
+            Result.swimmer_id.label("holder_id"),
+            Swimmer.name.label("holder_name"),
+            Swimmer.surname.label("holder_surname"),
+        )
+        .select_from(ClubRecord)
+        .join(ClubRecord.result)
+        .join(ClubRecord.age_category)
+        .join(Result.discipline)
+        .join(Result.course)
+        .join(Result.swimmer)
+        # only records of the swimmer's own sex are relevant targets
+        .filter(Swimmer.sex == swimmer.sex)
+        .all()
+    )
+
+    # Swimmer's times per (discipline, course) with the age at each result —
+    # a category record can only be attacked with a time swum at an age
+    # within that category's limit (same filters as record eligibility)
+    result_rows = (
+        db.query(
+            Result.discipline_id.label("discipline_id"),
+            Course.length.label("course_length"),
+            Result.time.label("time"),
+            Result.age_at_result.label("age_at_result"),
+        )
+        .join(Result.course)
+        .filter(
+            Result.swimmer_id == swimmer_id,
+            Result.time < DNF_THRESHOLD,
+            Result.competition_location.notin_(EXCLUDED_COMPETITION_LOCATIONS),
+            Result.age_at_result.isnot(None),
+        )
+        .all()
+    )
+
+    times_by_key: dict = {}
+    for row in result_rows:
+        times_by_key.setdefault((row.discipline_id, row.course_length), []).append(
+            (row.age_at_result, row.time)
+        )
+
+    chances = []
+    for row in record_rows:
+        candidates = times_by_key.get((row.discipline_id, row.course_length), [])
+        eligible_times = [time for age, time in candidates if age <= row.max_age]
+        pb_time = min(eligible_times) if eligible_times else None
+        beatable = swimmer_age is not None and row.max_age >= swimmer_age
+        gap = pb_time - row.record_time if pb_time is not None else None
+        chances.append(
+            {
+                "courseLength": row.course_length,
+                "disciplineCode": row.discipline_code.replace(" K", " VZ"),
+                "ageCategory": row.age_category,
+                "maxAge": row.max_age,
+                "recordTime": row.record_time,
+                "holderId": row.holder_id,
+                "holderName": row.holder_name,
+                "holderSurname": row.holder_surname,
+                "beatable": beatable,
+                "holdsRecord": row.holder_id == swimmer_id,
+                "pbTime": pb_time,
+                "gap": gap,
+            }
+        )
+    return chances

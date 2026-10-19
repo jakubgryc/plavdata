@@ -207,24 +207,6 @@ class SwimmerPersonalBestOut(BaseModel):
         from_attributes = True
 
 
-class BestTimeResultOut(BaseModel):
-    swimmer_id: int
-    name: str
-    surname: str
-    birth_year: int
-    time: int
-    age_at_result: int
-    split_time: Optional[bool] = None
-    relay_part: Optional[bool] = None
-    competition_location: Optional[str] = None
-    date: datetime
-
-    class Config:
-        from_attributes = True
-        alias_generator = to_camel
-        validate_by_name = True
-
-
 # Relay Schemas
 class RelaySwimmerInfo(BaseModel):
     swimmer_id: int
@@ -403,6 +385,43 @@ class QuarterlyImprovement(BaseModel):
         populate_by_name = True
 
 
+class RecordChanceOut(BaseModel):
+    course_length: int
+    discipline_code: str
+    age_category: str
+    max_age: int
+    record_time: int
+    holder_id: int
+    holder_name: str
+    holder_surname: str
+    beatable: bool
+    holds_record: bool
+    pb_time: Optional[int] = None
+    gap: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+class SwimmerClubRecord(BaseModel):
+    result_id: int
+    course_length: int
+    discipline_code: str
+    age_categories: List[str]
+    time: int
+    date: datetime
+    competition_location: Optional[str] = None
+    split_time: Optional[bool] = None
+    relay_part: Optional[bool] = None
+
+    class Config:
+        from_attributes = True
+        alias_generator = to_camel
+        populate_by_name = True
+
+
 class SwimmerProfileResponse(BaseModel):
     basic_info: SwimmerBasicInfo
     stats: SwimmerStats
@@ -412,6 +431,8 @@ class SwimmerProfileResponse(BaseModel):
     personal_bests: PersonalBestsByCourse
     starts_by_stroke: StartsByStroke
     quarterly_improvements: List[QuarterlyImprovement]
+    club_records: List[SwimmerClubRecord]
+    record_chances: List[RecordChanceOut]
 
     class Config:
         alias_generator = to_camel

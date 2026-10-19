@@ -75,9 +75,16 @@ function ClubRecordsTable({ records, title, subtitle, variant }: ClubRecordsTabl
                 </Table.Td>
                 <Table.Td>{record.poolLength} m</Table.Td>
                 <Table.Td>
-                  <Text c={color} fw={700}>
-                    {parseTimeFromMillis(record.time)}
-                  </Text>
+                  <Group gap={6} wrap="nowrap">
+                    <Text c={record.isCurrent ? color : "dimmed"} fw={700}>
+                      {parseTimeFromMillis(record.time)}
+                    </Text>
+                    {!record.isCurrent && (
+                      <Badge size="xs" variant="light" color="orange" tt="lowercase">
+                        překonán
+                      </Badge>
+                    )}
+                  </Group>
                 </Table.Td>
                 <Table.Td>
                   <Text c="dimmed">{formatDate(record.date)}</Text>

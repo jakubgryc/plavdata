@@ -43,6 +43,7 @@ export interface RecentClubRecord {
   date: string;
   poolLength: 25 | 50;
   ageCategories: string[];
+  isCurrent: boolean;
 }
 
 export interface DashboardResponse {
@@ -272,6 +273,33 @@ export interface QuarterlyImprovement {
   improvementRate: number;
 }
 
+export interface RecordChance {
+  courseLength: number;
+  disciplineCode: string;
+  ageCategory: string;
+  maxAge: number;
+  recordTime: number;
+  holderId: number;
+  holderName: string;
+  holderSurname: string;
+  beatable: boolean;
+  holdsRecord: boolean;
+  pbTime: number | null;
+  gap: number | null;
+}
+
+export interface SwimmerClubRecord {
+  resultId: number;
+  courseLength: number;
+  disciplineCode: string;
+  ageCategories: string[];
+  time: number;
+  date: string;
+  competitionLocation?: string;
+  splitTime?: boolean;
+  relayPart?: boolean;
+}
+
 export interface SwimmerProfileResponse {
   basicInfo: SwimmerBasicInfo;
   stats: SwimmerStats;
@@ -281,4 +309,6 @@ export interface SwimmerProfileResponse {
   personalBests: SwimmerPersonalBests;
   startsByStroke: StartsByStroke;
   quarterlyImprovements: QuarterlyImprovement[];
+  clubRecords: SwimmerClubRecord[];
+  recordChances: RecordChance[];
 }
