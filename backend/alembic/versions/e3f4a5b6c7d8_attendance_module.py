@@ -101,9 +101,7 @@ def upgrade() -> None:
             "season_id", "group_id", "user_id", name="uix_season_group_user"
         ),
     )
-    op.create_index(
-        op.f("ix_coach_groups_id"), "coach_groups", ["id"], unique=False
-    )
+    op.create_index(op.f("ix_coach_groups_id"), "coach_groups", ["id"], unique=False)
 
     # --- trainings ---
     op.create_table(
@@ -133,14 +131,10 @@ def upgrade() -> None:
         sa.Column("training_id", sa.Integer(), nullable=False),
         sa.Column("swimmer_id", sa.Integer(), nullable=False),
         sa.Column("present", sa.Boolean(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["training_id"], ["trainings.id"], ondelete="CASCADE"
-        ),
+        sa.ForeignKeyConstraint(["training_id"], ["trainings.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["swimmer_id"], ["swimmers.id"]),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint(
-            "training_id", "swimmer_id", name="uix_training_swimmer"
-        ),
+        sa.UniqueConstraint("training_id", "swimmer_id", name="uix_training_swimmer"),
     )
     op.create_index(op.f("ix_attendances_id"), "attendances", ["id"], unique=False)
 
@@ -193,9 +187,7 @@ def downgrade() -> None:
     op.drop_index(
         "idx_season_group_members_group_season", table_name="season_group_members"
     )
-    op.drop_index(
-        op.f("ix_season_group_members_id"), table_name="season_group_members"
-    )
+    op.drop_index(op.f("ix_season_group_members_id"), table_name="season_group_members")
     op.drop_table("season_group_members")
 
     # --- seasons ---
