@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Card,
+  Flex,
   Group,
   Loader,
   NumberInput,
@@ -13,6 +14,8 @@ import {
   Text,
   Textarea,
   Title,
+  useMantineColorScheme,
+  useMantineTheme,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { IconDeviceFloppy } from "@tabler/icons-react";
@@ -75,6 +78,8 @@ function draftsEqual(a: DraftState, b: DraftState): boolean {
 }
 
 function DayView({ groupId, date }: DayViewProps) {
+  const { colorScheme } = useMantineColorScheme();
+  const theme = useMantineTheme();
   const [dayData, setDayData] = useState<DayOut | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -236,7 +241,11 @@ function DayView({ groupId, date }: DayViewProps) {
       </Group>
 
       <Box style={{ overflowX: "auto" }} mb="md">
-        <Table>
+        <Table
+          striped
+          stripedColor={colorScheme === "dark" ? theme.colors.dark[5] : theme.colors.gray[1]}
+          highlightOnHover
+        >
           <Table.Thead>
             <Table.Tr>
               <Table.Th>Plavec</Table.Th>
@@ -250,12 +259,24 @@ function DayView({ groupId, date }: DayViewProps) {
                   {swimmer.surname} {swimmer.name}
                 </Table.Td>
                 <Table.Td style={{ textAlign: "center" }}>
-                  <Switch
-                    size="md"
-                    checked={draft.attendance[swimmer.id] ?? false}
-                    onChange={() => togglePresent(swimmer.id)}
-                    aria-label={`${swimmer.surname} ${swimmer.name}`}
-                  />
+                  <Flex justify="center">
+                    <Switch
+                      size="sm"
+                      checked={draft.attendance[swimmer.id] ?? false}
+                      onChange={() => togglePresent(swimmer.id)}
+                      aria-label={`${swimmer.surname} ${swimmer.name}`}
+                      styles={{
+                        track: {
+                          backgroundColor:
+                            (draft.attendance[swimmer.id] ?? false)
+                              ? undefined
+                              : colorScheme === "dark"
+                                ? theme.colors.dark[3]
+                                : theme.colors.gray[4],
+                        },
+                      }}
+                    />
+                  </Flex>
                 </Table.Td>
               </Table.Tr>
             ))}
@@ -310,24 +331,23 @@ function DayView({ groupId, date }: DayViewProps) {
         />
       </Stack>
 
-      <Box
-        style={{
-          position: "sticky",
-          bottom: 0,
-          backgroundColor: "var(--mantine-color-body)",
-          paddingTop: "var(--mantine-spacing-sm)",
-          paddingBottom: "var(--mantine-spacing-sm)",
+      <Button
+        fullWidth
+        leftSection={saving ? <Loader size="xs" /> : <IconDeviceFloppy size={16} />}
+        disabled={!isDirty || saving}
+        onClick={handleSave}
+        styles={{
+          root: {
+            "&[data-disabled]": {
+              backgroundColor: colorScheme === "dark" ? theme.colors.dark[4] : theme.colors.gray[3],
+              color: colorScheme === "dark" ? theme.colors.dark[0] : theme.colors.gray[7],
+              borderColor: "transparent",
+            },
+          },
         }}
       >
-        <Button
-          fullWidth
-          leftSection={saving ? <Loader size="xs" /> : <IconDeviceFloppy size={16} />}
-          disabled={!isDirty || saving}
-          onClick={handleSave}
-        >
-          Uložit docházku
-        </Button>
-      </Box>
+        Uložit docházku
+      </Button>
     </Card>
   );
 }

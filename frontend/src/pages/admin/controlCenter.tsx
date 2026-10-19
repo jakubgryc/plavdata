@@ -29,6 +29,9 @@ import dayjs from "dayjs";
 import { useState } from "react";
 import { Navigate } from "react-router";
 import { API_BASE_URL } from "../../../config";
+import AttendanceSetupSection from "../../components/admin/attendance/AttendanceSetupSection";
+import SeasonsSection from "../../components/admin/attendance/SeasonsSection";
+import UsersSection from "../../components/admin/attendance/UsersSection";
 import TaskCard from "../../components/admin/TaskCard";
 import { useAuth } from "../../hooks/useAuth";
 import { authApi } from "../../utils/auth";
@@ -423,6 +426,18 @@ function AdminControlCenterPage() {
           </Grid.Col>
         </Grid>
       </Stack>
+
+      <Divider />
+
+      <SeasonsSection />
+
+      <Divider />
+
+      <AttendanceSetupSection />
+
+      <Divider />
+
+      <UsersSection />
     </Stack>
   );
 }
