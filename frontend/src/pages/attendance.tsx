@@ -1,4 +1,13 @@
-import { ActionIcon, Center, Flex, SegmentedControl, Stack, Text, Title } from "@mantine/core";
+import {
+  ActionIcon,
+  Button,
+  Center,
+  Flex,
+  SegmentedControl,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import dayjs from "dayjs";
@@ -155,6 +164,32 @@ function AttendancePage() {
 
       {/* Date navigation row */}
       <Flex gap="sm" align="center" wrap="wrap">
+        <SegmentedControl
+          value={view}
+          flex={{ base: "1 0 100%", md: "0 0 auto" }}
+          onChange={(val) => {
+            const newView = val as "day" | "week";
+            if (newView === "week" && view === "day") {
+              // Switching day → week: set weekStart to mondayOf(selectedDate)
+              setWeekStart(mondayOf(selectedDate));
+            } else if (newView === "day" && view === "week") {
+              // Switching week → day: set selectedDate to first training day of the week, or weekStart
+              const firstTrainingDay = (() => {
+                for (let i = 0; i < 7; i++) {
+                  const candidate = dayjs(weekStart).add(i, "day").toDate();
+                  if (isTrainingDay(schedule, candidate)) return candidate;
+                }
+                return weekStart;
+              })();
+              setSelectedDate(firstTrainingDay);
+            }
+            setView(newView);
+          }}
+          data={[
+            { value: "day", label: "Den" },
+            { value: "week", label: "Týden" },
+          ]}
+        />
         <ActionIcon
           variant="light"
           size="lg"
@@ -206,31 +241,20 @@ function AttendancePage() {
           <IconChevronRight size={20} />
         </ActionIcon>
 
-        <SegmentedControl
-          value={view}
-          onChange={(val) => {
-            const newView = val as "day" | "week";
-            if (newView === "week" && view === "day") {
-              // Switching day → week: set weekStart to mondayOf(selectedDate)
-              setWeekStart(mondayOf(selectedDate));
-            } else if (newView === "day" && view === "week") {
-              // Switching week → day: set selectedDate to first training day of the week, or weekStart
-              const firstTrainingDay = (() => {
-                for (let i = 0; i < 7; i++) {
-                  const candidate = dayjs(weekStart).add(i, "day").toDate();
-                  if (isTrainingDay(schedule, candidate)) return candidate;
-                }
-                return weekStart;
-              })();
-              setSelectedDate(firstTrainingDay);
+        <Button
+          variant="light"
+          onClick={() => {
+            const now = new Date();
+            if (view === "week") {
+              setWeekStart(mondayOf(now));
+            } else {
+              setSelectedDate(now);
             }
-            setView(newView);
           }}
-          data={[
-            { value: "day", label: "Den" },
-            { value: "week", label: "Týden" },
-          ]}
-        />
+          aria-label="Přejít na dnešek"
+        >
+          Dnes
+        </Button>
       </Flex>
 
       {/* Content */}
