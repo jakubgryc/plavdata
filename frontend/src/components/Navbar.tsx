@@ -140,7 +140,19 @@ const Navbar = () => {
       </Flex>
 
       <Flex align="center" gap="xs">
-        <Flex>
+        {!isAuthenticated && (
+          <Button
+            component={NavLink}
+            to="/admin"
+            variant="light"
+            size="xs"
+            px="xs"
+            leftSection={<IconUser size={14} />}
+          >
+            Přihlásit
+          </Button>
+        )}
+        <Flex visibleFrom="md">
           {isAuthenticated && username && (
             <Menu shadow="md" width={220} position="bottom-end">
               <Menu.Target>
