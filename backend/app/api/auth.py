@@ -3,6 +3,7 @@ Authentication API endpoints.
 """
 
 import logging
+import os
 import re
 from datetime import timedelta
 from typing import Annotated, Optional
@@ -195,6 +196,27 @@ async def register(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Odeslání e-mailu se nezdařilo, kontaktuj administrátora.",
         )
+
+    # Notify admin(s) about the new registration (best effort — never fails
+    # the registration itself; the coach email is already out).
+    admin_notify = os.getenv("ADMIN_NOTIFY_EMAIL", "").strip()
+    if admin_notify:
+        notify_body = (
+            "Nová registrace v plavdata:\n\n"
+            f"Uživatelské jméno: {data.username}\n"
+            f"E-mail: {data.email}\n"
+            "Vygenerované heslo bylo uživateli odesláno na e-mail.\n\n"
+            "Účet čeká na schválení v Ovládacím centru (sekce Uživatelé)."
+        )
+        for addr in [a.strip() for a in admin_notify.split(",") if a.strip()]:
+            try:
+                await run_in_threadpool(
+                    send_email, addr, "plavdata — nová registrace trenéra", notify_body
+                )
+            except Exception:
+                logger.exception(
+                    "Failed to send admin registration notification to %s", addr
+                )
 
     return {"message": "Pokud je adresa volná, poslali jsme ti heslo na e-mail."}
 
