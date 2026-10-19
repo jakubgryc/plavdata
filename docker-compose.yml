@@ -44,6 +44,7 @@ services:
       - SMTP_HOST=mailpit
       - SMTP_PORT=1025
       - SMTP_FROM=noreply@plavdata.local
+      - ADMIN_NOTIFY_EMAIL=${ADMIN_NOTIFY_EMAIL:-}
     depends_on:
       postgres:
         condition: service_healthy
