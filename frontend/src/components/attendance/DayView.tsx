@@ -325,9 +325,14 @@ function DayView({ groupId, date }: DayViewProps) {
         </Group>
         <Textarea
           label="Popis tréninku"
+          autosize
           minRows={3}
+          maxRows={12}
           value={draft.description}
-          onChange={(e) => setDraft((prev) => ({ ...prev, description: e.currentTarget.value }))}
+          onChange={(e) => {
+            const value = e.currentTarget.value;
+            setDraft((prev) => ({ ...prev, description: value }));
+          }}
         />
       </Stack>
 
