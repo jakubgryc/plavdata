@@ -41,9 +41,21 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - ENV=development
       - TARGET_CLUB=${TARGET_CLUB}
+      - SMTP_HOST=mailpit
+      - SMTP_PORT=1025
+      - SMTP_FROM=noreply@plavdata.local
     depends_on:
       postgres:
         condition: service_healthy
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: plavdata_mailpit
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8025:8025"
+    networks:
+      - app-network
 
   frontend:
     build:
