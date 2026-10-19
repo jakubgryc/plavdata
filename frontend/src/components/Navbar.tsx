@@ -9,10 +9,12 @@ import {
   useComputedColorScheme,
 } from "@mantine/core";
 import {
+  IconCalendarCheck,
   IconClock,
   IconDatabaseImport,
   IconLogout,
   IconMoon,
+  IconShield,
   IconSun,
   IconUser,
 } from "@tabler/icons-react";
@@ -28,7 +30,7 @@ const Navbar = () => {
   const [opened, setOpened] = useState(false);
   const { setColorScheme } = useTheme();
   const computedColorScheme = useComputedColorScheme("light");
-  const { isAuthenticated, username, timeRemaining, logout } = useAuth();
+  const { isAuthenticated, username, role, timeRemaining, logout } = useAuth();
 
   const toggleColorScheme = () => {
     setColorScheme(computedColorScheme === "dark" ? "light" : "dark");
@@ -158,6 +160,23 @@ const Navbar = () => {
               <Menu.Dropdown>
                 <Menu.Item
                   component={NavLink}
+                  to="/attendance"
+                  leftSection={<IconCalendarCheck size={14} />}
+                >
+                  Docházka
+                </Menu.Item>
+                {role === "admin" && (
+                  <Menu.Item
+                    component={NavLink}
+                    to="/admin/control-center"
+                    leftSection={<IconShield size={14} />}
+                  >
+                    Administrace
+                  </Menu.Item>
+                )}
+                <Menu.Divider />
+                <Menu.Item
+                  component={NavLink}
                   to="/admin/swimmers"
                   leftSection={<IconUser size={14} />}
                 >
@@ -234,6 +253,25 @@ const Navbar = () => {
               </Menu.Target>
 
               <Menu.Dropdown>
+                <Menu.Item
+                  component={NavLink}
+                  to="/attendance"
+                  leftSection={<IconCalendarCheck size={14} />}
+                  onClick={() => setOpened(false)}
+                >
+                  Docházka
+                </Menu.Item>
+                {role === "admin" && (
+                  <Menu.Item
+                    component={NavLink}
+                    to="/admin/control-center"
+                    leftSection={<IconShield size={14} />}
+                    onClick={() => setOpened(false)}
+                  >
+                    Administrace
+                  </Menu.Item>
+                )}
+                <Menu.Divider />
                 <Menu.Item
                   component={NavLink}
                   to="/admin/swimmers"

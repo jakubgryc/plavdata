@@ -3,7 +3,7 @@ import { DatesProvider } from "@mantine/dates";
 import { Notifications } from "@mantine/notifications";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { createBrowserRouter } from "react-router";
+import { Navigate, createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import "dayjs/locale/cs";
 import "@mantine/core/styles.css";
@@ -15,6 +15,7 @@ import App from "./App.tsx";
 import AdminControlCenterPage from "./pages/admin/controlCenter.tsx";
 import { AdminGroupsPage } from "./pages/admin/groups";
 import { AdminSwimmersPage } from "./pages/admin/SwimmersAdmin.tsx";
+import AttendancePage from "./pages/attendance";
 import ClubRecords from "./pages/clubRecords";
 import CompareSwimmers from "./pages/compareSwimmers";
 import CompetitionDetail from "./pages/competitionDetail";
@@ -23,10 +24,20 @@ import Home from "./pages/home";
 import Login from "./pages/login";
 import NotFound from "./pages/notFound";
 import PersonalBests from "./pages/personalBests";
+import RegisterPage from "./pages/register";
 import Results from "./pages/results";
 import SwimmerProfile from "./pages/swimmerProfile";
 import Utils from "./pages/utils";
 import { theme } from "./theme";
+import { authApi } from "./utils/auth";
+
+function AdminEntry() {
+  return authApi.isAuthenticated() ? (
+    <Navigate to="/admin/control-center" replace />
+  ) : (
+    <Login />
+  );
+}
 
 const router = createBrowserRouter([
   {
@@ -66,8 +77,16 @@ const router = createBrowserRouter([
         element: <CompetitionDetail />,
       },
       {
+        path: "attendance",
+        element: <AttendancePage />,
+      },
+      {
         path: "admin",
-        element: <Login />,
+        element: <AdminEntry />,
+      },
+      {
+        path: "register",
+        element: <RegisterPage />,
       },
       {
         path: "admin/swimmers",

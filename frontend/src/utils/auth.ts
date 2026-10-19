@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "../../config";
+import { authenticatedFetch } from "./authenticatedFetch";
 
 export interface LoginRequest {
   username: string;
@@ -9,6 +10,7 @@ export interface LoginResponse {
   access_token: string;
   token_type: string;
   username: string;
+  role: string;
 }
 
 interface DecodedToken {
@@ -19,6 +21,7 @@ interface DecodedToken {
 class AuthApi {
   private readonly TOKEN_KEY = "auth_token";
   private readonly USERNAME_KEY = "auth_username";
+  private readonly ROLE_KEY = "auth_role";
 
   private decodeToken(token: string): DecodedToken | null {
     try {
@@ -68,6 +71,18 @@ class AuthApi {
     });
 
     if (!response.ok) {
+      if (response.status === 403) {
+        let detail = "Přihlášení se nezdařilo";
+        try {
+          const body = await response.json();
+          if (body.detail) {
+            detail = body.detail;
+          }
+        } catch {
+          // JSON parse failed, use default message
+        }
+        throw new Error(detail);
+      }
       if (response.status === 401) {
         throw new Error("Nesprávné uživatelské jméno nebo heslo");
       }
@@ -77,9 +92,10 @@ class AuthApi {
     return await response.json();
   }
 
-  saveToken(token: string, username: string): void {
+  saveToken(token: string, username: string, role: string): void {
     localStorage.setItem(this.TOKEN_KEY, token);
     localStorage.setItem(this.USERNAME_KEY, username);
+    localStorage.setItem(this.ROLE_KEY, role);
   }
 
   getToken(): string | null {
@@ -90,9 +106,14 @@ class AuthApi {
     return localStorage.getItem(this.USERNAME_KEY);
   }
 
+  getRole(): string | null {
+    return localStorage.getItem(this.ROLE_KEY);
+  }
+
   removeToken(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USERNAME_KEY);
+    localStorage.removeItem(this.ROLE_KEY);
   }
 
   isAuthenticated(): boolean {
@@ -103,6 +124,55 @@ class AuthApi {
 
   logout(): void {
     this.removeToken();
+  }
+
+  async register(email: string, username: string): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/auth/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, username }),
+    });
+
+    if (!response.ok) {
+      let detail = "Registrace se nezdařila";
+      try {
+        const body = await response.json();
+        if (body.detail) {
+          detail = body.detail;
+        }
+      } catch {
+        // JSON parse failed, use default message
+      }
+      throw new Error(detail);
+    }
+  }
+
+  async changePassword(currentPassword: string, newPassword: string): Promise<void> {
+    const response = await authenticatedFetch(`${API_BASE_URL}/auth/change-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        current_password: currentPassword,
+        new_password: newPassword,
+      }),
+    });
+
+    if (!response.ok) {
+      let detail = "Změna hesla se nezdařila";
+      try {
+        const body = await response.json();
+        if (body.detail) {
+          detail = body.detail;
+        }
+      } catch {
+        // JSON parse failed, use default message
+      }
+      throw new Error(detail);
+    }
   }
 }
 

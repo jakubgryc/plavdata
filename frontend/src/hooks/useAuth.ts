@@ -5,6 +5,7 @@ import { authApi } from "../utils/auth";
 interface AuthState {
   isAuthenticated: boolean;
   username: string | null;
+  role: string | null;
   timeRemaining: number | null;
 }
 
@@ -13,6 +14,7 @@ export function useAuth() {
   const [authState, setAuthState] = useState<AuthState>({
     isAuthenticated: authApi.isAuthenticated(),
     username: authApi.getUsername(),
+    role: authApi.getRole(),
     timeRemaining: authApi.getTimeUntilExpiration(),
   });
 
@@ -21,6 +23,7 @@ export function useAuth() {
       setAuthState({
         isAuthenticated: authApi.isAuthenticated(),
         username: authApi.getUsername(),
+        role: authApi.getRole(),
         timeRemaining: authApi.getTimeUntilExpiration(),
       });
     };
@@ -42,6 +45,7 @@ export function useAuth() {
     setAuthState({
       isAuthenticated: false,
       username: null,
+      role: null,
       timeRemaining: null,
     });
     window.dispatchEvent(new Event("storage"));

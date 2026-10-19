@@ -1,4 +1,5 @@
 import {
+  Anchor,
   Button,
   Center,
   Container,
@@ -12,7 +13,7 @@ import {
 import { IconLock, IconUser } from "@tabler/icons-react";
 import type { FormEvent } from "react";
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import { authApi } from "../utils/auth";
 
 function Login() {
@@ -29,7 +30,7 @@ function Login() {
 
     try {
       const response = await authApi.login({ username, password });
-      authApi.saveToken(response.access_token, response.username);
+      authApi.saveToken(response.access_token, response.username, response.role);
       window.dispatchEvent(new Event("storage"));
       navigate("/admin/swimmers");
     } catch (err) {
@@ -49,7 +50,7 @@ function Login() {
         <form onSubmit={handleSubmit}>
           <Stack gap="md">
             <TextInput
-              label="Uživatelské jméno"
+              label="E-mail nebo uživatelské jméno"
               placeholder="admin"
               required
               value={username}
@@ -79,6 +80,12 @@ function Login() {
             </Button>
           </Stack>
         </form>
+
+        <Center mt="md">
+          <Anchor component={NavLink} to="/register" size="sm">
+            Jsem trenér — registrace
+          </Anchor>
+        </Center>
       </Paper>
     </Container>
   );
