@@ -12,6 +12,7 @@ import {
   IconCalendarCheck,
   IconClock,
   IconDatabaseImport,
+  IconLock,
   IconLogout,
   IconMoon,
   IconShield,
@@ -23,11 +24,13 @@ import { NavLink } from "react-router";
 import { formatTimeRemaining, useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
 import SwimmerSearch from "./SwimmerSearch";
+import ChangePasswordModal from "./shared/ChangePasswordModal";
 
 type LinkState = { isActive: boolean };
 
 const Navbar = () => {
   const [opened, setOpened] = useState(false);
+  const [changePasswordOpened, setChangePasswordOpened] = useState(false);
   const { setColorScheme } = useTheme();
   const computedColorScheme = useComputedColorScheme("light");
   const { isAuthenticated, username, role, timeRemaining, logout } = useAuth();
@@ -223,6 +226,12 @@ const Navbar = () => {
                     </Menu.Item>
                   </>
                 )}
+                <Menu.Item
+                  leftSection={<IconLock size={14} />}
+                  onClick={() => setChangePasswordOpened(true)}
+                >
+                  Změnit heslo
+                </Menu.Item>
                 <Menu.Item color="red" leftSection={<IconLogout size={14} />} onClick={logout}>
                   Odhlásit se
                 </Menu.Item>
@@ -324,6 +333,15 @@ const Navbar = () => {
                   </>
                 )}
                 <Menu.Item
+                  leftSection={<IconLock size={14} />}
+                  onClick={() => {
+                    setChangePasswordOpened(true);
+                    setOpened(false);
+                  }}
+                >
+                  Změnit heslo
+                </Menu.Item>
+                <Menu.Item
                   color="red"
                   leftSection={<IconLogout size={14} />}
                   onClick={() => {
@@ -351,6 +369,11 @@ const Navbar = () => {
           </Button>
         </Flex>
       </Drawer>
+
+      <ChangePasswordModal
+        opened={changePasswordOpened}
+        onClose={() => setChangePasswordOpened(false)}
+      />
     </Flex>
   );
 };
