@@ -319,7 +319,7 @@ class Training(Base):
     kick_meters = Column(Integer, nullable=True)
     description = Column(Text, nullable=True)
     saved_by = Column(Integer, ForeignKey("users.id"), nullable=False)
-    saved_at = Column(DateTime, nullable=False)
+    saved_at = Column(DateTime(timezone=True), nullable=False)
 
     __table_args__ = (
         UniqueConstraint("group_id", "date", name="uix_training_group_date"),
