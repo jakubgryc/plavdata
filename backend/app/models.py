@@ -10,6 +10,7 @@ from sqlalchemy import (
     Integer,
     String,
     Table,
+    Text,
     UniqueConstraint,
     Index,
     text,
@@ -232,12 +233,124 @@ Swimmer.results = relationship(
 )
 
 
+class Season(Base):
+    __tablename__ = "seasons"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, nullable=False)
+    start_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=False)
+
+
+class SeasonGroupMember(Base):
+    __tablename__ = "season_group_members"
+
+    id = Column(Integer, primary_key=True, index=True)
+    season_id = Column(
+        Integer, ForeignKey("seasons.id", ondelete="CASCADE"), nullable=False
+    )
+    group_id = Column(
+        Integer, ForeignKey("groups.id", ondelete="CASCADE"), nullable=False
+    )
+    swimmer_id = Column(
+        Integer, ForeignKey("swimmers.id", ondelete="CASCADE"), nullable=False
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            "season_id", "group_id", "swimmer_id", name="uix_season_group_swimmer"
+        ),
+        Index("idx_season_group_members_group_season", "group_id", "season_id"),
+    )
+
+
+class TrainingSchedule(Base):
+    __tablename__ = "training_schedules"
+
+    id = Column(Integer, primary_key=True, index=True)
+    season_id = Column(
+        Integer, ForeignKey("seasons.id", ondelete="CASCADE"), nullable=False
+    )
+    group_id = Column(
+        Integer, ForeignKey("groups.id", ondelete="CASCADE"), nullable=False
+    )
+    weekday = Column(Integer, nullable=False)
+    start_time = Column(String(5), nullable=False)
+    end_time = Column(String(5), nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint(
+            "season_id", "group_id", "weekday", name="uix_season_group_weekday"
+        ),
+        Index("idx_training_schedules_season_group", "season_id", "group_id"),
+    )
+
+
+class CoachGroup(Base):
+    __tablename__ = "coach_groups"
+
+    id = Column(Integer, primary_key=True, index=True)
+    season_id = Column(
+        Integer, ForeignKey("seasons.id", ondelete="CASCADE"), nullable=False
+    )
+    group_id = Column(
+        Integer, ForeignKey("groups.id", ondelete="CASCADE"), nullable=False
+    )
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            "season_id", "group_id", "user_id", name="uix_season_group_user"
+        ),
+    )
+
+
+class Training(Base):
+    __tablename__ = "trainings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    group_id = Column(Integer, ForeignKey("groups.id"), nullable=False)
+    season_id = Column(Integer, ForeignKey("seasons.id"), nullable=False)
+    date = Column(Date, nullable=False)
+    total_meters = Column(Integer, nullable=True)
+    drill_meters = Column(Integer, nullable=True)
+    kick_meters = Column(Integer, nullable=True)
+    description = Column(Text, nullable=True)
+    saved_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+    saved_at = Column(DateTime, nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("group_id", "date", name="uix_training_group_date"),
+    )
+
+
+class Attendance(Base):
+    __tablename__ = "attendances"
+
+    id = Column(Integer, primary_key=True, index=True)
+    training_id = Column(
+        Integer, ForeignKey("trainings.id", ondelete="CASCADE"), nullable=False
+    )
+    swimmer_id = Column(Integer, ForeignKey("swimmers.id"), nullable=False)
+    present = Column(Boolean, nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint("training_id", "swimmer_id", name="uix_training_swimmer"),
+    )
+
+
 class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, nullable=False, index=True)
+    email = Column(String, unique=True, nullable=True, index=True)
     hashed_password = Column(String, nullable=False)
+    role = Column(
+        String, nullable=False, default="coach", server_default=text("'coach'")
+    )
     is_active = Column(Boolean, default=True, nullable=False)
     created_at = Column(
         DateTime, default=lambda: datetime.now(timezone.utc), nullable=False
