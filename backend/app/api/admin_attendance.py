@@ -2,6 +2,7 @@
 Admin API endpoints for managing seasons and attendance configuration.
 """
 
+import re
 from datetime import date
 from typing import Annotated
 
@@ -13,8 +14,10 @@ from app.auth import get_current_admin
 from app.db import get_db
 from app.models import (
     CoachGroup,
+    Group,
     Season,
     SeasonGroupMember,
+    Swimmer,
     Training,
     TrainingSchedule,
     User,
@@ -277,3 +280,423 @@ async def copy_season_config(
 
     db.commit()
     return None
+
+
+# ---------------------------------------------------------------------------
+# Task 6 Schemas
+# ---------------------------------------------------------------------------
+
+
+class SeasonMemberOut(BaseModel):
+    id: int
+    name: str
+    surname: str
+    birth_year: int
+
+    class Config:
+        from_attributes = True
+
+
+class MembersIn(BaseModel):
+    swimmer_ids: list[int]
+
+
+class ScheduleSlotOut(BaseModel):
+    weekday: int
+    start_time: str
+    end_time: str
+
+
+class ScheduleIn(BaseModel):
+    slots: list[ScheduleSlotOut]
+
+
+class CoachOut(BaseModel):
+    id: int
+    username: str
+    is_active: bool
+
+    class Config:
+        from_attributes = True
+
+
+class CoachesIn(BaseModel):
+    user_ids: list[int]
+
+
+class GroupOut(BaseModel):
+    id: int
+    name: str
+    display_name_cs: str
+
+    class Config:
+        from_attributes = True
+
+
+# ---------------------------------------------------------------------------
+# Task 6 Validation helpers
+# ---------------------------------------------------------------------------
+
+_TIME_RE = re.compile(r"^\d{2}:\d{2}$")
+
+
+def _validate_time_value(value: str) -> None:
+    """Raise 422 if value is not a valid HH:MM time."""
+    if not _TIME_RE.match(value):
+        raise HTTPException(status_code=422, detail=f"Neplatný čas: {value}.")
+    hours, minutes = value.split(":")
+    if int(hours) > 23 or int(minutes) > 59:
+        raise HTTPException(status_code=422, detail=f"Neplatný čas: {value}.")
+
+
+def _validate_schedule_slots(payload: ScheduleIn) -> None:
+    """Validate all schedule slots; raise 422 on any problem."""
+    seen_weekdays: set[int] = set()
+    for slot in payload.slots:
+        if slot.weekday < 1 or slot.weekday > 7:
+            raise HTTPException(
+                status_code=422,
+                detail=f"Neplatný den v týdnu: {slot.weekday}.",
+            )
+        _validate_time_value(slot.start_time)
+        _validate_time_value(slot.end_time)
+        if slot.end_time <= slot.start_time:
+            raise HTTPException(
+                status_code=422,
+                detail="Konec musí být později než začátek.",
+            )
+        if slot.weekday in seen_weekdays:
+            raise HTTPException(
+                status_code=422,
+                detail=f"Den v týdnu se opakuje: {slot.weekday}.",
+            )
+        seen_weekdays.add(slot.weekday)
+
+
+# ---------------------------------------------------------------------------
+# Task 6 Endpoints
+# ---------------------------------------------------------------------------
+
+
+@router.get("/seasons/{season_id}/groups", response_model=list[GroupOut])
+async def list_season_groups(
+    season_id: int,
+    _current_user: Annotated[User, Depends(get_current_admin)],
+    db: Session = Depends(get_db),
+):
+    """Return ALL groups ordered by display_order, regardless of config."""
+    season = db.query(Season).filter(Season.id == season_id).first()
+    if not season:
+        raise HTTPException(status_code=404, detail="Sezóna nenalezena.")
+
+    groups = db.query(Group).order_by(Group.display_order).all()
+    return [GroupOut.model_validate(g) for g in groups]
+
+
+@router.get(
+    "/seasons/{season_id}/groups/{group_id}/members",
+    response_model=list[SeasonMemberOut],
+)
+async def get_group_members(
+    season_id: int,
+    group_id: int,
+    _current_user: Annotated[User, Depends(get_current_admin)],
+    db: Session = Depends(get_db),
+):
+    """Return members of a season-group, joined with Swimmer, ordered by surname, name."""
+    season = db.query(Season).filter(Season.id == season_id).first()
+    if not season:
+        raise HTTPException(status_code=404, detail="Sezóna nenalezena.")
+
+    group = db.query(Group).filter(Group.id == group_id).first()
+    if not group:
+        raise HTTPException(status_code=404, detail="Skupina nenalezena.")
+
+    rows = (
+        db.query(Swimmer)
+        .join(SeasonGroupMember, SeasonGroupMember.swimmer_id == Swimmer.id)
+        .filter(
+            SeasonGroupMember.season_id == season_id,
+            SeasonGroupMember.group_id == group_id,
+        )
+        .order_by(Swimmer.surname, Swimmer.name)
+        .all()
+    )
+    return [
+        SeasonMemberOut(
+            id=s.id, name=s.name, surname=s.surname, birth_year=s.birth_year
+        )
+        for s in rows
+    ]
+
+
+@router.put(
+    "/seasons/{season_id}/groups/{group_id}/members",
+    response_model=list[SeasonMemberOut],
+)
+async def put_group_members(
+    season_id: int,
+    group_id: int,
+    payload: MembersIn,
+    _current_user: Annotated[User, Depends(get_current_admin)],
+    db: Session = Depends(get_db),
+):
+    """Full replace of season-group members in one transaction."""
+    season = db.query(Season).filter(Season.id == season_id).first()
+    if not season:
+        raise HTTPException(status_code=404, detail="Sezóna nenalezena.")
+
+    group = db.query(Group).filter(Group.id == group_id).first()
+    if not group:
+        raise HTTPException(status_code=404, detail="Skupina nenalezena.")
+
+    # Dedupe silently
+    unique_ids = list(set(payload.swimmer_ids))
+
+    # Validate all swimmer_ids exist
+    existing_ids = {
+        id_ for (id_,) in db.query(Swimmer.id).filter(Swimmer.id.in_(unique_ids)).all()
+    }
+    for sid in unique_ids:
+        if sid not in existing_ids:
+            raise HTTPException(
+                status_code=422, detail=f"Neznámý plavec: id {sid}."
+            )
+
+    # Delete existing
+    db.query(SeasonGroupMember).filter(
+        SeasonGroupMember.season_id == season_id,
+        SeasonGroupMember.group_id == group_id,
+    ).delete(synchronize_session=False)
+
+    # Insert new
+    for swimmer_id in unique_ids:
+        db.add(
+            SeasonGroupMember(
+                season_id=season_id,
+                group_id=group_id,
+                swimmer_id=swimmer_id,
+            )
+        )
+
+    db.commit()
+
+    # Return the GET shape
+    rows = (
+        db.query(Swimmer)
+        .join(SeasonGroupMember, SeasonGroupMember.swimmer_id == Swimmer.id)
+        .filter(
+            SeasonGroupMember.season_id == season_id,
+            SeasonGroupMember.group_id == group_id,
+        )
+        .order_by(Swimmer.surname, Swimmer.name)
+        .all()
+    )
+    return [
+        SeasonMemberOut(
+            id=s.id, name=s.name, surname=s.surname, birth_year=s.birth_year
+        )
+        for s in rows
+    ]
+
+
+@router.get(
+    "/seasons/{season_id}/groups/{group_id}/schedule",
+    response_model=list[ScheduleSlotOut],
+)
+async def get_group_schedule(
+    season_id: int,
+    group_id: int,
+    _current_user: Annotated[User, Depends(get_current_admin)],
+    db: Session = Depends(get_db),
+):
+    """Return training schedule slots for a season-group, ordered by weekday."""
+    season = db.query(Season).filter(Season.id == season_id).first()
+    if not season:
+        raise HTTPException(status_code=404, detail="Sezóna nenalezena.")
+
+    group = db.query(Group).filter(Group.id == group_id).first()
+    if not group:
+        raise HTTPException(status_code=404, detail="Skupina nenalezena.")
+
+    rows = (
+        db.query(TrainingSchedule)
+        .filter(
+            TrainingSchedule.season_id == season_id,
+            TrainingSchedule.group_id == group_id,
+        )
+        .order_by(TrainingSchedule.weekday)
+        .all()
+    )
+    return [
+        ScheduleSlotOut(
+            weekday=r.weekday, start_time=r.start_time, end_time=r.end_time
+        )
+        for r in rows
+    ]
+
+
+@router.put(
+    "/seasons/{season_id}/groups/{group_id}/schedule",
+    response_model=list[ScheduleSlotOut],
+)
+async def put_group_schedule(
+    season_id: int,
+    group_id: int,
+    payload: ScheduleIn,
+    _current_user: Annotated[User, Depends(get_current_admin)],
+    db: Session = Depends(get_db),
+):
+    """Full replace of training schedule in one transaction."""
+    season = db.query(Season).filter(Season.id == season_id).first()
+    if not season:
+        raise HTTPException(status_code=404, detail="Sezóna nenalezena.")
+
+    group = db.query(Group).filter(Group.id == group_id).first()
+    if not group:
+        raise HTTPException(status_code=404, detail="Skupina nenalezena.")
+
+    _validate_schedule_slots(payload)
+
+    # Delete existing
+    db.query(TrainingSchedule).filter(
+        TrainingSchedule.season_id == season_id,
+        TrainingSchedule.group_id == group_id,
+    ).delete(synchronize_session=False)
+
+    # Insert new
+    for slot in payload.slots:
+        db.add(
+            TrainingSchedule(
+                season_id=season_id,
+                group_id=group_id,
+                weekday=slot.weekday,
+                start_time=slot.start_time,
+                end_time=slot.end_time,
+            )
+        )
+
+    db.commit()
+
+    # Return the GET shape
+    rows = (
+        db.query(TrainingSchedule)
+        .filter(
+            TrainingSchedule.season_id == season_id,
+            TrainingSchedule.group_id == group_id,
+        )
+        .order_by(TrainingSchedule.weekday)
+        .all()
+    )
+    return [
+        ScheduleSlotOut(
+            weekday=r.weekday, start_time=r.start_time, end_time=r.end_time
+        )
+        for r in rows
+    ]
+
+
+@router.get(
+    "/seasons/{season_id}/groups/{group_id}/coaches",
+    response_model=list[CoachOut],
+)
+async def get_group_coaches(
+    season_id: int,
+    group_id: int,
+    _current_user: Annotated[User, Depends(get_current_admin)],
+    db: Session = Depends(get_db),
+):
+    """Return coaches assigned to a season-group, joined to User, ordered by username."""
+    season = db.query(Season).filter(Season.id == season_id).first()
+    if not season:
+        raise HTTPException(status_code=404, detail="Sezóna nenalezena.")
+
+    group = db.query(Group).filter(Group.id == group_id).first()
+    if not group:
+        raise HTTPException(status_code=404, detail="Skupina nenalezena.")
+
+    rows = (
+        db.query(User)
+        .join(CoachGroup, CoachGroup.user_id == User.id)
+        .filter(
+            CoachGroup.season_id == season_id,
+            CoachGroup.group_id == group_id,
+            User.role == "coach",
+        )
+        .order_by(User.username)
+        .all()
+    )
+    return [
+        CoachOut(id=u.id, username=u.username, is_active=u.is_active) for u in rows
+    ]
+
+
+@router.put(
+    "/seasons/{season_id}/groups/{group_id}/coaches",
+    response_model=list[CoachOut],
+)
+async def put_group_coaches(
+    season_id: int,
+    group_id: int,
+    payload: CoachesIn,
+    _current_user: Annotated[User, Depends(get_current_admin)],
+    db: Session = Depends(get_db),
+):
+    """Full replace of coach assignments in one transaction."""
+    season = db.query(Season).filter(Season.id == season_id).first()
+    if not season:
+        raise HTTPException(status_code=404, detail="Sezóna nenalezena.")
+
+    group = db.query(Group).filter(Group.id == group_id).first()
+    if not group:
+        raise HTTPException(status_code=404, detail="Skupina nenalezena.")
+
+    # Dedupe silently
+    unique_user_ids = list(set(payload.user_ids))
+
+    # Validate all user_ids are existing coaches (pending allowed)
+    existing_coach_ids = {
+        id_
+        for (id_,) in db.query(User.id)
+        .filter(User.id.in_(unique_user_ids), User.role == "coach")
+        .all()
+    }
+    for uid in unique_user_ids:
+        if uid not in existing_coach_ids:
+            raise HTTPException(
+                status_code=422, detail=f"Neznámý trenér: id {uid}."
+            )
+
+    # Delete existing
+    db.query(CoachGroup).filter(
+        CoachGroup.season_id == season_id,
+        CoachGroup.group_id == group_id,
+    ).delete(synchronize_session=False)
+
+    # Insert new
+    for user_id in unique_user_ids:
+        db.add(
+            CoachGroup(
+                season_id=season_id,
+                group_id=group_id,
+                user_id=user_id,
+            )
+        )
+
+    db.commit()
+
+    # Return the GET shape
+    rows = (
+        db.query(User)
+        .join(CoachGroup, CoachGroup.user_id == User.id)
+        .filter(
+            CoachGroup.season_id == season_id,
+            CoachGroup.group_id == group_id,
+            User.role == "coach",
+        )
+        .order_by(User.username)
+        .all()
+    )
+    return [
+        CoachOut(id=u.id, username=u.username, is_active=u.is_active) for u in rows
+    ]
