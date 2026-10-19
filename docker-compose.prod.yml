@@ -40,6 +40,7 @@ services:
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - ENV=production
+      - ENV_NAME=${ENV_NAME:-}
       - CORS_ORIGINS=${CORS_ORIGINS:-}
       - TARGET_CLUB=${TARGET_CLUB}
       - SECRET_KEY=${SECRET_KEY}
