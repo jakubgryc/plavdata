@@ -156,9 +156,7 @@ async def register(
 
     # Check if email already exists (case-insensitive) - anti-enumeration
     existing_email = (
-        db.query(User)
-        .filter(func.lower(User.email) == data.email.lower())
-        .first()
+        db.query(User).filter(func.lower(User.email) == data.email.lower()).first()
     )
     if existing_email:
         return {"message": "Pokud je adresa volná, poslali jsme ti heslo na e-mail."}

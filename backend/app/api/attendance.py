@@ -39,9 +39,7 @@ def prague_today() -> date:
     return datetime.now(_PRAGUE).date()
 
 
-def _check_group_access(
-    db: Session, season_id: int, group_id: int, user: User
-) -> None:
+def _check_group_access(db: Session, season_id: int, group_id: int, user: User) -> None:
     """Raise 403 if user is not admin and has no CoachGroup row."""
     if user.role == "admin":
         return
@@ -161,9 +159,7 @@ def _build_training_out(db: Session, training: Training) -> TrainingOut:
     """Build TrainingOut from a Training ORM instance."""
     saved_by_user = db.query(User).filter(User.id == training.saved_by).first()
     attendance_rows = (
-        db.query(Attendance)
-        .filter(Attendance.training_id == training.id)
-        .all()
+        db.query(Attendance).filter(Attendance.training_id == training.id).all()
     )
     return TrainingOut(
         total_meters=training.total_meters,
@@ -307,14 +303,10 @@ async def get_context(
             for s in sched_rows
         ]
         context_groups.append(
-            ContextGroup(
-                id=g.id, display_name_cs=g.display_name_cs, schedule=schedule
-            )
+            ContextGroup(id=g.id, display_name_cs=g.display_name_cs, schedule=schedule)
         )
 
-    return ContextOut(
-        season=SeasonOut.model_validate(season), groups=context_groups
-    )
+    return ContextOut(season=SeasonOut.model_validate(season), groups=context_groups)
 
 
 @router.get("/day", response_model=DayOut)
@@ -547,13 +539,9 @@ async def get_week(
             .first()
         )
         if training is not None:
-            saved_by_user = (
-                db.query(User).filter(User.id == training.saved_by).first()
-            )
+            saved_by_user = db.query(User).filter(User.id == training.saved_by).first()
             attendance_rows = (
-                db.query(Attendance)
-                .filter(Attendance.training_id == training.id)
-                .all()
+                db.query(Attendance).filter(Attendance.training_id == training.id).all()
             )
             present_count = sum(1 for a in attendance_rows if a.present)
             days.append(
@@ -563,14 +551,10 @@ async def get_week(
                     schedule=schedule_slot,
                     filled=True,
                     present_count=present_count,
-                    saved_by_name=(
-                        saved_by_user.username if saved_by_user else ""
-                    ),
+                    saved_by_name=(saved_by_user.username if saved_by_user else ""),
                     saved_at=training.saved_at,
                     attendance=[
-                        AttendanceEntry(
-                            swimmer_id=a.swimmer_id, present=a.present
-                        )
+                        AttendanceEntry(swimmer_id=a.swimmer_id, present=a.present)
                         for a in attendance_rows
                     ],
                 )

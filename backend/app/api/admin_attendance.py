@@ -221,7 +221,9 @@ async def copy_season_config(
         .all()
     )
     source_members = (
-        db.query(SeasonGroupMember).filter(SeasonGroupMember.season_id == source_id).all()
+        db.query(SeasonGroupMember)
+        .filter(SeasonGroupMember.season_id == source_id)
+        .all()
     )
     for src in source_members:
         key = (src.group_id, src.swimmer_id)
@@ -241,9 +243,7 @@ async def copy_season_config(
         .all()
     )
     source_schedules = (
-        db.query(TrainingSchedule)
-        .filter(TrainingSchedule.season_id == source_id)
-        .all()
+        db.query(TrainingSchedule).filter(TrainingSchedule.season_id == source_id).all()
     )
     for src in source_schedules:
         key = (src.group_id, src.weekday)
@@ -459,9 +459,7 @@ async def put_group_members(
     }
     for sid in unique_ids:
         if sid not in existing_ids:
-            raise HTTPException(
-                status_code=422, detail=f"Neznámý plavec: id {sid}."
-            )
+            raise HTTPException(status_code=422, detail=f"Neznámý plavec: id {sid}.")
 
     # Delete existing
     db.query(SeasonGroupMember).filter(
@@ -529,9 +527,7 @@ async def get_group_schedule(
         .all()
     )
     return [
-        ScheduleSlotOut(
-            weekday=r.weekday, start_time=r.start_time, end_time=r.end_time
-        )
+        ScheduleSlotOut(weekday=r.weekday, start_time=r.start_time, end_time=r.end_time)
         for r in rows
     ]
 
@@ -589,9 +585,7 @@ async def put_group_schedule(
         .all()
     )
     return [
-        ScheduleSlotOut(
-            weekday=r.weekday, start_time=r.start_time, end_time=r.end_time
-        )
+        ScheduleSlotOut(weekday=r.weekday, start_time=r.start_time, end_time=r.end_time)
         for r in rows
     ]
 
@@ -626,9 +620,7 @@ async def get_group_coaches(
         .order_by(User.username)
         .all()
     )
-    return [
-        CoachOut(id=u.id, username=u.username, is_active=u.is_active) for u in rows
-    ]
+    return [CoachOut(id=u.id, username=u.username, is_active=u.is_active) for u in rows]
 
 
 @router.put(
@@ -663,9 +655,7 @@ async def put_group_coaches(
     }
     for uid in unique_user_ids:
         if uid not in existing_coach_ids:
-            raise HTTPException(
-                status_code=422, detail=f"Neznámý trenér: id {uid}."
-            )
+            raise HTTPException(status_code=422, detail=f"Neznámý trenér: id {uid}.")
 
     # Delete existing
     db.query(CoachGroup).filter(
@@ -697,6 +687,4 @@ async def put_group_coaches(
         .order_by(User.username)
         .all()
     )
-    return [
-        CoachOut(id=u.id, username=u.username, is_active=u.is_active) for u in rows
-    ]
+    return [CoachOut(id=u.id, username=u.username, is_active=u.is_active) for u in rows]
