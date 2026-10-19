@@ -12,6 +12,7 @@ import "@mantine/dates/styles.css";
 import "mantine-datatable/styles.css";
 import "./index.css";
 import App from "./App.tsx";
+import RequireAdmin from "./components/shared/RequireAdmin.tsx";
 import AdminControlCenterPage from "./pages/admin/controlCenter.tsx";
 import { AdminGroupsPage } from "./pages/admin/groups";
 import { AdminSwimmersPage } from "./pages/admin/SwimmersAdmin.tsx";
@@ -32,7 +33,14 @@ import { theme } from "./theme";
 import { authApi } from "./utils/auth";
 
 function AdminEntry() {
-  return authApi.isAuthenticated() ? <Navigate to="/admin/control-center" replace /> : <Login />;
+  if (!authApi.isAuthenticated()) {
+    return <Login />;
+  }
+  const role = authApi.getRole();
+  if (role === "admin") {
+    return <Navigate to="/admin/control-center" replace />;
+  }
+  return <Navigate to="/attendance" replace />;
 }
 
 const router = createBrowserRouter([
@@ -86,15 +94,27 @@ const router = createBrowserRouter([
       },
       {
         path: "admin/swimmers",
-        element: <AdminSwimmersPage />,
+        element: (
+          <RequireAdmin>
+            <AdminSwimmersPage />
+          </RequireAdmin>
+        ),
       },
       {
         path: "admin/groups",
-        element: <AdminGroupsPage />,
+        element: (
+          <RequireAdmin>
+            <AdminGroupsPage />
+          </RequireAdmin>
+        ),
       },
       {
         path: "admin/control-center",
-        element: <AdminControlCenterPage />,
+        element: (
+          <RequireAdmin>
+            <AdminControlCenterPage />
+          </RequireAdmin>
+        ),
       },
       {
         path: "results",

@@ -32,7 +32,7 @@ function Login() {
       const response = await authApi.login({ username, password });
       authApi.saveToken(response.access_token, response.username, response.role);
       window.dispatchEvent(new Event("storage"));
-      navigate("/admin/swimmers");
+      navigate(response.role === "admin" ? "/admin/swimmers" : "/attendance");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Přihlášení se nezdařilo");
     } finally {

@@ -103,6 +103,16 @@ const Navbar = () => {
       >
         Nástroje
       </NavLink>
+      {isAuthenticated && (
+        <NavLink
+          to="/attendance"
+          style={navLinkStyle}
+          onClick={() => setOpened(false)}
+          className="textHoverLink"
+        >
+          Docházka
+        </NavLink>
+      )}
     </>
   );
 
@@ -178,39 +188,41 @@ const Navbar = () => {
                   Docházka
                 </Menu.Item>
                 {role === "admin" && (
-                  <Menu.Item
-                    component={NavLink}
-                    to="/admin/control-center"
-                    leftSection={<IconShield size={14} />}
-                  >
-                    Administrace
-                  </Menu.Item>
+                  <>
+                    <Menu.Item
+                      component={NavLink}
+                      to="/admin/control-center"
+                      leftSection={<IconShield size={14} />}
+                    >
+                      Administrace
+                    </Menu.Item>
+                    <Menu.Divider />
+                    <Menu.Item
+                      component={NavLink}
+                      to="/admin/swimmers"
+                      leftSection={<IconUser size={14} />}
+                    >
+                      Správa plavců
+                    </Menu.Item>
+                    <Menu.Item
+                      component={NavLink}
+                      to="/admin/groups"
+                      leftSection={<IconUser size={14} />}
+                      onClick={() => setOpened(false)}
+                    >
+                      Správa skupin
+                    </Menu.Item>
+                    <Menu.Divider />
+                    <Menu.Item
+                      component={NavLink}
+                      to="/admin/control-center"
+                      leftSection={<IconDatabaseImport size={14} />}
+                      onClick={() => setOpened(false)}
+                    >
+                      Ovládací centrum
+                    </Menu.Item>
+                  </>
                 )}
-                <Menu.Divider />
-                <Menu.Item
-                  component={NavLink}
-                  to="/admin/swimmers"
-                  leftSection={<IconUser size={14} />}
-                >
-                  Správa plavců
-                </Menu.Item>
-                <Menu.Item
-                  component={NavLink}
-                  to="/admin/groups"
-                  leftSection={<IconUser size={14} />}
-                  onClick={() => setOpened(false)}
-                >
-                  Správa skupin
-                </Menu.Item>
-                <Menu.Divider />
-                <Menu.Item
-                  component={NavLink}
-                  to="/admin/control-center"
-                  leftSection={<IconDatabaseImport size={14} />}
-                  onClick={() => setOpened(false)}
-                >
-                  Ovládací centrum
-                </Menu.Item>
                 <Menu.Item color="red" leftSection={<IconLogout size={14} />} onClick={logout}>
                   Odhlásit se
                 </Menu.Item>
@@ -274,33 +286,43 @@ const Navbar = () => {
                   Docházka
                 </Menu.Item>
                 {role === "admin" && (
-                  <Menu.Item
-                    component={NavLink}
-                    to="/admin/control-center"
-                    leftSection={<IconShield size={14} />}
-                    onClick={() => setOpened(false)}
-                  >
-                    Administrace
-                  </Menu.Item>
+                  <>
+                    <Menu.Item
+                      component={NavLink}
+                      to="/admin/control-center"
+                      leftSection={<IconShield size={14} />}
+                      onClick={() => setOpened(false)}
+                    >
+                      Administrace
+                    </Menu.Item>
+                    <Menu.Divider />
+                    <Menu.Item
+                      component={NavLink}
+                      to="/admin/swimmers"
+                      leftSection={<IconUser size={14} />}
+                      onClick={() => setOpened(false)}
+                    >
+                      Správa plavců
+                    </Menu.Item>
+                    <Menu.Item
+                      component={NavLink}
+                      to="/admin/groups"
+                      leftSection={<IconUser size={14} />}
+                      onClick={() => setOpened(false)}
+                    >
+                      Správa skupiny
+                    </Menu.Item>
+                    <Menu.Divider />
+                    <Menu.Item
+                      component={NavLink}
+                      to="/admin/control-center"
+                      leftSection={<IconDatabaseImport size={14} />}
+                      onClick={() => setOpened(false)}
+                    >
+                      Ovládací centrum
+                    </Menu.Item>
+                  </>
                 )}
-                <Menu.Divider />
-                <Menu.Item
-                  component={NavLink}
-                  to="/admin/swimmers"
-                  leftSection={<IconUser size={14} />}
-                  onClick={() => setOpened(false)}
-                >
-                  Správa plavců
-                </Menu.Item>
-                <Menu.Item
-                  component={NavLink}
-                  to="/admin/groups"
-                  leftSection={<IconUser size={14} />}
-                  onClick={() => setOpened(false)}
-                >
-                  Správa skupiny
-                </Menu.Item>
-                <Menu.Divider />
                 <Menu.Item
                   color="red"
                   leftSection={<IconLogout size={14} />}
@@ -310,14 +332,6 @@ const Navbar = () => {
                   }}
                 >
                   Odhlásit se
-                </Menu.Item>
-                <Menu.Item
-                  component={NavLink}
-                  to="/admin/control-center"
-                  leftSection={<IconDatabaseImport size={14} />}
-                  onClick={() => setOpened(false)}
-                >
-                  Ovládací centrum
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>
