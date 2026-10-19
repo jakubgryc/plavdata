@@ -50,7 +50,6 @@ function AttendanceSetupSection() {
 
   // --- Members tab state ---
   const [allSwimmers, setAllSwimmers] = useState<Swimmer[]>([]);
-  const [currentMembers, setCurrentMembers] = useState<GroupMember[]>([]);
   const [selectedMemberIds, setSelectedMemberIds] = useState<Set<number>>(new Set());
   const [initialMemberIds, setInitialMemberIds] = useState<Set<number>>(new Set());
   const [memberSearch, setMemberSearch] = useState("");
@@ -71,8 +70,9 @@ function AttendanceSetupSection() {
   const [savingSchedule, setSavingSchedule] = useState(false);
 
   // --- Coaches tab state ---
-  const [allCoaches, setAllCoaches] = useState<{ id: number; username: string; is_active: boolean }[]>([]);
-  const [currentCoachIds, setCurrentCoachIds] = useState<Set<number>>(new Set());
+  const [allCoaches, setAllCoaches] = useState<
+    { id: number; username: string; is_active: boolean }[]
+  >([]);
   const [selectedCoachIds, setSelectedCoachIds] = useState<Set<number>>(new Set());
   const [initialCoachIds, setInitialCoachIds] = useState<Set<number>>(new Set());
   const [loadingCoaches, setLoadingCoaches] = useState(false);
@@ -158,7 +158,14 @@ function AttendanceSetupSection() {
     const loadAllCoaches = async () => {
       try {
         const data = await apiGet<
-          { id: number; username: string; email: string; role: string; is_active: boolean; created_at: string }[]
+          {
+            id: number;
+            username: string;
+            email: string;
+            role: string;
+            is_active: boolean;
+            created_at: string;
+          }[]
         >(`${API_BASE_URL}/admin/users`);
         setAllCoaches(
           data
@@ -184,7 +191,6 @@ function AttendanceSetupSection() {
       const data = await apiGet<GroupMember[]>(
         `${API_BASE_URL}/admin/seasons/${selectedSeasonId}/groups/${selectedGroupId}/members`,
       );
-      setCurrentMembers(data);
       const ids = new Set(data.map((m) => m.id));
       setSelectedMemberIds(ids);
       setInitialMemberIds(ids);
@@ -237,7 +243,6 @@ function AttendanceSetupSection() {
         `${API_BASE_URL}/admin/seasons/${selectedSeasonId}/groups/${selectedGroupId}/coaches`,
       );
       const ids = new Set(data.map((c) => c.id));
-      setCurrentCoachIds(ids);
       setSelectedCoachIds(ids);
       setInitialCoachIds(ids);
     } catch {
@@ -394,9 +399,7 @@ function AttendanceSetupSection() {
     const q = memberSearch.toLowerCase().trim();
     if (!q) return allSwimmers;
     return allSwimmers.filter(
-      (s) =>
-        s.surname.toLowerCase().includes(q) ||
-        s.name.toLowerCase().includes(q),
+      (s) => s.surname.toLowerCase().includes(q) || s.name.toLowerCase().includes(q),
     );
   }, [allSwimmers, memberSearch]);
 
@@ -467,10 +470,7 @@ function AttendanceSetupSection() {
                       value={memberSearch}
                       onChange={(e) => setMemberSearch(e.currentTarget.value)}
                     />
-                    <Stack
-                      gap="xs"
-                      style={{ maxHeight: 400, overflowY: "auto" }}
-                    >
+                    <Stack gap="xs" style={{ maxHeight: 400, overflowY: "auto" }}>
                       {filteredSwimmers.map((swimmer) => (
                         <Checkbox
                           key={swimmer.id}
@@ -525,9 +525,7 @@ function AttendanceSetupSection() {
                                   const wd = row.weekday;
                                   setScheduleRows((prev) =>
                                     prev.map((r) =>
-                                      r.weekday === wd
-                                        ? { ...r, enabled: checked }
-                                        : r,
+                                      r.weekday === wd ? { ...r, enabled: checked } : r,
                                     ),
                                   );
                                 }}
@@ -542,9 +540,7 @@ function AttendanceSetupSection() {
                                   const val = e.target.value;
                                   setScheduleRows((prev) =>
                                     prev.map((r) =>
-                                      r.weekday === row.weekday
-                                        ? { ...r, start_time: val }
-                                        : r,
+                                      r.weekday === row.weekday ? { ...r, start_time: val } : r,
                                     ),
                                   );
                                 }}
@@ -565,9 +561,7 @@ function AttendanceSetupSection() {
                                   const val = e.target.value;
                                   setScheduleRows((prev) =>
                                     prev.map((r) =>
-                                      r.weekday === row.weekday
-                                        ? { ...r, end_time: val }
-                                        : r,
+                                      r.weekday === row.weekday ? { ...r, end_time: val } : r,
                                     ),
                                   );
                                 }}

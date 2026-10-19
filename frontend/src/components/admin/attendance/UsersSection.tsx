@@ -318,11 +318,7 @@ function UsersSection() {
             <>
               <Text>Opravdu resetovat heslo pro tohoto uživatele?</Text>
               <Group justify="flex-end">
-                <Button
-                  variant="default"
-                  onClick={() => setResetTarget(null)}
-                  disabled={resetting}
-                >
+                <Button variant="default" onClick={() => setResetTarget(null)} disabled={resetting}>
                   Zrušit
                 </Button>
                 <Button color="orange" onClick={handleResetPassword} loading={resetting}>

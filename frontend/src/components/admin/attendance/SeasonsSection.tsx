@@ -95,7 +95,11 @@ function SeasonsSection() {
     openModal();
   };
 
-  const handleSave = async (values: { name: string; startDate: Date | null; endDate: Date | null }) => {
+  const handleSave = async (values: {
+    name: string;
+    startDate: Date | null;
+    endDate: Date | null;
+  }) => {
     if (!values.startDate || !values.endDate) return;
     setSaving(true);
     setModalError(null);
@@ -353,12 +357,7 @@ function SeasonsSection() {
             value={copySourceId}
             onChange={setCopySourceId}
           />
-          <Button
-            onClick={handleCopy}
-            loading={copying}
-            disabled={!copySourceId}
-            fullWidth
-          >
+          <Button onClick={handleCopy} loading={copying} disabled={!copySourceId} fullWidth>
             Kopírovat
           </Button>
         </Stack>
