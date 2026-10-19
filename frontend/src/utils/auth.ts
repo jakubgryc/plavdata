@@ -149,6 +149,29 @@ class AuthApi {
     }
   }
 
+  async forgotPassword(email: string): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!response.ok) {
+      let detail = "Odeslání se nezdařilo";
+      try {
+        const body = await response.json();
+        if (body.detail) {
+          detail = body.detail;
+        }
+      } catch {
+        // JSON parse failed, use default message
+      }
+      throw new Error(detail);
+    }
+  }
+
   async changePassword(currentPassword: string, newPassword: string): Promise<void> {
     const response = await authenticatedFetch(`${API_BASE_URL}/auth/change-password`, {
       method: "POST",

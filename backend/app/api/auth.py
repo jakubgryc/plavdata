@@ -65,6 +65,10 @@ class ChangePasswordRequest(BaseModel):
     new_password: str
 
 
+class ForgotPasswordRequest(BaseModel):
+    email: str
+
+
 @router.post("/auth/login", response_model=LoginResponse)
 async def login(login_data: LoginRequest, db: Session = Depends(get_db)):
     """
@@ -223,3 +227,52 @@ async def change_password(
     db.commit()
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post("/auth/forgot-password")
+@limiter.limit("5/hour")
+async def forgot_password(
+    data: ForgotPasswordRequest, request: Request, db: Session = Depends(get_db)
+):
+    """
+    Reset password by email. Always returns the same generic response
+    to prevent email enumeration.
+    """
+    generic_message = {
+        "message": "Pokud je e-mail registrován, poslali jsme ti nové heslo."
+    }
+
+    # Look up user by email (case-insensitive)
+    user = (
+        db.query(User).filter(func.lower(User.email) == data.email.lower()).first()
+    )
+    if not user:
+        return generic_message
+
+    # Generate new password and update hash
+    password = generate_password()
+    old_hashed_password = user.hashed_password
+    user.hashed_password = get_password_hash(password)
+    db.commit()
+
+    # Send email with new password
+    subject = "Nové heslo do plavdata"
+    body = (
+        f"Ahoj {user.username},\n\n"
+        f"na základě žádosti o obnovu hesla ti posíláme nové:\n"
+        f"Heslo: {password}\n\n"
+        f"Po přihlášení si ho můžeš změnit v nastavení.\n"
+    )
+
+    try:
+        await run_in_threadpool(send_email, user.email, subject, body)
+    except Exception:
+        # Restore old hash so user is not locked out with an unknown password.
+        # Return the same generic response to avoid leaking email existence
+        # via a 500-vs-200 side channel. Admin sees failures in logs.
+        user.hashed_password = old_hashed_password
+        db.commit()
+        logger.exception("Failed to send forgot-password email")
+        return generic_message
+
+    return generic_message
