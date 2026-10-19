@@ -9,7 +9,7 @@ import DayView from "../components/attendance/DayView";
 import WeekView from "../components/attendance/WeekView";
 import { useAuth } from "../hooks/useAuth";
 import type { AttendanceContext, ContextGroup } from "../schema/attendance";
-import { defaultDate, isTrainingDay, mondayOf, toApiDate } from "../utils/attendance";
+import { defaultDate, isTrainingDay, mondayOf, parseApiDate, toApiDate } from "../utils/attendance";
 import { authenticatedFetch } from "../utils/authenticatedFetch";
 
 function AttendancePage() {
@@ -172,20 +172,21 @@ function AttendancePage() {
         </ActionIcon>
 
         <DatePickerInput
-          value={view === "week" ? weekStart : selectedDate}
+          value={toApiDate(view === "week" ? weekStart : selectedDate)}
           onChange={(val) => {
             if (val) {
+              // Mantine dates v8 emits "YYYY-MM-DD" strings, not Date objects
+              const picked = parseApiDate(val as string);
               if (view === "week") {
-                setWeekStart(mondayOf(val));
+                setWeekStart(mondayOf(picked));
               } else {
-                setSelectedDate(val);
+                setSelectedDate(picked);
               }
             }
           }}
           locale="cs"
           firstDayOfWeek={1}
           valueFormat="D. M. YYYY"
-          maxDate={new Date()}
           style={{ flex: 1, minWidth: 140 }}
         />
 
