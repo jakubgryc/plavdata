@@ -6,6 +6,7 @@ import logging_loki
 from fastapi import FastAPI
 from starlette.requests import Request
 
+ENV_NAME = os.getenv("ENV_NAME", "local")
 logger = logging.getLogger("plavdata")
 
 
@@ -49,6 +50,7 @@ def setup_logging(app: FastAPI):
             raise
         duration = time.time() - start_time
         logger.info(
+            f"{ENV_NAME} - "
             f"{client_ip} - {request.method} {request.url.path} "
             f"- Status: {response.status_code} "
             f"- Duration: {duration:.3f}s"
