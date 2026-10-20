@@ -240,46 +240,73 @@ function DayView({ groupId, date }: DayViewProps) {
         {badge}
       </Group>
 
-      <Box style={{ overflowX: "auto" }} mb="md">
+      <Box
+        style={{
+          overflowX: "auto",
+          border: "1px solid var(--mantine-color-default-border)",
+          borderRadius: theme.radius.md,
+          // slightly lifted surface so the table doesn't blend into the card
+          backgroundColor: colorScheme === "dark" ? theme.colors.dark[6] : theme.colors.gray[0],
+        }}
+        mb="md"
+      >
         <Table
+          className="attendance-day-table"
           striped
-          stripedColor={colorScheme === "dark" ? theme.colors.dark[5] : theme.colors.gray[1]}
+          stripedColor={colorScheme === "dark" ? theme.colors.dark[5] : theme.colors.gray[2]}
           highlightOnHover
+          withRowBorders
         >
           <Table.Thead>
             <Table.Tr>
+              <Table.Th style={{ width: 56 }} aria-hidden />
               <Table.Th>Plavec</Table.Th>
-              <Table.Th style={{ textAlign: "center", width: 80 }}>Přítomen</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            {sortedSwimmers.map((swimmer) => (
-              <Table.Tr key={swimmer.id}>
-                <Table.Td>
-                  {swimmer.surname} {swimmer.name}
-                </Table.Td>
-                <Table.Td style={{ textAlign: "center" }}>
+            {sortedSwimmers.map((swimmer) => {
+              const present = draft.attendance[swimmer.id] ?? false;
+              return (
+              <Table.Tr
+                key={swimmer.id}
+                onClick={() => togglePresent(swimmer.id)}
+                style={{
+                  cursor: "pointer",
+                  // subtle primary-blue wash on present rows (overrides stripes)
+                  backgroundColor: present
+                    ? colorScheme === "dark"
+                      ? "rgba(18, 160, 216, 0.14)"
+                      : "rgba(18, 160, 216, 0.10)"
+                    : undefined,
+                }}
+              >
+                {/* stopPropagation: tapping the switch itself must not toggle twice */}
+                <Table.Td
+                  style={{ textAlign: "center", width: 56 }}
+                  onClick={(event) => event.stopPropagation()}
+                >
                   <Flex justify="center">
                     <Switch
                       size="sm"
-                      checked={draft.attendance[swimmer.id] ?? false}
+                      checked={present}
                       onChange={() => togglePresent(swimmer.id)}
                       aria-label={`${swimmer.surname} ${swimmer.name}`}
                       styles={{
                         track: {
-                          backgroundColor:
-                            (draft.attendance[swimmer.id] ?? false)
-                              ? undefined
-                              : colorScheme === "dark"
-                                ? theme.colors.dark[3]
-                                : theme.colors.gray[4],
+                          backgroundColor: present
+                            ? undefined
+                            : colorScheme === "dark"
+                              ? theme.colors.dark[3]
+                              : theme.colors.gray[4],
                         },
                       }}
                     />
                   </Flex>
                 </Table.Td>
+                <Table.Td fw={500}>{swimmer.surname} {swimmer.name}</Table.Td>
               </Table.Tr>
-            ))}
+              );
+            })}
           </Table.Tbody>
         </Table>
       </Box>

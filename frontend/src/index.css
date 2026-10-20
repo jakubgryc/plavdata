@@ -268,3 +268,24 @@ button {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+/* Attendance day-view table: bigger text + taller rows on small screens,
+   normal size from the md breakpoint up. !important to beat any Mantine
+   table cell styles (matches the mobile-override idiom used above). */
+@media (max-width: 767px) {
+  .attendance-day-table td,
+  .attendance-day-table .mantine-Table-td {
+    font-size: 0.95rem !important;
+    padding-top: 14px !important;
+    padding-bottom: 14px !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .attendance-day-table td,
+  .attendance-day-table .mantine-Table-td {
+    font-size: 0.875rem;
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+}
