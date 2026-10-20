@@ -265,9 +265,7 @@ async def forgot_password(
     }
 
     # Look up user by email (case-insensitive)
-    user = (
-        db.query(User).filter(func.lower(User.email) == data.email.lower()).first()
-    )
+    user = db.query(User).filter(func.lower(User.email) == data.email.lower()).first()
     if not user:
         return generic_message
 

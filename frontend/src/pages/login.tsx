@@ -85,12 +85,7 @@ function Login() {
 
       <Paper withBorder shadow="md" p={30} radius="md">
         {successAlert && !forgotMode && (
-          <Alert
-            color="green"
-            mb="md"
-            withCloseButton
-            onClose={() => setSuccessAlert(null)}
-          >
+          <Alert color="green" mb="md" withCloseButton onClose={() => setSuccessAlert(null)}>
             {successAlert}
           </Alert>
         )}
@@ -108,9 +103,7 @@ function Login() {
                 size="md"
               />
 
-              {forgotError && (
-                <Alert color="red">{forgotError}</Alert>
-              )}
+              {forgotError && <Alert color="red">{forgotError}</Alert>}
 
               <Button type="submit" fullWidth size="md" loading={forgotLoading}>
                 Odeslat nové heslo

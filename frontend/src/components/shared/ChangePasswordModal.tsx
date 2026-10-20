@@ -20,10 +20,8 @@ function ChangePasswordModal({ opened, onClose }: ChangePasswordModalProps) {
       confirm_password: "",
     },
     validate: {
-      current_password: (v: string) =>
-        v.length === 0 ? "Zadejte současné heslo" : null,
-      new_password: (v: string) =>
-        v.length < 8 ? "Heslo musí mít alespoň 8 znaků" : null,
+      current_password: (v: string) => (v.length === 0 ? "Zadejte současné heslo" : null),
+      new_password: (v: string) => (v.length < 8 ? "Heslo musí mít alespoň 8 znaků" : null),
       confirm_password: (v: string, values) =>
         v !== values.new_password ? "Hesla se neshodují" : null,
     },
@@ -31,12 +29,14 @@ function ChangePasswordModal({ opened, onClose }: ChangePasswordModalProps) {
 
   // Reset form when modal opens so stale errors/values from a prior attempt
   // don't leak into the next open.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: form.reset is
+  // intentionally omitted — Mantine's useForm returns a new object each
+  // render, so listing it would re-run the reset on every keystroke.
   useEffect(() => {
     if (opened) {
       form.reset();
       setError(null);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened]);
 
   const handleSubmit = async (values: {
