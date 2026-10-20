@@ -197,7 +197,7 @@ const Navbar = () => {
                       to="/admin/control-center"
                       leftSection={<IconShield size={14} />}
                     >
-                      Administrace
+                      Ovládací centrum
                     </Menu.Item>
                     <Menu.Divider />
                     <Menu.Item
@@ -216,14 +216,6 @@ const Navbar = () => {
                       Správa skupin
                     </Menu.Item>
                     <Menu.Divider />
-                    <Menu.Item
-                      component={NavLink}
-                      to="/admin/control-center"
-                      leftSection={<IconDatabaseImport size={14} />}
-                      onClick={() => setOpened(false)}
-                    >
-                      Ovládací centrum
-                    </Menu.Item>
                   </>
                 )}
                 <Menu.Item

@@ -40,7 +40,7 @@ function Login() {
       const response = await authApi.login({ username, password });
       authApi.saveToken(response.access_token, response.username, response.role);
       window.dispatchEvent(new Event("storage"));
-      navigate(response.role === "admin" ? "/admin/swimmers" : "/attendance");
+      navigate(response.role === "admin" ? "/admin/control-center" : "/attendance");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Přihlášení se nezdařilo");
     } finally {
@@ -160,7 +160,7 @@ function Login() {
               </Anchor>
             )}
             <Anchor component={NavLink} to="/register" size="sm">
-              Jsem trenér — registrace
+              Jsem trenér - registrace
             </Anchor>
           </Stack>
         </Center>
