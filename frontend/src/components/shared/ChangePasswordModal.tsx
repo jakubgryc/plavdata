@@ -62,7 +62,18 @@ function ChangePasswordModal({ opened, onClose }: ChangePasswordModalProps) {
         try {
           const username = authApi.getUsername();
           if (username) {
-            const cred = new PasswordCredential({
+            // Constructed via window lookup: the Credential Management API
+            // types are missing from some TypeScript DOM libs.
+            const PasswordCredentialCtor = (
+              window as unknown as {
+                PasswordCredential: new (data: {
+                  id: string;
+                  password: string;
+                  name: string;
+                }) => Credential;
+              }
+            ).PasswordCredential;
+            const cred = new PasswordCredentialCtor({
               id: username,
               password: values.new_password,
               name: username,
