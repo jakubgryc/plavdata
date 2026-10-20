@@ -82,7 +82,7 @@ function TableRow({ chance, beatable }: RecordRowProps) {
       <Table.Td>
         <Holder chance={chance} size="sm" />
       </Table.Td>
-      <Table.Td ta="right">
+      <Table.Td align="right">
         {chance.holdsRecord ? (
           <IconTrophy size={16} color="#f59f00" />
         ) : chance.gap != null ? (
@@ -222,7 +222,7 @@ function ProfileRecordTracker({ chances }: ProfileRecordTrackerProps) {
         <Group gap={4}>
           <IconLock size={13} color="var(--mantine-color-dimmed)" />
           <Text size="xs" c="dimmed">
-            V této kategorii už není možné rekord překonat (věkový limit) — jde o historické
+            V této kategorii už není možné rekord překonat (věkový limit), jde o historické
             srovnání.
           </Text>
         </Group>
