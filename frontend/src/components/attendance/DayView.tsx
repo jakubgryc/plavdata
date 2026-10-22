@@ -269,44 +269,46 @@ function DayView({ groupId, date }: DayViewProps) {
             {sortedSwimmers.map((swimmer) => {
               const present = draft.attendance[swimmer.id] ?? false;
               return (
-              <Table.Tr
-                key={swimmer.id}
-                onClick={() => togglePresent(swimmer.id)}
-                style={{
-                  cursor: "pointer",
-                  // subtle primary-blue wash on present rows (overrides stripes)
-                  backgroundColor: present
-                    ? colorScheme === "dark"
-                      ? "rgba(18, 160, 216, 0.14)"
-                      : "rgba(18, 160, 216, 0.10)"
-                    : undefined,
-                }}
-              >
-                {/* stopPropagation: tapping the switch itself must not toggle twice */}
-                <Table.Td
-                  style={{ textAlign: "center", width: 56 }}
-                  onClick={(event) => event.stopPropagation()}
+                <Table.Tr
+                  key={swimmer.id}
+                  onClick={() => togglePresent(swimmer.id)}
+                  style={{
+                    cursor: "pointer",
+                    // subtle primary-blue wash on present rows (overrides stripes)
+                    backgroundColor: present
+                      ? colorScheme === "dark"
+                        ? "rgba(18, 160, 216, 0.14)"
+                        : "rgba(18, 160, 216, 0.10)"
+                      : undefined,
+                  }}
                 >
-                  <Flex justify="center">
-                    <Switch
-                      size="sm"
-                      checked={present}
-                      onChange={() => togglePresent(swimmer.id)}
-                      aria-label={`${swimmer.surname} ${swimmer.name}`}
-                      styles={{
-                        track: {
-                          backgroundColor: present
-                            ? undefined
-                            : colorScheme === "dark"
-                              ? theme.colors.dark[3]
-                              : theme.colors.gray[4],
-                        },
-                      }}
-                    />
-                  </Flex>
-                </Table.Td>
-                <Table.Td fw={500}>{swimmer.surname} {swimmer.name}</Table.Td>
-              </Table.Tr>
+                  {/* stopPropagation: tapping the switch itself must not toggle twice */}
+                  <Table.Td
+                    style={{ textAlign: "center", width: 56 }}
+                    onClick={(event) => event.stopPropagation()}
+                  >
+                    <Flex justify="center">
+                      <Switch
+                        size="sm"
+                        checked={present}
+                        onChange={() => togglePresent(swimmer.id)}
+                        aria-label={`${swimmer.surname} ${swimmer.name}`}
+                        styles={{
+                          track: {
+                            backgroundColor: present
+                              ? undefined
+                              : colorScheme === "dark"
+                                ? theme.colors.dark[3]
+                                : theme.colors.gray[4],
+                          },
+                        }}
+                      />
+                    </Flex>
+                  </Table.Td>
+                  <Table.Td fw={500}>
+                    {swimmer.surname} {swimmer.name}
+                  </Table.Td>
+                </Table.Tr>
               );
             })}
           </Table.Tbody>

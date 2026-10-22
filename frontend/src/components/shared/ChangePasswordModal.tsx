@@ -28,10 +28,10 @@ function ChangePasswordModal({ opened, onClose }: ChangePasswordModalProps) {
   });
 
   // Reset form when modal opens so stale errors/values from a prior attempt
-  // don't leak into the next open.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: form.reset is
-  // intentionally omitted — Mantine's useForm returns a new object each
-  // render, so listing it would re-run the reset on every keystroke.
+  // don't leak into the next open. form.reset is intentionally NOT a dep:
+  // Mantine's useForm returns a new object each render, so listing it would
+  // re-run the reset on every keystroke.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: see comment above
   useEffect(() => {
     if (opened) {
       form.reset();
