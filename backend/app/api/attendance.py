@@ -351,6 +351,31 @@ async def save_day(
 
     _check_group_access(db, season.id, payload.group_id, current_user)
 
+    # --- Training-day check ---
+    existing_training = (
+        db.query(Training)
+        .filter(
+            Training.group_id == payload.group_id,
+            Training.date == payload.date,
+        )
+        .first()
+    )
+    if existing_training is None:
+        sched = (
+            db.query(TrainingSchedule)
+            .filter(
+                TrainingSchedule.season_id == season.id,
+                TrainingSchedule.group_id == payload.group_id,
+                TrainingSchedule.weekday == payload.date.isoweekday(),
+            )
+            .first()
+        )
+        if sched is None:
+            raise HTTPException(
+                status_code=422,
+                detail="Tento den nemá skupina trénink dle rozvrhu.",
+            )
+
     # --- Validate attendance entries ---
     swimmer_ids = [entry.swimmer_id for entry in payload.attendance]
 

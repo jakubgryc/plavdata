@@ -153,7 +153,16 @@ function AttendancePage() {
       {context && context.groups.length > 0 && (
         <SegmentedControl
           value={selectedGroupId != null ? String(selectedGroupId) : ""}
-          onChange={(val) => setSelectedGroupId(Number(val))}
+          onChange={(val) => {
+            const newGroupId = Number(val);
+            if (context) {
+              const newGroup = context.groups.find((g) => g.id === newGroupId);
+              if (newGroup && !isTrainingDay(newGroup.schedule, selectedDate)) {
+                setSelectedDate(defaultDate(newGroup.schedule, selectedDate));
+              }
+            }
+            setSelectedGroupId(newGroupId);
+          }}
           data={context.groups.map((g) => ({
             value: String(g.id),
             label: g.display_name_cs,

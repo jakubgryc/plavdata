@@ -207,6 +207,8 @@ function DayView({ groupId, date }: DayViewProps) {
     return null;
   }
 
+  const readOnly = !dayData.is_training_day && !dayData.training;
+
   const scheduleLabel = dayData.schedule
     ? `${dayData.schedule.start_time} – ${dayData.schedule.end_time}`
     : null;
@@ -311,6 +313,12 @@ function DayView({ groupId, date }: DayViewProps) {
         </Table>
       </Box>
 
+      {readOnly && (
+        <Text size="sm" c="dimmed" mb="sm">
+          Tento den nemá skupina trénink — docházku nelze uložit.
+        </Text>
+      )}
+
       <Stack gap="sm" mb="md">
         <Group grow>
           <NumberInput
@@ -324,6 +332,7 @@ function DayView({ groupId, date }: DayViewProps) {
               }))
             }
             hideControls
+            disabled={readOnly}
           />
           <NumberInput
             label="Technika (m)"
@@ -336,6 +345,7 @@ function DayView({ groupId, date }: DayViewProps) {
               }))
             }
             hideControls
+            disabled={readOnly}
           />
           <NumberInput
             label="Nohy (m)"
@@ -348,6 +358,7 @@ function DayView({ groupId, date }: DayViewProps) {
               }))
             }
             hideControls
+            disabled={readOnly}
           />
         </Group>
         <Textarea
@@ -360,13 +371,14 @@ function DayView({ groupId, date }: DayViewProps) {
             const value = e.currentTarget.value;
             setDraft((prev) => ({ ...prev, description: value }));
           }}
+          disabled={readOnly}
         />
       </Stack>
 
       <Button
         fullWidth
         leftSection={saving ? <Loader size="xs" /> : <IconDeviceFloppy size={16} />}
-        disabled={!isDirty || saving}
+        disabled={!isDirty || saving || readOnly}
         onClick={handleSave}
         styles={{
           root: {
