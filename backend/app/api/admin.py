@@ -4,18 +4,21 @@ Admin API endpoints for managing swimmers.
 
 import asyncio
 import json
-from datetime import date
+import logging
+from datetime import date, datetime
 from typing import Annotated, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy import asc, desc, func
 from sqlalchemy.orm import Session
 
-from app.auth import get_current_user
+from app.auth import get_current_admin, get_current_user, get_password_hash
 from app.db import get_db
-from app.models import Group, Swimmer, User
+from app.models import Group, Swimmer, Training, User
+from app.services.email import generate_password, send_email
 from scripts.db.sync_competitions import sync_competitions_generator
 from scripts.db.sync_results import sync_results_generator
 from scripts.db.link_results_to_competitions import link_results_to_competitions
@@ -218,7 +221,7 @@ def _update_single_swimmer(
 @router.patch("/swimmers/bulk")
 async def bulk_update_swimmers(
     bulk_request: BulkUpdateSwimmersRequest,
-    _current_user: Annotated[User, Depends(get_current_user)],
+    _current_user: Annotated[User, Depends(get_current_admin)],
     db: Session = Depends(get_db),
 ):
     """
@@ -263,7 +266,7 @@ async def bulk_update_swimmers(
 async def update_swimmer(
     swimmer_id: int,
     update_data: UpdateSwimmerRequest,
-    _current_user: Annotated[User, Depends(get_current_user)],
+    _current_user: Annotated[User, Depends(get_current_admin)],
     db: Session = Depends(get_db),
 ):
     """
@@ -313,7 +316,7 @@ class SyncResultsRequest(BaseModel):
 @router.post("/sync/results")
 async def sync_results_action(
     request: SyncResultsRequest,
-    _current_user: Annotated[User, Depends(get_current_user)],
+    _current_user: Annotated[User, Depends(get_current_admin)],
     db: Session = Depends(get_db),
 ):
     """
@@ -347,7 +350,7 @@ class SyncCompetitionsRequest(BaseModel):
 @router.post("/sync/competitions")
 async def sync_competitions_action(
     request: SyncCompetitionsRequest,
-    _current_user: Annotated[User, Depends(get_current_user)],
+    _current_user: Annotated[User, Depends(get_current_admin)],
 ):
     """
     Triggers live syncing of competitions and streams the progress via SSE.
@@ -381,7 +384,7 @@ async def sync_competitions_action(
 
 
 @router.post("/sync/link-results")
-async def api_link_results(_current_user: Annotated[User, Depends(get_current_user)]):
+async def api_link_results(_current_user: Annotated[User, Depends(get_current_admin)]):
     matched, unmatched = await asyncio.to_thread(link_results_to_competitions)
     return {
         "message": f"Spárováno: {matched} výsledků | Nespárováno: {unmatched} výsledků."
@@ -390,21 +393,160 @@ async def api_link_results(_current_user: Annotated[User, Depends(get_current_us
 
 @router.post("/sync/calculate-improvements")
 async def api_calc_improvements(
-    _current_user: Annotated[User, Depends(get_current_user)],
+    _current_user: Annotated[User, Depends(get_current_admin)],
 ):
     await asyncio.to_thread(calculate_improvements)
     return {"message": "Zlepšení a mezičasy byly úspěšně přepočítány."}
 
 
 @router.post("/sync/update-pbs")
-async def api_update_pbs(_current_user: Annotated[User, Depends(get_current_user)]):
+async def api_update_pbs(_current_user: Annotated[User, Depends(get_current_admin)]):
     new_pbs, updated_pbs = await asyncio.to_thread(update_personal_bests, False)
     return {"message": f"Hotovo. Nových OR: {new_pbs}, Překonaných OR: {updated_pbs}."}
 
 
 @router.post("/sync/update-club-records")
 async def api_update_club_records(
-    _current_user: Annotated[User, Depends(get_current_user)],
+    _current_user: Annotated[User, Depends(get_current_admin)],
 ):
     await asyncio.to_thread(update_club_records)
     return {"message": "Klubové rekordy byly úspěšně zkontrolovány a aktualizovány."}
+
+
+# ---------------------------------------------------------------------------
+# User management (admin-only)
+# ---------------------------------------------------------------------------
+
+logger = logging.getLogger(__name__)
+
+
+class AdminUserOut(BaseModel):
+    id: int
+    username: str
+    email: Optional[str]
+    role: str
+    is_active: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+@router.get("/users", response_model=list[AdminUserOut])
+async def list_users(
+    _current_user: Annotated[User, Depends(get_current_admin)],
+    pending: Optional[bool] = None,
+    db: Session = Depends(get_db),
+):
+    """
+    List users. With pending=true returns inactive coaches awaiting approval;
+    pending=false returns active users; omitted returns everyone.
+    Ordered by created_at ascending.
+    """
+    query = db.query(User)
+
+    if pending is True:
+        query = query.filter(User.is_active == False, User.role == "coach")  # noqa: E712
+    elif pending is False:
+        query = query.filter(User.is_active == True)  # noqa: E712
+
+    users = query.order_by(asc(User.created_at)).all()
+    return [AdminUserOut.model_validate(u) for u in users]
+
+
+@router.post("/users/{user_id}/approve", response_model=AdminUserOut)
+async def approve_user(
+    _current_user: Annotated[User, Depends(get_current_admin)],
+    user_id: int,
+    db: Session = Depends(get_db),
+):
+    """Approve a pending coach (set is_active=True). Idempotent."""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Uživatel nenalezen.")
+
+    if not user.is_active:
+        user.is_active = True
+        db.commit()
+        db.refresh(user)
+
+    return AdminUserOut.model_validate(user)
+
+
+@router.delete("/users/{user_id}", status_code=204)
+async def delete_user(
+    current_user: Annotated[User, Depends(get_current_admin)],
+    user_id: int,
+    db: Session = Depends(get_db),
+):
+    """Delete a non-admin user. Admins cannot delete themselves or other admins."""
+    if user_id == current_user.id:
+        raise HTTPException(status_code=400, detail="Nemůžeš smazat sám sebe.")
+
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Uživatel nenalezen.")
+
+    if user.role == "admin":
+        raise HTTPException(status_code=400, detail="Administrátora nelze smazat.")
+
+    has_saved_trainings = (
+        db.query(Training).filter(Training.saved_by == user_id).first()
+    )
+    if has_saved_trainings:
+        raise HTTPException(
+            status_code=400, detail="Trenér má uložené tréninky a nelze ho smazat."
+        )
+
+    db.delete(user)
+    db.commit()
+    return None
+
+
+@router.post("/users/{user_id}/reset-password")
+async def reset_password(
+    _current_user: Annotated[User, Depends(get_current_admin)],
+    user_id: int,
+    db: Session = Depends(get_db),
+):
+    """
+    Reset a non-admin user's password. Returns the new plain-text password
+    (shown once). Tries to email it; on failure the password is still returned.
+    """
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Uživatel nenalezen.")
+
+    if user.role == "admin":
+        raise HTTPException(
+            status_code=400, detail="Heslo administrátora nelze resetovat."
+        )
+
+    new_password = generate_password()
+    user.hashed_password = get_password_hash(new_password)
+    db.commit()
+
+    # Best-effort email notification.
+    if user.email:
+        subject = "Nové heslo do plavdata"
+        body = (
+            f"Ahoj {user.username},\n\n"
+            f"tvé nové heslo do plavdata je: {new_password}\n\n"
+            f"Doporučujeme ho co nejdříve změnit.\n"
+        )
+        try:
+            await run_in_threadpool(send_email, user.email, subject, body)
+        except Exception:
+            logger.warning(
+                "Nepodařilo se odeslat email s novým heslem pro uživatele %s (id=%s).",
+                user.username,
+                user.id,
+            )
+    else:
+        logger.warning(
+            "Uživatel %s (id=%s) nemá zadaný email, heslo nelze odeslat.",
+            user.username,
+            user.id,
+        )
+
+    return {"password": new_password}

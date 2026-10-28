@@ -25,8 +25,8 @@ async function apiRequest<T>(
     throw new Error(errorMessage);
   }
 
-  // Handle DELETE requests (typically no response body)
-  if (options?.method === "DELETE") {
+  // Handle responses with no body (204 No Content or DELETE)
+  if (response.status === 204 || options?.method === "DELETE") {
     return undefined as T;
   }
 
@@ -71,6 +71,24 @@ export function apiPatch<T>(url: string, data: unknown, authenticated: boolean =
     url,
     {
       method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    },
+    authenticated,
+  );
+}
+
+/**
+ * Helper for PUT requests
+ * @param url - The URL to fetch
+ * @param data - The data to send in the request body
+ * @param authenticated - Whether to use authenticated fetch (default: true)
+ */
+export function apiPut<T>(url: string, data: unknown, authenticated: boolean = true): Promise<T> {
+  return apiRequest<T>(
+    url,
+    {
+      method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     },

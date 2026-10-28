@@ -9,9 +9,17 @@ from pydantic import BaseModel
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from app.auth import get_current_user
+from app.auth import get_current_admin, get_current_user
 from app.db import get_db
-from app.models import Group, Swimmer, User
+from app.models import (
+    CoachGroup,
+    Group,
+    SeasonGroupMember,
+    Swimmer,
+    Training,
+    TrainingSchedule,
+    User,
+)
 
 router = APIRouter(tags=["admin"], prefix="/admin/groups")
 
@@ -98,7 +106,7 @@ async def get_all_groups(
 @router.patch("/reorder")
 async def reorder_groups(
     reorder_data: ReorderGroupsRequest,
-    _current_user: Annotated[User, Depends(get_current_user)],
+    _current_user: Annotated[User, Depends(get_current_admin)],
     db: Session = Depends(get_db),
 ):
     """
@@ -208,7 +216,7 @@ async def get_group_swimmers(
 @router.post("", response_model=GroupOut)
 async def create_group(
     create_data: CreateGroupRequest,
-    _current_user: Annotated[User, Depends(get_current_user)],
+    _current_user: Annotated[User, Depends(get_current_admin)],
     db: Session = Depends(get_db),
 ):
     """
@@ -249,7 +257,7 @@ async def create_group(
 async def update_group(
     group_id: int,
     update_data: UpdateGroupRequest,
-    _current_user: Annotated[User, Depends(get_current_user)],
+    _current_user: Annotated[User, Depends(get_current_admin)],
     db: Session = Depends(get_db),
 ):
     """
@@ -289,7 +297,7 @@ async def update_group(
 @router.delete("/{group_id}")
 async def delete_group(
     group_id: int,
-    _current_user: Annotated[User, Depends(get_current_user)],
+    _current_user: Annotated[User, Depends(get_current_admin)],
     db: Session = Depends(get_db),
 ):
     """
@@ -309,6 +317,31 @@ async def delete_group(
             detail=f"Cannot delete group with {swimmer_count} swimmers assigned. Reassign swimmers first.",
         )
 
+    # Check if group has any saved training sessions
+    has_trainings = db.query(Training).filter(Training.group_id == group_id).first()
+    if has_trainings:
+        raise HTTPException(
+            status_code=409,
+            detail="Skupinu s uloženými tréninky nelze smazat.",
+        )
+
+    # Check if group has attendance configuration (seasons, schedules, coaches)
+    has_season_member = (
+        db.query(SeasonGroupMember)
+        .filter(SeasonGroupMember.group_id == group_id)
+        .first()
+    )
+    has_schedule = (
+        db.query(TrainingSchedule).filter(TrainingSchedule.group_id == group_id).first()
+    )
+    has_coach = db.query(CoachGroup).filter(CoachGroup.group_id == group_id).first()
+
+    if has_season_member or has_schedule or has_coach:
+        raise HTTPException(
+            status_code=409,
+            detail="Skupina má nastavení docházky (sezóny) — nejprve ho odstraňte.",
+        )
+
     db.delete(group)
     db.commit()
 
@@ -319,7 +352,7 @@ async def delete_group(
 async def remove_swimmer_from_group(
     group_id: int,
     swimmer_id: int,
-    _current_user: Annotated[User, Depends(get_current_user)],
+    _current_user: Annotated[User, Depends(get_current_admin)],
     db: Session = Depends(get_db),
 ):
     """

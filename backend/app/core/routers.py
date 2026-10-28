@@ -7,6 +7,8 @@ from app.api import (
     utils,
     auth,
     admin,
+    admin_attendance,
+    attendance,
     groups,
     results,
 )
@@ -14,6 +16,8 @@ from app.api import (
 _routers = [
     auth,
     admin,
+    admin_attendance,
+    attendance,
     competitions,
     groups,
     personal_bests,

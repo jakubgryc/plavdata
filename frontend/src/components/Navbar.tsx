@@ -9,10 +9,12 @@ import {
   useComputedColorScheme,
 } from "@mantine/core";
 import {
+  IconCalendarCheck,
   IconClock,
-  IconDatabaseImport,
+  IconLock,
   IconLogout,
   IconMoon,
+  IconShield,
   IconSun,
   IconUser,
 } from "@tabler/icons-react";
@@ -21,14 +23,16 @@ import { NavLink } from "react-router";
 import { formatTimeRemaining, useAuth } from "../hooks/useAuth";
 import { useTheme } from "../hooks/useTheme";
 import SwimmerSearch from "./SwimmerSearch";
+import ChangePasswordModal from "./shared/ChangePasswordModal";
 
 type LinkState = { isActive: boolean };
 
 const Navbar = () => {
   const [opened, setOpened] = useState(false);
+  const [changePasswordOpened, setChangePasswordOpened] = useState(false);
   const { setColorScheme } = useTheme();
   const computedColorScheme = useComputedColorScheme("light");
-  const { isAuthenticated, username, timeRemaining, logout } = useAuth();
+  const { isAuthenticated, username, role, timeRemaining, logout } = useAuth();
 
   const toggleColorScheme = () => {
     setColorScheme(computedColorScheme === "dark" ? "light" : "dark");
@@ -101,6 +105,16 @@ const Navbar = () => {
       >
         Nástroje
       </NavLink>
+      {isAuthenticated && (
+        <NavLink
+          to="/attendance"
+          style={navLinkStyle}
+          onClick={() => setOpened(false)}
+          className="textHoverLink"
+        >
+          Docházka
+        </NavLink>
+      )}
     </>
   );
 
@@ -138,7 +152,19 @@ const Navbar = () => {
       </Flex>
 
       <Flex align="center" gap="xs">
-        <Flex>
+        {!isAuthenticated && (
+          <Button
+            component={NavLink}
+            to="/admin"
+            variant="light"
+            size="xs"
+            px="xs"
+            leftSection={<IconUser size={14} />}
+          >
+            Přihlásit
+          </Button>
+        )}
+        <Flex visibleFrom="md">
           {isAuthenticated && username && (
             <Menu shadow="md" width={220} position="bottom-end">
               <Menu.Target>
@@ -158,27 +184,44 @@ const Navbar = () => {
               <Menu.Dropdown>
                 <Menu.Item
                   component={NavLink}
-                  to="/admin/swimmers"
-                  leftSection={<IconUser size={14} />}
+                  to="/attendance"
+                  leftSection={<IconCalendarCheck size={14} />}
                 >
-                  Správa plavců
+                  Docházka
                 </Menu.Item>
+                {role === "admin" && (
+                  <>
+                    <Menu.Item
+                      component={NavLink}
+                      to="/admin/control-center"
+                      leftSection={<IconShield size={14} />}
+                    >
+                      Ovládací centrum
+                    </Menu.Item>
+                    <Menu.Divider />
+                    <Menu.Item
+                      component={NavLink}
+                      to="/admin/swimmers"
+                      leftSection={<IconUser size={14} />}
+                    >
+                      Správa plavců
+                    </Menu.Item>
+                    <Menu.Item
+                      component={NavLink}
+                      to="/admin/groups"
+                      leftSection={<IconUser size={14} />}
+                      onClick={() => setOpened(false)}
+                    >
+                      Správa skupin
+                    </Menu.Item>
+                    <Menu.Divider />
+                  </>
+                )}
                 <Menu.Item
-                  component={NavLink}
-                  to="/admin/groups"
-                  leftSection={<IconUser size={14} />}
-                  onClick={() => setOpened(false)}
+                  leftSection={<IconLock size={14} />}
+                  onClick={() => setChangePasswordOpened(true)}
                 >
-                  Správa skupin
-                </Menu.Item>
-                <Menu.Divider />
-                <Menu.Item
-                  component={NavLink}
-                  to="/admin/control-center"
-                  leftSection={<IconDatabaseImport size={14} />}
-                  onClick={() => setOpened(false)}
-                >
-                  Ovládací centrum
+                  Změnit heslo
                 </Menu.Item>
                 <Menu.Item color="red" leftSection={<IconLogout size={14} />} onClick={logout}>
                   Odhlásit se
@@ -236,21 +279,51 @@ const Navbar = () => {
               <Menu.Dropdown>
                 <Menu.Item
                   component={NavLink}
-                  to="/admin/swimmers"
-                  leftSection={<IconUser size={14} />}
+                  to="/attendance"
+                  leftSection={<IconCalendarCheck size={14} />}
                   onClick={() => setOpened(false)}
                 >
-                  Správa plavců
+                  Docházka
                 </Menu.Item>
+                {role === "admin" && (
+                  <>
+                    <Menu.Item
+                      component={NavLink}
+                      to="/admin/control-center"
+                      leftSection={<IconShield size={14} />}
+                      onClick={() => setOpened(false)}
+                    >
+                      Ovládací centrum
+                    </Menu.Item>
+                    <Menu.Divider />
+                    <Menu.Item
+                      component={NavLink}
+                      to="/admin/swimmers"
+                      leftSection={<IconUser size={14} />}
+                      onClick={() => setOpened(false)}
+                    >
+                      Správa plavců
+                    </Menu.Item>
+                    <Menu.Item
+                      component={NavLink}
+                      to="/admin/groups"
+                      leftSection={<IconUser size={14} />}
+                      onClick={() => setOpened(false)}
+                    >
+                      Správa skupin
+                    </Menu.Item>
+                    <Menu.Divider />
+                  </>
+                )}
                 <Menu.Item
-                  component={NavLink}
-                  to="/admin/groups"
-                  leftSection={<IconUser size={14} />}
-                  onClick={() => setOpened(false)}
+                  leftSection={<IconLock size={14} />}
+                  onClick={() => {
+                    setChangePasswordOpened(true);
+                    setOpened(false);
+                  }}
                 >
-                  Správa skupiny
+                  Změnit heslo
                 </Menu.Item>
-                <Menu.Divider />
                 <Menu.Item
                   color="red"
                   leftSection={<IconLogout size={14} />}
@@ -260,14 +333,6 @@ const Navbar = () => {
                   }}
                 >
                   Odhlásit se
-                </Menu.Item>
-                <Menu.Item
-                  component={NavLink}
-                  to="/admin/control-center"
-                  leftSection={<IconDatabaseImport size={14} />}
-                  onClick={() => setOpened(false)}
-                >
-                  Ovládací centrum
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>
@@ -287,6 +352,11 @@ const Navbar = () => {
           </Button>
         </Flex>
       </Drawer>
+
+      <ChangePasswordModal
+        opened={changePasswordOpened}
+        onClose={() => setChangePasswordOpened(false)}
+      />
     </Flex>
   );
 };

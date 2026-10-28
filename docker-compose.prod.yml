@@ -46,6 +46,13 @@ services:
       - SECRET_KEY=${SECRET_KEY}
       - LOKI_ENABLED=${LOKI_ENABLED:-false}
       - LOKI_URL=${LOKI_URL:-}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_FROM=${SMTP_FROM}
+      - SMTP_TLS=${SMTP_TLS}
+      - ADMIN_NOTIFY_EMAIL=${ADMIN_NOTIFY_EMAIL:-}
     restart: unless-stopped
     depends_on:
       postgres:
