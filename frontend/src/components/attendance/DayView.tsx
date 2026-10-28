@@ -537,11 +537,6 @@ function DayView({ groupId, date }: DayViewProps) {
                   Nepodařilo se načíst skupiny k importu.
                 </Text>
               )}
-              {!importLoading && !importError && importSources.length === 0 && (
-                <Text size="xs" c="dimmed">
-                  Žádná jiná skupina nemá tento den uložený trénink.
-                </Text>
-              )}
               {!importLoading && importSources.length > 0 && (
                 <Select
                   label="Importovat trénink"
