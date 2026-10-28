@@ -274,7 +274,6 @@ function DayView({ groupId, date }: DayViewProps) {
                   onClick={() => togglePresent(swimmer.id)}
                   style={{
                     cursor: "pointer",
-                    // subtle primary-blue wash on present rows (overrides stripes)
                     backgroundColor: present
                       ? colorScheme === "dark"
                         ? "rgba(18, 160, 216, 0.14)"
@@ -369,6 +368,14 @@ function DayView({ groupId, date }: DayViewProps) {
           minRows={3}
           maxRows={12}
           value={draft.description}
+          onFocus={(event) => {
+            // attempt to fix iOS Safari bug scrolling
+            const el = event.currentTarget;
+            window.setTimeout(
+              () => el.scrollIntoView({ block: "center", behavior: "smooth" }),
+              300,
+            );
+          }}
           onChange={(e) => {
             const value = e.currentTarget.value;
             setDraft((prev) => ({ ...prev, description: value }));
