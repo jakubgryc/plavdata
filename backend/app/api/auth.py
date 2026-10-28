@@ -71,7 +71,10 @@ class ForgotPasswordRequest(BaseModel):
 
 
 @router.post("/auth/login", response_model=LoginResponse)
-async def login(login_data: LoginRequest, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+async def login(
+    login_data: LoginRequest, request: Request, db: Session = Depends(get_db)
+):
     """
     Authenticate user and return JWT token.
     """

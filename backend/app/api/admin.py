@@ -221,7 +221,7 @@ def _update_single_swimmer(
 @router.patch("/swimmers/bulk")
 async def bulk_update_swimmers(
     bulk_request: BulkUpdateSwimmersRequest,
-    _current_user: Annotated[User, Depends(get_current_user)],
+    _current_user: Annotated[User, Depends(get_current_admin)],
     db: Session = Depends(get_db),
 ):
     """
@@ -266,7 +266,7 @@ async def bulk_update_swimmers(
 async def update_swimmer(
     swimmer_id: int,
     update_data: UpdateSwimmerRequest,
-    _current_user: Annotated[User, Depends(get_current_user)],
+    _current_user: Annotated[User, Depends(get_current_admin)],
     db: Session = Depends(get_db),
 ):
     """
@@ -316,7 +316,7 @@ class SyncResultsRequest(BaseModel):
 @router.post("/sync/results")
 async def sync_results_action(
     request: SyncResultsRequest,
-    _current_user: Annotated[User, Depends(get_current_user)],
+    _current_user: Annotated[User, Depends(get_current_admin)],
     db: Session = Depends(get_db),
 ):
     """
@@ -350,7 +350,7 @@ class SyncCompetitionsRequest(BaseModel):
 @router.post("/sync/competitions")
 async def sync_competitions_action(
     request: SyncCompetitionsRequest,
-    _current_user: Annotated[User, Depends(get_current_user)],
+    _current_user: Annotated[User, Depends(get_current_admin)],
 ):
     """
     Triggers live syncing of competitions and streams the progress via SSE.
@@ -384,7 +384,7 @@ async def sync_competitions_action(
 
 
 @router.post("/sync/link-results")
-async def api_link_results(_current_user: Annotated[User, Depends(get_current_user)]):
+async def api_link_results(_current_user: Annotated[User, Depends(get_current_admin)]):
     matched, unmatched = await asyncio.to_thread(link_results_to_competitions)
     return {
         "message": f"Spárováno: {matched} výsledků | Nespárováno: {unmatched} výsledků."
@@ -393,21 +393,21 @@ async def api_link_results(_current_user: Annotated[User, Depends(get_current_us
 
 @router.post("/sync/calculate-improvements")
 async def api_calc_improvements(
-    _current_user: Annotated[User, Depends(get_current_user)],
+    _current_user: Annotated[User, Depends(get_current_admin)],
 ):
     await asyncio.to_thread(calculate_improvements)
     return {"message": "Zlepšení a mezičasy byly úspěšně přepočítány."}
 
 
 @router.post("/sync/update-pbs")
-async def api_update_pbs(_current_user: Annotated[User, Depends(get_current_user)]):
+async def api_update_pbs(_current_user: Annotated[User, Depends(get_current_admin)]):
     new_pbs, updated_pbs = await asyncio.to_thread(update_personal_bests, False)
     return {"message": f"Hotovo. Nových OR: {new_pbs}, Překonaných OR: {updated_pbs}."}
 
 
 @router.post("/sync/update-club-records")
 async def api_update_club_records(
-    _current_user: Annotated[User, Depends(get_current_user)],
+    _current_user: Annotated[User, Depends(get_current_admin)],
 ):
     await asyncio.to_thread(update_club_records)
     return {"message": "Klubové rekordy byly úspěšně zkontrolovány a aktualizovány."}

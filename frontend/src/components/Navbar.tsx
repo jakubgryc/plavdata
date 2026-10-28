@@ -11,7 +11,6 @@ import {
 import {
   IconCalendarCheck,
   IconClock,
-  IconDatabaseImport,
   IconLock,
   IconLogout,
   IconMoon,
@@ -294,7 +293,7 @@ const Navbar = () => {
                       leftSection={<IconShield size={14} />}
                       onClick={() => setOpened(false)}
                     >
-                      Administrace
+                      Ovládací centrum
                     </Menu.Item>
                     <Menu.Divider />
                     <Menu.Item
@@ -311,17 +310,9 @@ const Navbar = () => {
                       leftSection={<IconUser size={14} />}
                       onClick={() => setOpened(false)}
                     >
-                      Správa skupiny
+                      Správa skupin
                     </Menu.Item>
                     <Menu.Divider />
-                    <Menu.Item
-                      component={NavLink}
-                      to="/admin/control-center"
-                      leftSection={<IconDatabaseImport size={14} />}
-                      onClick={() => setOpened(false)}
-                    >
-                      Ovládací centrum
-                    </Menu.Item>
                   </>
                 )}
                 <Menu.Item
