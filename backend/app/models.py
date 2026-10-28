@@ -47,6 +47,15 @@ class Group(Base):
     # Manual ordering of groups in public views (lower = first); managed
     # via drag & drop in the admin center.
     display_order = Column(Integer, nullable=False, default=0, server_default=text("0"))
+    # ID of the corresponding group in the ČSPS Yarmill system (manual mapping,
+    # set in the admin group detail). NULL = group is not synced to Yarmill.
+    yarmill_group_id = Column(Integer, nullable=True)
+    # Morning groups gather swimmers from multiple home groups for morning
+    # trainings. Yarmill sync writes their plan per swimmer (userId set,
+    # userGroupId null) instead of group-wide, and skips the GroupToUsers copy.
+    is_morning_group = Column(
+        Boolean, nullable=False, default=False, server_default=text("false")
+    )
 
     swimmers = relationship("Swimmer", back_populates="group_rel")
 
@@ -66,6 +75,9 @@ class Swimmer(Base):
     show_in_comparison = Column(Boolean, default=False)
     show_in_personal_bests = Column(Boolean, default=False)
     show_in_relay_builder = Column(Boolean, default=False)
+    # ID of the corresponding user in the ČSPS Yarmill system (manual mapping,
+    # set in the admin swimmer center). NULL = swimmer is not synced to Yarmill.
+    yarmill_user_id = Column(Integer, nullable=True)
 
     group_rel = relationship("Group", back_populates="swimmers")
 

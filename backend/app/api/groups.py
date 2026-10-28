@@ -30,6 +30,8 @@ class GroupOut(BaseModel):
     display_name_cs: str
     display_order: int
     swimmer_count: int
+    yarmill_group_id: Optional[int]
+    is_morning_group: bool
 
     class Config:
         from_attributes = True
@@ -42,6 +44,8 @@ class GroupDetail(BaseModel):
     display_order: int
     swimmer_count: int
     active_swimmer_count: int
+    yarmill_group_id: Optional[int]
+    is_morning_group: bool
 
     class Config:
         from_attributes = True
@@ -55,6 +59,9 @@ class CreateGroupRequest(BaseModel):
 class UpdateGroupRequest(BaseModel):
     name: Optional[str] = None
     display_name_cs: Optional[str] = None
+    # Explicit null clears the mapping — the handler checks model_fields_set.
+    yarmill_group_id: Optional[int] = None
+    is_morning_group: Optional[bool] = None
 
 
 class ReorderGroupsRequest(BaseModel):
@@ -97,6 +104,8 @@ async def get_all_groups(
                 display_name_cs=group.display_name_cs,
                 display_order=group.display_order,
                 swimmer_count=swimmer_count,
+                yarmill_group_id=group.yarmill_group_id,
+                is_morning_group=group.is_morning_group,
             )
         )
 
@@ -174,6 +183,8 @@ async def get_group_detail(
         display_order=group.display_order,
         swimmer_count=swimmer_count,
         active_swimmer_count=active_swimmer_count,
+        yarmill_group_id=group.yarmill_group_id,
+        is_morning_group=group.is_morning_group,
     )
 
 
@@ -250,6 +261,8 @@ async def create_group(
         display_name_cs=new_group.display_name_cs,
         display_order=new_group.display_order,
         swimmer_count=0,
+        yarmill_group_id=new_group.yarmill_group_id,
+        is_morning_group=new_group.is_morning_group,
     )
 
 
@@ -280,6 +293,13 @@ async def update_group(
     if update_data.display_name_cs:
         group.display_name_cs = update_data.display_name_cs
 
+    # Yarmill mapping: an explicit null clears it, so check presence, not value
+    if "yarmill_group_id" in update_data.model_fields_set:
+        group.yarmill_group_id = update_data.yarmill_group_id
+
+    if update_data.is_morning_group is not None:
+        group.is_morning_group = update_data.is_morning_group
+
     db.commit()
     db.refresh(group)
 
@@ -291,6 +311,8 @@ async def update_group(
         display_name_cs=group.display_name_cs,
         display_order=group.display_order,
         swimmer_count=swimmer_count,
+        yarmill_group_id=group.yarmill_group_id,
+        is_morning_group=group.is_morning_group,
     )
 
 

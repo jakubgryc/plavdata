@@ -16,7 +16,7 @@ import { CreateGroupModal } from "../../components/admin/CreateGroupModal";
 import { GroupCard } from "../../components/admin/GroupCard";
 import { GroupDetailModal } from "../../components/admin/GroupDetailModal";
 import { ReorderGroupsModal } from "../../components/admin/ReorderGroupsModal";
-import type { Group, GroupDetail } from "../../schema/groups";
+import type { Group, GroupDetail, UpdateGroupRequest } from "../../schema/groups";
 import { authApi } from "../../utils/auth";
 import { groupsApi } from "../../utils/groupsApi";
 
@@ -64,10 +64,7 @@ export function AdminGroupsPage() {
     await loadGroups();
   };
 
-  const handleUpdate = async (
-    groupId: number,
-    data: { name?: string; display_name_cs?: string },
-  ) => {
+  const handleUpdate = async (groupId: number, data: UpdateGroupRequest) => {
     await groupsApi.update(groupId, data);
     await loadGroups();
     // Reload the detail

@@ -43,6 +43,7 @@ class SwimmerAdminOut(BaseModel):
     show_in_comparison: bool
     show_in_personal_bests: bool
     show_in_relay_builder: bool
+    yarmill_user_id: Optional[int]
 
     class Config:
         from_attributes = True
@@ -67,6 +68,7 @@ class SwimmerAdminOut(BaseModel):
             show_in_comparison=swimmer.show_in_comparison,
             show_in_personal_bests=swimmer.show_in_personal_bests,
             show_in_relay_builder=swimmer.show_in_relay_builder,
+            yarmill_user_id=swimmer.yarmill_user_id,
         )
 
 
@@ -83,6 +85,8 @@ class UpdateSwimmerRequest(BaseModel):
     show_in_comparison: Optional[bool] = None
     show_in_personal_bests: Optional[bool] = None
     show_in_relay_builder: Optional[bool] = None
+    # Explicit null clears the mapping — handlers check model_fields_set, not the value.
+    yarmill_user_id: Optional[int] = None
 
 
 class SwimmerUpdateItem(BaseModel):
@@ -208,6 +212,10 @@ def _update_single_swimmer(
     if updates.show_in_relay_builder is not None:
         swimmer.show_in_relay_builder = updates.show_in_relay_builder
 
+    # Yarmill mapping: an explicit null clears it, so check presence, not value
+    if "yarmill_user_id" in updates.model_fields_set:
+        swimmer.yarmill_user_id = updates.yarmill_user_id
+
     db.flush()
 
     # Get group display name if swimmer has a group_id and we didn't just set it
@@ -295,6 +303,10 @@ async def update_swimmer(
         swimmer.show_in_personal_bests = update_data.show_in_personal_bests
     if update_data.show_in_relay_builder is not None:
         swimmer.show_in_relay_builder = update_data.show_in_relay_builder
+
+    # Yarmill mapping: an explicit null clears it, so check presence, not value
+    if "yarmill_user_id" in update_data.model_fields_set:
+        swimmer.yarmill_user_id = update_data.yarmill_user_id
 
     db.commit()
     db.refresh(swimmer)
