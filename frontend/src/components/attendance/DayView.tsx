@@ -340,7 +340,22 @@ function DayView({ groupId, date }: DayViewProps) {
   }));
 
   return (
-    <Card withBorder p="lg" radius="md">
+    <Card
+      withBorder
+      p="lg"
+      radius="md"
+      style={
+        isDirty
+          ? {
+              borderColor:
+                colorScheme === "dark" ? "rgba(250, 200, 60, 0.8)" : "rgba(230, 120, 20, 0.55)",
+              backgroundColor:
+                colorScheme === "dark" ? "rgba(255, 236, 153, 0.13)" : "rgba(255, 150, 50, 0.07)",
+              transition: "background-color 200ms ease, border-color 200ms ease",
+            }
+          : { transition: "background-color 200ms ease, border-color 200ms ease" }
+      }
+    >
       <Group justify="space-between" mb="md" wrap="wrap">
         <Stack gap={4}>
           <Title order={4}>{fmtDayLabel(date)}</Title>
@@ -351,7 +366,14 @@ function DayView({ groupId, date }: DayViewProps) {
           )}
           {savedLine}
         </Stack>
-        {badge}
+        <Group gap="xs">
+          {isDirty && (
+            <Badge color={colorScheme === "dark" ? "yellow" : "orange"} variant="light">
+              Neuloženo
+            </Badge>
+          )}
+          {badge}
+        </Group>
       </Group>
 
       <Box
