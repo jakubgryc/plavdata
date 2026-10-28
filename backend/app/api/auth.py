@@ -182,7 +182,7 @@ async def register(
     db.commit()
 
     # Send email with credentials
-    subject = "Registrace v plavdata — tvoje heslo"
+    subject = "Registrace v plavdata: tvoje heslo"
     body = (
         f"Ahoj {data.username},\n\n"
         f"tvé přihlašovací údaje:\n"
@@ -214,7 +214,7 @@ async def register(
         for addr in [a.strip() for a in admin_notify.split(",") if a.strip()]:
             try:
                 await run_in_threadpool(
-                    send_email, addr, "plavdata — nová registrace trenéra", notify_body
+                    send_email, addr, "plavdata: nová registrace trenéra", notify_body
                 )
             except Exception:
                 logger.exception(

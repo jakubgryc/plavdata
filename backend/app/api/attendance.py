@@ -97,6 +97,7 @@ class TrainingOut(BaseModel):
     drill_meters: int | None
     kick_meters: int | None
     description: str | None
+    duration_minutes: int | None
     saved_by_name: str
     saved_at: datetime
     attendance: list[AttendanceEntry]
@@ -118,6 +119,7 @@ class SaveDayIn(BaseModel):
     drill_meters: int | None = None
     kick_meters: int | None = None
     description: str | None = None
+    duration_minutes: int | None = None
 
 
 class WeekDayOut(BaseModel):
@@ -129,6 +131,11 @@ class WeekDayOut(BaseModel):
     saved_by_name: str | None
     saved_at: datetime | None
     attendance: list[AttendanceEntry]
+
+
+class ImportSource(BaseModel):
+    group_id: int
+    display_name_cs: str
 
 
 class WeekOut(BaseModel):
@@ -166,6 +173,7 @@ def _build_training_out(db: Session, training: Training) -> TrainingOut:
         drill_meters=training.drill_meters,
         kick_meters=training.kick_meters,
         description=training.description,
+        duration_minutes=training.duration_minutes,
         saved_by_name=saved_by_user.username if saved_by_user else "",
         saved_at=training.saved_at,
         attendance=[
@@ -351,6 +359,15 @@ async def save_day(
 
     _check_group_access(db, season.id, payload.group_id, current_user)
 
+    # --- Validate duration_minutes ---
+    if payload.duration_minutes is not None and not (
+        1 <= payload.duration_minutes <= 600
+    ):
+        raise HTTPException(
+            status_code=422,
+            detail="Délka tréninku musí být mezi 1 a 600 minutami.",
+        )
+
     # --- Training-day check ---
     existing_training = (
         db.query(Training)
@@ -424,6 +441,7 @@ async def save_day(
             drill_meters=payload.drill_meters,
             kick_meters=payload.kick_meters,
             description=payload.description,
+            duration_minutes=payload.duration_minutes,
             saved_by=current_user.id,
             saved_at=datetime.now(timezone.utc),
         )
@@ -433,6 +451,7 @@ async def save_day(
         training.drill_meters = payload.drill_meters
         training.kick_meters = payload.kick_meters
         training.description = payload.description
+        training.duration_minutes = payload.duration_minutes
         training.saved_by = current_user.id
         training.saved_at = datetime.now(timezone.utc)
 
@@ -455,6 +474,71 @@ async def save_day(
 
     # Fresh read after commit
     return _build_day_out(db, payload.date, season, payload.group_id)
+
+
+@router.get("/import-sources", response_model=list[ImportSource])
+async def get_import_sources(
+    date: date,
+    exclude_group_id: int,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Session = Depends(get_db),
+):
+    """
+    Return groups (excluding exclude_group_id) that have a saved training
+    on the given date and are accessible to the caller.
+    Admins see all groups with a schedule that season; coaches see only
+    their CoachGroup-assigned groups.
+    """
+    season = get_season_for_date(db, date)
+    if season is None:
+        return []
+
+    if current_user.role == "admin":
+        accessible_group_ids = {
+            gid
+            for (gid,) in db.query(TrainingSchedule.group_id)
+            .filter(TrainingSchedule.season_id == season.id)
+            .distinct()
+            .all()
+        }
+    else:
+        accessible_group_ids = {
+            gid
+            for (gid,) in db.query(CoachGroup.group_id)
+            .filter(
+                CoachGroup.season_id == season.id,
+                CoachGroup.user_id == current_user.id,
+            )
+            .all()
+        }
+
+    accessible_group_ids.discard(exclude_group_id)
+    if not accessible_group_ids:
+        return []
+
+    training_group_ids = {
+        gid
+        for (gid,) in db.query(Training.group_id)
+        .filter(
+            Training.date == date,
+            Training.group_id.in_(accessible_group_ids),
+        )
+        .all()
+    }
+
+    if not training_group_ids:
+        return []
+
+    groups = (
+        db.query(Group)
+        .filter(Group.id.in_(training_group_ids))
+        .order_by(Group.display_order)
+        .all()
+    )
+    return [
+        ImportSource(group_id=g.id, display_name_cs=g.display_name_cs)
+        for g in groups
+    ]
 
 
 @router.get("/week", response_model=WeekOut)

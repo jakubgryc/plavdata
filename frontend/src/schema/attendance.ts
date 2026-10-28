@@ -38,6 +38,7 @@ export interface TrainingOut {
   drill_meters: number | null;
   kick_meters: number | null;
   description: string | null;
+  duration_minutes: number | null;
   saved_by_name: string;
   saved_at: string;
   attendance: AttendanceEntry[];
@@ -59,6 +60,7 @@ export interface SaveDayBody {
   drill_meters: number | null;
   kick_meters: number | null;
   description: string | null;
+  duration_minutes: number | null;
 }
 
 export interface WeekDayOut {
@@ -75,4 +77,9 @@ export interface WeekDayOut {
 export interface WeekOut {
   swimmers: SwimmerBrief[];
   days: WeekDayOut[];
+}
+
+export interface ImportSource {
+  group_id: number;
+  display_name_cs: string;
 }

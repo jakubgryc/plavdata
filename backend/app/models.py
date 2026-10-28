@@ -318,6 +318,7 @@ class Training(Base):
     drill_meters = Column(Integer, nullable=True)
     kick_meters = Column(Integer, nullable=True)
     description = Column(Text, nullable=True)
+    duration_minutes = Column(Integer, nullable=True)
     saved_by = Column(Integer, ForeignKey("users.id"), nullable=False)
     saved_at = Column(DateTime(timezone=True), nullable=False)
 

@@ -284,7 +284,7 @@ function UsersSection() {
           setResetTarget(null);
           setNewPassword(null);
         }}
-        title={`Resetovat heslo — ${resetTarget?.username ?? ""}`}
+        title={`Resetovat heslo: ${resetTarget?.username ?? ""}`}
         centered
         size="sm"
       >

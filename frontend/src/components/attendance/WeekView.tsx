@@ -190,6 +190,7 @@ function WeekView({ groupId, weekStart }: WeekViewProps) {
           drill_meters: fullDay.training?.drill_meters ?? null,
           kick_meters: fullDay.training?.kick_meters ?? null,
           description: fullDay.training?.description ?? null,
+          duration_minutes: fullDay.training?.duration_minutes ?? null,
         };
 
         const response = await authenticatedFetch(`${API_BASE_URL}/attendance/day`, {

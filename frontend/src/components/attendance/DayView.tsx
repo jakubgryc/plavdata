@@ -4,10 +4,12 @@ import {
   Box,
   Button,
   Card,
+  Collapse,
   Flex,
   Group,
   Loader,
   NumberInput,
+  Select,
   Stack,
   Switch,
   Table,
@@ -18,12 +20,12 @@ import {
   useMantineTheme,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { IconDeviceFloppy } from "@tabler/icons-react";
+import { IconChevronDown, IconChevronUp, IconDeviceFloppy } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { API_BASE_URL } from "../../../config";
-import type { DayOut, SaveDayBody } from "../../schema/attendance";
+import type { DayOut, ImportSource, SaveDayBody } from "../../schema/attendance";
 import { fmtDayLabel, toApiDate } from "../../utils/attendance";
 import { authenticatedFetch } from "../../utils/authenticatedFetch";
 
@@ -40,6 +42,17 @@ interface DraftState {
   drillMeters: string;
   kickMeters: string;
   description: string;
+  durationMinutes: string;
+}
+
+function computeScheduleMinutes(slot: { start_time: string; end_time: string } | null): number | null {
+  if (!slot) return null;
+  const [sh, sm] = slot.start_time.split(":").map(Number);
+  const [eh, em] = slot.end_time.split(":").map(Number);
+  const startMin = sh * 60 + sm;
+  const endMin = eh * 60 + em;
+  const diff = endMin >= startMin ? endMin - startMin : 24 * 60 - startMin + endMin;
+  return diff > 0 ? diff : null;
 }
 
 function buildDraft(day: DayOut): DraftState {
@@ -54,6 +67,8 @@ function buildDraft(day: DayOut): DraftState {
     drillMeters: day.training?.drill_meters != null ? String(day.training.drill_meters) : "",
     kickMeters: day.training?.kick_meters != null ? String(day.training.kick_meters) : "",
     description: day.training?.description ?? "",
+    durationMinutes:
+      day.training?.duration_minutes != null ? String(day.training.duration_minutes) : "",
   };
 }
 
@@ -70,6 +85,7 @@ function draftToBody(groupId: number, date: Date, draft: DraftState): SaveDayBod
     drill_meters: draft.drillMeters !== "" ? Number(draft.drillMeters) : null,
     kick_meters: draft.kickMeters !== "" ? Number(draft.kickMeters) : null,
     description: draft.description !== "" ? draft.description : null,
+    duration_minutes: draft.durationMinutes !== "" ? Number(draft.durationMinutes) : null,
   };
 }
 
@@ -90,8 +106,15 @@ function DayView({ groupId, date }: DayViewProps) {
     drillMeters: "",
     kickMeters: "",
     description: "",
+    durationMinutes: "",
   });
   const loadedDraftRef = useRef<DraftState | null>(null);
+
+  const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [importSources, setImportSources] = useState<ImportSource[]>([]);
+  const [importLoading, setImportLoading] = useState(false);
+  const [importError, setImportError] = useState(false);
+  const [selectedSource, setSelectedSource] = useState<string | null>(null);
 
   const fetchDay = useCallback(async () => {
     setLoading(true);
@@ -130,6 +153,41 @@ function DayView({ groupId, date }: DayViewProps) {
     fetchDay();
   }, [fetchDay]);
 
+  // Fetch import sources when the collapse opens, or date/group changes
+  useEffect(() => {
+    if (!advancedOpen) return;
+    let cancelled = false;
+    const dateStr = toApiDate(date);
+    authenticatedFetch(
+      `${API_BASE_URL}/attendance/import-sources?date=${dateStr}&exclude_group_id=${groupId}`,
+    )
+      .then((resp) => {
+        if (cancelled) return undefined;
+        if (!resp.ok) {
+          setImportSources([]);
+          setImportError(true);
+          setSelectedSource(null);
+          return undefined;
+        }
+        return (resp.json() as Promise<ImportSource[]>).then((data) => {
+          if (cancelled) return;
+          setImportSources(data ?? []);
+          setImportError(false);
+          setSelectedSource(null);
+        });
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setImportSources([]);
+          setImportError(true);
+          setSelectedSource(null);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [advancedOpen, groupId, date]);
+
   const isDirty = useMemo(() => {
     if (!loadedDraftRef.current) return false;
     return !draftsEqual(draft, loadedDraftRef.current);
@@ -152,6 +210,53 @@ function DayView({ groupId, date }: DayViewProps) {
         [swimmerId]: !prev.attendance[swimmerId],
       },
     }));
+  };
+
+  const handleImport = async (sourceGroupId: string) => {
+    setSelectedSource(sourceGroupId);
+    setImportLoading(true);
+    try {
+      const dateStr = toApiDate(date);
+      const response = await authenticatedFetch(
+        `${API_BASE_URL}/attendance/day?group_id=${sourceGroupId}&date=${dateStr}`,
+      );
+      if (!response.ok) {
+        notifications.show({
+          color: "red",
+          message: "Nepodařilo se načíst trénink ze zvolené skupiny.",
+        });
+        return;
+      }
+      const sourceDay = (await response.json()) as DayOut;
+      if (!sourceDay.training) {
+        notifications.show({
+          color: "red",
+          message: "Zvolená skupina nemá tento den uložený trénink.",
+        });
+        return;
+      }
+      const t = sourceDay.training;
+      setDraft((prev) => ({
+        ...prev,
+        totalMeters: t.total_meters != null ? String(t.total_meters) : "",
+        drillMeters: t.drill_meters != null ? String(t.drill_meters) : "",
+        kickMeters: t.kick_meters != null ? String(t.kick_meters) : "",
+        description: t.description ?? "",
+      }));
+      const sourceName =
+        importSources.find((s) => s.group_id === Number(sourceGroupId))?.display_name_cs ?? "";
+      notifications.show({
+        color: "blue",
+        message: `Hodnoty načteny ze skupiny ${sourceName}.`,
+      });
+    } catch {
+      notifications.show({
+        color: "red",
+        message: "Nepodařilo se načíst trénink ze zvolené skupiny.",
+      });
+    } finally {
+      setImportLoading(false);
+    }
   };
 
   const handleSave = async () => {
@@ -213,6 +318,8 @@ function DayView({ groupId, date }: DayViewProps) {
     ? `${dayData.schedule.start_time} – ${dayData.schedule.end_time}`
     : null;
 
+  const scheduleMinutes = computeScheduleMinutes(dayData.schedule);
+
   let badge: React.ReactNode = null;
   if (!dayData.is_training_day && dayData.training) {
     badge = <Badge color="orange">Mimo rozvrh</Badge>;
@@ -226,6 +333,11 @@ function DayView({ groupId, date }: DayViewProps) {
       {dayjs.utc(dayData.training.saved_at).local().format("D. M. YYYY H:mm")}
     </Text>
   ) : null;
+
+  const importSourceOptions = importSources.map((s) => ({
+    value: String(s.group_id),
+    label: s.display_name_cs,
+  }));
 
   return (
     <Card withBorder p="lg" radius="md">
@@ -316,7 +428,7 @@ function DayView({ groupId, date }: DayViewProps) {
 
       {readOnly && (
         <Text size="sm" c="dimmed" mb="sm">
-          Tento den nemá skupina trénink — docházku nelze uložit.
+          Tento den nemá skupina trénink.
         </Text>
       )}
 
@@ -369,7 +481,7 @@ function DayView({ groupId, date }: DayViewProps) {
           maxRows={12}
           value={draft.description}
           onFocus={(event) => {
-            // attempt to fix iOS Safari bug scrolling
+            // attempt to fix iOS Safari scrolling
             const el = event.currentTarget;
             window.setTimeout(
               () => el.scrollIntoView({ block: "center", behavior: "smooth" }),
@@ -383,6 +495,71 @@ function DayView({ groupId, date }: DayViewProps) {
           disabled={readOnly}
         />
       </Stack>
+
+      <Box mb="md">
+        <Button
+          variant="subtle"
+          size="xs"
+          onClick={() => setAdvancedOpen((prev) => !prev)}
+          rightSection={advancedOpen ? <IconChevronUp size={14} /> : <IconChevronDown size={14} />}
+          disabled={readOnly}
+          compact
+        >
+          Další možnosti
+        </Button>
+        <Collapse in={advancedOpen}>
+          <Group grow align="flex-start" wrap="nowrap" gap="sm" mt="sm">
+            <Stack gap={4}>
+              <NumberInput
+                label="Délka tréninku (min)"
+                min={1}
+                max={600}
+                hideControls
+                value={draft.durationMinutes}
+                onChange={(val) =>
+                  setDraft((prev) => ({
+                    ...prev,
+                    durationMinutes: val === "" ? "" : String(val),
+                  }))
+                }
+                disabled={readOnly}
+              />
+              {scheduleMinutes != null && (
+                <Text size="xs" c="dimmed">
+                  Výchozí z rozvrhu: {scheduleMinutes} min.
+                </Text>
+              )}
+            </Stack>
+            <Stack gap={4}>
+              {importLoading && <Loader size="xs" />}
+              {!importLoading && importError && (
+                <Text size="xs" c="red">
+                  Nepodařilo se načíst skupiny k importu.
+                </Text>
+              )}
+              {!importLoading && !importError && importSources.length === 0 && (
+                <Text size="xs" c="dimmed">
+                  Žádná jiná skupina nemá tento den uložený trénink.
+                </Text>
+              )}
+              {!importLoading && importSources.length > 0 && (
+                <Select
+                  label="Importovat trénink"
+                  placeholder="Vyber skupinu"
+                  data={importSourceOptions}
+                  value={selectedSource}
+                  onChange={(val) => {
+                    if (val) {
+                      handleImport(val);
+                    }
+                  }}
+                  disabled={readOnly}
+                />
+              )}
+            </Stack>
+          </Group>
+        </Collapse>
+      </Box>
 
       <Button
         fullWidth
