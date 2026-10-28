@@ -527,7 +527,6 @@ function DayView({ groupId, date }: DayViewProps) {
           onClick={() => setAdvancedOpen((prev) => !prev)}
           rightSection={advancedOpen ? <IconChevronUp size={14} /> : <IconChevronDown size={14} />}
           disabled={readOnly}
-          compact
         >
           Další možnosti
         </Button>
