@@ -89,7 +89,7 @@ async def login(
                     User.username == login_data.username,
                     User.email == login_data.username,
                 ),
-                User.is_active == False,
+                User.is_active,
             )
             .first()
         )

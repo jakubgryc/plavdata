@@ -11,7 +11,15 @@ from sqlalchemy.orm import Session
 
 from app.auth import get_current_admin, get_current_user
 from app.db import get_db
-from app.models import CoachGroup, Group, SeasonGroupMember, Swimmer, Training, TrainingSchedule, User
+from app.models import (
+    CoachGroup,
+    Group,
+    SeasonGroupMember,
+    Swimmer,
+    Training,
+    TrainingSchedule,
+    User,
+)
 
 router = APIRouter(tags=["admin"], prefix="/admin/groups")
 
@@ -324,9 +332,7 @@ async def delete_group(
         .first()
     )
     has_schedule = (
-        db.query(TrainingSchedule)
-        .filter(TrainingSchedule.group_id == group_id)
-        .first()
+        db.query(TrainingSchedule).filter(TrainingSchedule.group_id == group_id).first()
     )
     has_coach = db.query(CoachGroup).filter(CoachGroup.group_id == group_id).first()
 
