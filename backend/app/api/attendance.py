@@ -536,8 +536,7 @@ async def get_import_sources(
         .all()
     )
     return [
-        ImportSource(group_id=g.id, display_name_cs=g.display_name_cs)
-        for g in groups
+        ImportSource(group_id=g.id, display_name_cs=g.display_name_cs) for g in groups
     ]
 
 

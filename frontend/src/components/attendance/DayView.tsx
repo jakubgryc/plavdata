@@ -45,7 +45,9 @@ interface DraftState {
   durationMinutes: string;
 }
 
-function computeScheduleMinutes(slot: { start_time: string; end_time: string } | null): number | null {
+function computeScheduleMinutes(
+  slot: { start_time: string; end_time: string } | null,
+): number | null {
   if (!slot) return null;
   const [sh, sm] = slot.start_time.split(":").map(Number);
   const [eh, em] = slot.end_time.split(":").map(Number);
