@@ -1,4 +1,5 @@
 import os
+from enum import IntEnum, StrEnum
 
 
 TARGET_CLUB = os.getenv("TARGET_CLUB")
@@ -31,3 +32,52 @@ DISCIPLINE_ORDER = [
     "200 O",
     "400 O",
 ]
+
+
+# Yarmill observed API magic constants.
+class YarmillActivityItem(IntEnum):
+    """activityItemId values for the api/TrainingDayActivity plan endpoint."""
+
+    DZ = 23  # training done that day: 1/0
+    JZ_VODA = 1  # number of water trainings that day
+    JZ_SUCHO = 31  # unused — plavdata does not track dryland training
+    HZ_VODA_DOPO = 57  # morning water training duration, MINUTES
+    HZ_VODA_ODPO = 62  # afternoon water training duration, MINUTES
+    KM_DOPO = 58  # morning training: total km
+    KM_ODPO = 64  # afternoon training: total km
+    NOHY_DOPO = 12  # morning training: kick km
+    NOHY_ODPO = 66  # afternoon training: kick km
+    TECHNIKA_DOPO = 13  # morning training: drill km
+    TECHNIKA_ODPO = 78  # afternoon training: drill km
+    HZ_SUCHO_DOPO = 59  # unused
+    HZ_SUCHO_ODPO = 82  # unused
+
+
+class YarmillAttendanceItem(IntEnum):
+    """ActivityItemID values for the /api/attendance/save/user endpoint."""
+
+    MORNING = 33  # morning training
+    AFTERNOON = 47  # afternoon training
+
+
+class YarmillAttendanceValue(IntEnum):
+    """Possible attendance values in Yarmill."""
+
+    ATTEND = 1
+    FREE = 2
+    EXCUSED = 3
+    UNEXCUSED = 4
+
+
+class YarmillAttributeId(IntEnum):
+    """attributeId values for the api/TrainingDayAttribute endpoint."""
+
+    MORNING = 1
+    AFTERNOON = 9
+
+
+class YarmillState(StrEnum):
+    """state field of the plan endpoints."""
+
+    PLAN = "P"
+    REALITY = "R"  # unused in v1 — we always send PLAN
