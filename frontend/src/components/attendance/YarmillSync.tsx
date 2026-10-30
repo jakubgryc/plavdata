@@ -26,7 +26,7 @@ function readStoredToken(): string {
   try {
     return localStorage.getItem(TOKEN_KEY) ?? "";
   } catch {
-    return ""; 
+    return "";
   }
 }
 
@@ -37,8 +37,7 @@ function storeToken(value: string): void {
     } else {
       localStorage.removeItem(TOKEN_KEY);
     }
-  } catch {
-  }
+  } catch {}
 }
 
 interface YarmillSyncProps {
@@ -106,8 +105,7 @@ export function YarmillSync({ groupId, weekStart, days }: YarmillSyncProps) {
     }
 
     // FastAPI validation errors return detail as an array — only strings are shown
-    const detail =
-      typeof parsed?.detail === "string" ? parsed.detail : "Synchronizace selhala.";
+    const detail = typeof parsed?.detail === "string" ? parsed.detail : "Synchronizace selhala.";
     if (detail.includes("vypršel")) {
       handleClearToken();
     }
