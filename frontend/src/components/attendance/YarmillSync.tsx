@@ -61,6 +61,7 @@ export function YarmillSync({ groupId, weekStart, days }: YarmillSyncProps) {
   const [syncingPlan, setSyncingPlan] = useState(false);
   const [syncingDay, setSyncingDay] = useState<string | null>(null);
   const [copyingReality, setCopyingReality] = useState(false);
+  const [syncingAllDays, setSyncingAllDays] = useState(false);
 
   const filledDays = days.filter((d) => d.filled);
 
@@ -87,7 +88,7 @@ export function YarmillSync({ groupId, weekStart, days }: YarmillSyncProps) {
   };
 
   /** Shared POST helper; clears the token when Yarmill reports it expired. */
-  const postSync = async (path: string, body: Record<string, unknown>) => {
+  const postSync = async (path: string, body: Record<string, unknown>): Promise<boolean> => {
     const response = await authenticatedFetch(`${API_BASE_URL}${path}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -101,7 +102,7 @@ export function YarmillSync({ groupId, weekStart, days }: YarmillSyncProps) {
         title: "Yarmill",
         message: parsed?.details ?? "Synchronizace proběhla.",
       });
-      return;
+      return true;
     }
 
     // FastAPI validation errors return detail as an array — only strings are shown
@@ -110,6 +111,7 @@ export function YarmillSync({ groupId, weekStart, days }: YarmillSyncProps) {
       handleClearToken();
     }
     notifications.show({ color: "red", title: "Yarmill", message: detail });
+    return false;
   };
 
   const handleSyncPlan = async () => {
@@ -152,7 +154,7 @@ export function YarmillSync({ groupId, weekStart, days }: YarmillSyncProps) {
   };
 
   const handleSyncAttendance = async (date: string) => {
-    if (!token || syncingDay) return;
+    if (!token || syncingDay || syncingAllDays) return;
     setSyncingDay(date);
     try {
       await postSync("/yarmill/sync-attendance", { group_id: groupId, date });
@@ -164,6 +166,31 @@ export function YarmillSync({ groupId, weekStart, days }: YarmillSyncProps) {
       });
     } finally {
       setSyncingDay(null);
+    }
+  };
+
+  /** Runs the per-day attendance sync for every filled day, oldest first; stops on first failure. */
+  const handleSyncAllAttendance = async () => {
+    if (!token || syncingAllDays || syncingDay !== null) return;
+    setSyncingAllDays(true);
+    try {
+      for (const day of filledDays) {
+        setSyncingDay(day.date);
+        const ok = await postSync("/yarmill/sync-attendance", {
+          group_id: groupId,
+          date: day.date,
+        });
+        if (!ok) break;
+      }
+    } catch {
+      notifications.show({
+        color: "red",
+        title: "Yarmill",
+        message: "Spojení se serverem se nezdařilo.",
+      });
+    } finally {
+      setSyncingDay(null);
+      setSyncingAllDays(false);
     }
   };
 
@@ -251,6 +278,7 @@ export function YarmillSync({ groupId, weekStart, days }: YarmillSyncProps) {
                   !token ||
                   syncingPlan ||
                   copyingReality ||
+                  syncingAllDays ||
                   (syncingDay !== null && syncingDay !== day.date)
                 }
                 onClick={() => handleSyncAttendance(day.date)}
@@ -258,6 +286,15 @@ export function YarmillSync({ groupId, weekStart, days }: YarmillSyncProps) {
                 {dayjs(day.date).format("D.M.")} → Yarmill
               </Button>
             ))}
+            <Button
+              size="xs"
+              variant="filled"
+              loading={syncingAllDays}
+              disabled={!token || syncingPlan || copyingReality || syncingDay !== null}
+              onClick={handleSyncAllAttendance}
+            >
+              Všechny dny → Yarmill
+            </Button>
           </Flex>
         </>
       )}
