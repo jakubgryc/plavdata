@@ -12,6 +12,7 @@ export interface Swimmer {
   show_in_comparison: boolean;
   show_in_personal_bests: boolean;
   show_in_relay_builder: boolean;
+  yarmill_user_id: number | null;
 }
 
 export interface PaginatedSwimmersResponse {
@@ -27,6 +28,7 @@ export interface SwimmerEdits {
   show_in_comparison?: boolean;
   show_in_personal_bests?: boolean;
   show_in_relay_builder?: boolean;
+  yarmill_user_id?: number | null;
 }
 
 export interface UpdateSwimmerRequest {
@@ -34,4 +36,6 @@ export interface UpdateSwimmerRequest {
   show_in_comparison?: boolean;
   show_in_personal_bests?: boolean;
   show_in_relay_builder?: boolean;
+  /** Explicit null clears the mapping on the backend. */
+  yarmill_user_id?: number | null;
 }

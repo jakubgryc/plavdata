@@ -7,8 +7,10 @@ import {
   Loader,
   Group as MantineGroup,
   Modal,
+  NumberInput,
   ScrollArea,
   Stack,
+  Switch,
   Table,
   Text,
   TextInput,
@@ -44,6 +46,8 @@ export function GroupDetailModal({
     initialValues: {
       name: group?.name || "",
       display_name_cs: group?.display_name_cs || "",
+      yarmill_group_id: group?.yarmill_group_id ?? null,
+      is_morning_group: group?.is_morning_group ?? false,
     },
     validate: {
       name: (value: string | undefined) =>
@@ -131,6 +135,8 @@ export function GroupDetailModal({
       form.setValues({
         name: group.name,
         display_name_cs: group.display_name_cs,
+        yarmill_group_id: group.yarmill_group_id ?? null,
+        is_morning_group: group.is_morning_group ?? false,
       });
     }
   }, [group, form.setValues]);
@@ -162,6 +168,23 @@ export function GroupDetailModal({
               required
               {...form.getInputProps("display_name_cs")}
             />
+            <NumberInput
+              label="Yarmill ID skupiny"
+              description="ID skupiny v systému Yarmill (pro synchronizaci tréninků)"
+              placeholder="Není nastaveno"
+              hideControls
+              allowNegative={false}
+              decimalScale={0}
+              value={form.values.yarmill_group_id ?? ""}
+              onChange={(value) =>
+                form.setFieldValue("yarmill_group_id", value === "" ? null : Number(value))
+              }
+            />
+            <Switch
+              label="Ranní skupina"
+              description="Plavci z více skupin trénují ráno společně — synchronizace do Yarmillu probíhá po jednotlivých plavcích, ne hromadně za skupinu"
+              {...form.getInputProps("is_morning_group", { type: "checkbox" })}
+            />
             <MantineGroup justify="flex-end">
               <Button
                 variant="subtle"
@@ -170,6 +193,8 @@ export function GroupDetailModal({
                   form.setValues({
                     name: group.name,
                     display_name_cs: group.display_name_cs,
+                    yarmill_group_id: group.yarmill_group_id ?? null,
+                    is_morning_group: group.is_morning_group ?? false,
                   });
                 }}
               >
@@ -195,6 +220,22 @@ export function GroupDetailModal({
               Klíč skupiny
             </Text>
             <Text>{group.name}</Text>
+          </div>
+
+          <div>
+            <Text size="sm" c="dimmed">
+              Yarmill ID
+            </Text>
+            <Text>{group.yarmill_group_id ?? "—"}</Text>
+          </div>
+
+          <div>
+            <Text size="sm" c="dimmed">
+              Ranní skupina
+            </Text>
+            <Badge size="sm" variant="light" color={group.is_morning_group ? "violet" : "gray"}>
+              {group.is_morning_group ? "Ano" : "Ne"}
+            </Badge>
           </div>
 
           <Divider />

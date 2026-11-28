@@ -11,6 +11,7 @@ from app.api import (
     attendance,
     groups,
     results,
+    yarmill,
 )
 
 _routers = [
@@ -25,6 +26,7 @@ _routers = [
     results,
     dashboard_stats,
     utils,
+    yarmill,
 ]
 
 

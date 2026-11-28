@@ -6,6 +6,8 @@ import { apiGet, apiPatch } from "./apiHelpers";
 export interface GetSwimmersParams {
   page?: number;
   pageSize?: number;
+  /** Filter by plavdata group id; null/undefined = all groups. */
+  groupId?: number | null;
 }
 
 export interface SwimmerUpdateItem {
@@ -26,12 +28,16 @@ export interface BulkUpdateSwimmersResponse {
 
 export const swimmersApi = {
   async getAll(params: GetSwimmersParams = {}): Promise<PaginatedSwimmersResponse> {
-    const { page = 1, pageSize = 50 } = params;
+    const { page = 1, pageSize = 50, groupId } = params;
 
     const searchParams = new URLSearchParams({
       page: page.toString(),
       page_size: pageSize.toString(),
     });
+
+    if (groupId !== undefined && groupId !== null) {
+      searchParams.set("group_id", groupId.toString());
+    }
 
     return apiGet(`${API_BASE_URL}/admin/swimmers?${searchParams}`);
   },

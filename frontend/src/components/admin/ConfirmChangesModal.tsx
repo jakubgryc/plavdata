@@ -80,6 +80,17 @@ export function ConfirmChangesModal({
         });
       }
 
+      if (
+        edits.yarmill_user_id !== undefined &&
+        edits.yarmill_user_id !== original.yarmill_user_id
+      ) {
+        fieldChanges.push({
+          field: "Yarmill ID",
+          from: original.yarmill_user_id?.toString() ?? "—",
+          to: edits.yarmill_user_id?.toString() ?? "—",
+        });
+      }
+
       if (fieldChanges.length === 0) return null;
 
       return {

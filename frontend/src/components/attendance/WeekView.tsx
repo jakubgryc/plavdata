@@ -20,9 +20,11 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { API_BASE_URL } from "../../../config";
+import { useAuth } from "../../hooks/useAuth";
 import type { DayOut, SaveDayBody, WeekDayOut, WeekOut } from "../../schema/attendance";
 import { toApiDate } from "../../utils/attendance";
 import { authenticatedFetch } from "../../utils/authenticatedFetch";
+import { YarmillSync } from "./YarmillSync";
 
 dayjs.extend(utc);
 
@@ -64,6 +66,7 @@ function isDayModified(
 function WeekView({ groupId, weekStart }: WeekViewProps) {
   const { colorScheme } = useMantineColorScheme();
   const theme = useMantineTheme();
+  const { role } = useAuth();
   const [weekData, setWeekData] = useState<WeekOut | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -382,6 +385,10 @@ function WeekView({ groupId, weekStart }: WeekViewProps) {
       >
         Uložit týden
       </Button>
+
+      {role === "admin" && (
+        <YarmillSync groupId={groupId} weekStart={weekStart} days={includedDays} />
+      )}
     </Card>
   );
 }

@@ -1,4 +1,4 @@
-import { Badge, Flex, Select, Switch, Table } from "@mantine/core";
+import { Badge, Flex, NumberInput, Select, Switch, Table } from "@mantine/core";
 import type { ChangeEvent } from "react";
 import { memo, useCallback } from "react";
 import type { Swimmer, SwimmerEdits } from "../../schema/swimmers";
@@ -32,6 +32,8 @@ export const SwimmerRow = memo(function SwimmerRow({
     edits?.show_in_relay_builder !== undefined
       ? edits.show_in_relay_builder
       : swimmer.show_in_relay_builder;
+  const currentYarmillId =
+    edits?.yarmill_user_id !== undefined ? edits.yarmill_user_id : swimmer.yarmill_user_id;
 
   // Check if each field has been edited
   const isGroupEdited = edits?.group_id !== undefined && edits.group_id !== swimmer.group_id;
@@ -44,9 +46,15 @@ export const SwimmerRow = memo(function SwimmerRow({
   const isRelayBuilderEdited =
     edits?.show_in_relay_builder !== undefined &&
     edits.show_in_relay_builder !== swimmer.show_in_relay_builder;
+  const isYarmillIdEdited =
+    edits?.yarmill_user_id !== undefined && edits.yarmill_user_id !== swimmer.yarmill_user_id;
 
   const hasAnyEdit =
-    isGroupEdited || isComparisonEdited || isPersonalBestsEdited || isRelayBuilderEdited;
+    isGroupEdited ||
+    isComparisonEdited ||
+    isPersonalBestsEdited ||
+    isRelayBuilderEdited ||
+    isYarmillIdEdited;
 
   const handleGroupChange = useCallback(
     (value: string | null) => {
@@ -73,6 +81,14 @@ export const SwimmerRow = memo(function SwimmerRow({
   const handleRelayBuilderChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       onEdit(swimmer.id, "show_in_relay_builder", event.currentTarget.checked);
+    },
+    [swimmer.id, onEdit],
+  );
+
+  const handleYarmillIdChange = useCallback(
+    (value: number | string) => {
+      // Empty input clears the mapping (sends explicit null to the backend)
+      onEdit(swimmer.id, "yarmill_user_id", value === "" ? null : Number(value));
     },
     [swimmer.id, onEdit],
   );
@@ -105,6 +121,31 @@ export const SwimmerRow = memo(function SwimmerRow({
           }
           comboboxProps={{ withinPortal: true }}
         />
+      </Table.Td>
+      <Table.Td style={{ minWidth: 100 }}>
+        <Flex justify="center">
+          <NumberInput
+            size="xs"
+            w={90}
+            hideControls
+            allowNegative={false}
+            decimalScale={0}
+            value={currentYarmillId ?? ""}
+            onChange={handleYarmillIdChange}
+            placeholder="—"
+            aria-label={`Yarmill ID plavce ${swimmer.name} ${swimmer.surname}`}
+            styles={
+              isYarmillIdEdited
+                ? {
+                    input: {
+                      backgroundColor: "rgba(255, 236, 153, 0.3)",
+                      borderColor: "rgba(250, 200, 60, 0.6)",
+                    },
+                  }
+                : undefined
+            }
+          />
+        </Flex>
       </Table.Td>
       <Table.Td style={{ minWidth: 90 }}>
         <Flex justify="center">

@@ -8,6 +8,7 @@ import {
   Loader,
   Pagination,
   Paper,
+  Select,
   Stack,
   Table,
   Text,
@@ -42,6 +43,8 @@ export function AdminSwimmersPage() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  // Group filter for the swimmer list ("all" = no filter)
+  const [groupFilter, setGroupFilter] = useState<string>("all");
 
   // Loading state
   const [loading, setLoading] = useState(true);
@@ -86,7 +89,11 @@ export function AdminSwimmersPage() {
     const loadSwimmers = async () => {
       try {
         setLoading(true);
-        const data = await swimmersApi.getAll({ page, pageSize: PAGE_SIZE });
+        const data = await swimmersApi.getAll({
+          page,
+          pageSize: PAGE_SIZE,
+          groupId: groupFilter === "all" ? null : Number(groupFilter),
+        });
         setSwimmers(data.swimmers);
         setTotal(data.total);
         setTotalPages(data.total_pages);
@@ -102,7 +109,7 @@ export function AdminSwimmersPage() {
       }
     };
     void loadSwimmers();
-  }, [page]);
+  }, [page, groupFilter]);
 
   // Compute select options once per groups load/change (avoid per-row map work)
   const groupOptions = useMemo(
@@ -114,6 +121,12 @@ export function AdminSwimmersPage() {
       })),
     ],
     [groups],
+  );
+
+  // Options for the list-level group filter (includes "all groups")
+  const groupFilterOptions = useMemo(
+    () => [{ value: "all", label: "Všechny skupiny" }, ...groupOptions.slice(1)],
+    [groupOptions],
   );
 
   // Handle edit for a swimmer field
@@ -174,6 +187,8 @@ export function AdminSwimmersPage() {
         edits.show_in_relay_builder !== original.show_in_relay_builder
       )
         count++;
+      if (edits.yarmill_user_id !== undefined && edits.yarmill_user_id !== original.yarmill_user_id)
+        count++;
     });
     return count;
   }, [editedSwimmers]);
@@ -205,6 +220,12 @@ export function AdminSwimmersPage() {
         edits.show_in_relay_builder !== original.show_in_relay_builder
       ) {
         actualChanges.show_in_relay_builder = edits.show_in_relay_builder;
+      }
+      if (
+        edits.yarmill_user_id !== undefined &&
+        edits.yarmill_user_id !== original.yarmill_user_id
+      ) {
+        actualChanges.yarmill_user_id = edits.yarmill_user_id;
       }
 
       if (Object.keys(actualChanges).length > 0) {
@@ -322,9 +343,23 @@ export function AdminSwimmersPage() {
           </Group>
         </Flex>
 
-        <Text c="dimmed" size="sm">
-          Celkem {total} plavců • Stránka {page} z {totalPages}
-        </Text>
+        <Flex justify="space-between" align="center" wrap="wrap" gap="sm">
+          <Text c="dimmed" size="sm">
+            Celkem {total} plavců • Stránka {page} z {totalPages}
+          </Text>
+          <Select
+            size="xs"
+            w={200}
+            data={groupFilterOptions}
+            value={groupFilter}
+            onChange={(value) => {
+              setGroupFilter(value ?? "all");
+              setPage(1);
+            }}
+            allowDeselect={false}
+            aria-label="Filtrovat podle skupiny"
+          />
+        </Flex>
 
         <Paper
           shadow="sm"
@@ -367,6 +402,9 @@ export function AdminSwimmersPage() {
                       Rok
                     </Table.Th>
                     <Table.Th style={{ minWidth: 120 }}>Skupina</Table.Th>
+                    <Table.Th style={{ minWidth: 100 }} ta="center">
+                      Yarmill ID
+                    </Table.Th>
                     <Table.Th style={{ minWidth: 90 }} ta="center">
                       Porovnání
                     </Table.Th>

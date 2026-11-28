@@ -4,6 +4,8 @@ export interface Group {
   display_name_cs: string;
   display_order: number;
   swimmer_count: number;
+  yarmill_group_id: number | null;
+  is_morning_group: boolean;
 }
 
 /** A group that has at least one swimmer visible in the personal bests view. */
@@ -24,6 +26,9 @@ export interface CreateGroupRequest {
 export interface UpdateGroupRequest {
   name?: string;
   display_name_cs?: string;
+  /** Explicit null clears the mapping on the backend. */
+  yarmill_group_id?: number | null;
+  is_morning_group?: boolean;
 }
 
 export interface SwimmerInGroup {

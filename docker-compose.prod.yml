@@ -53,6 +53,7 @@ services:
       - SMTP_FROM=${SMTP_FROM}
       - SMTP_TLS=${SMTP_TLS}
       - ADMIN_NOTIFY_EMAIL=${ADMIN_NOTIFY_EMAIL:-}
+      - YARMILL_API_BASE=${YARMILL_API_BASE:-}
     restart: unless-stopped
     depends_on:
       postgres:
